@@ -26,44 +26,44 @@ class Queue implements LoggerAwareInterface {
 		}
 
 		function getMethod( $args, LoggerInterface $log ) {
-			switch ($args[1]) {
+			switch ( $args[1] ) {
 				case "delete":
-					if (!$args[2]) {
-						$log->info("Deleting ready jobs");
+					if ( !$args[2] ) {
+						$log->info( "Deleting ready jobs" );
 						return "deleteReadyJobs";
 					}
-					switch ($args[2]) {
+					switch ( $args[2] ) {
 						case "buried":
-							$log->info("Deleting buried jobs");
+							$log->info( "Deleting buried jobs" );
 							return "deleteBuriedJobs";
 						case "delayed":
-							$log->info("Deleting delayed jobs");
+							$log->info( "Deleting delayed jobs" );
 							return "deleteDelayedJobs";
 						case "ready":
-							$log->info("Deleting ready jobs");
+							$log->info( "Deleting ready jobs" );
 							return "deleteReadyJobs";
 					}
 					return "help";
 				case "stats":
-					$log->info("View queue stats");
+					$log->info( "View queue stats" );
 					return "getStats";
 				case "view":
-					$log->info("View ready jobs");
+					$log->info( "View ready jobs" );
 					return "getReadyJobsIn";
 				case "kick":
-					if (!$args[2]) {
-						$log->info("Kicking buried jobs");
+					if ( !$args[2] ) {
+						$log->info( "Kicking buried jobs" );
 						return "kickBuriedJobs";
 					}
-					switch ($args[2]) {
+					switch ( $args[2] ) {
 						case "delayed":
-							$log->info("Kicking delayed jobs");
+							$log->info( "Kicking delayed jobs" );
 							return "kickDelayedJobs";
 						case "ready":
-							$log->info("Cannot kick ready jobs");
+							$log->info( "Cannot kick ready jobs" );
 							return "help";
 						case "buried":
-							$log->info("Kicking buried jobs");
+							$log->info( "Kicking buried jobs" );
 							return "kickBuriedJobs";
 					}
 					return "help";
@@ -71,7 +71,9 @@ class Queue implements LoggerAwareInterface {
 			return "help";
 		}
 
-		if ( count( $args ) == 1) { help( $filename ); }
+		if ( count( $args ) == 1 ) {
+			help( $filename );
+		}
 
 		$method = getMethod( $args, $this->log );
 
@@ -82,14 +84,14 @@ class Queue implements LoggerAwareInterface {
 			case "getStats":
 			case "getReadyJobsIn":
 				$tubes = array();
-				foreach ($this->listTubes() as $tube) {
+				foreach ( $this->listTubes() as $tube ) {
 					$tubes[$tube] = $this->$method( $tube );
 				}
-				$this->log->info( print_r($tubes, true) );
+				$this->log->info( print_r( $tubes, true ) );
 				break;
 			default:
-				foreach ($this->listTubes() as $tube) {
-					$this->$method($tube);
+				foreach ( $this->listTubes() as $tube ) {
+					$this->$method( $tube );
 				}
 		}
 
@@ -98,7 +100,7 @@ class Queue implements LoggerAwareInterface {
 	/**
 	 * Push a job to a queue
 	 * @param string $tube tube name
-	 * @param array $data job data
+	 * @param array  $data job data
 	 */
 	public function push( $tube, $data ) {
 		$data = json_encode( $data );
@@ -217,7 +219,8 @@ class Queue implements LoggerAwareInterface {
 
 			$this->kickBuriedJobs( $tube );
 
-		} catch ( \Pheanstalk_Exception_ServerException $e ) { }
+		} catch ( \Pheanstalk_Exception_ServerException $e ) {
+		}
 
 		return $queuedJobs;
 	}

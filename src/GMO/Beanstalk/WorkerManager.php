@@ -17,21 +17,21 @@ class WorkerManager implements LoggerAwareInterface {
 	 * @param array $args command-line arguments
 	 */
 	public function runCommand( $args ) {
-		$filename = basename($args[0]);
+		$filename = basename( $args[0] );
 
-		function help($filename) {
+		function help( $filename ) {
 			echo "php $filename [restart|start|stop|beanstalkd]\n";
 			echo "beanstalkd: Starts beanstalkd if not running (also starts workers if beanstalkd stopped)\n";
 			exit(1);
 		}
 
-		if (count($args) == 1) {
-			help($filename);
+		if ( count( $args ) == 1 ) {
+			help( $filename );
 		}
 
-		switch ($args[1]) {
+		switch ( $args[1] ) {
 			case "beanstalkd":
-				if (!$this->isBeanstalkdRunning()) {
+				if ( !$this->isBeanstalkdRunning() ) {
 					$this->startBeanstalkd();
 					$this->startWorkers();
 				}
@@ -46,7 +46,7 @@ class WorkerManager implements LoggerAwareInterface {
 				$this->startWorkers();
 				break;
 			default:
-				help($filename);
+				help( $filename );
 		}
 
 	}
@@ -66,7 +66,7 @@ class WorkerManager implements LoggerAwareInterface {
 	public function startWorkers() {
 		$this->log->info( "Starting workers..." );
 		# get workers
-		$workers = $this->getWorkers($this->workerDir);
+		$workers = $this->getWorkers( $this->workerDir );
 
 		# get currently running workers
 		$currentWorkers = $this->listWorkers();
@@ -75,9 +75,9 @@ class WorkerManager implements LoggerAwareInterface {
 		 * loop through workers
 		 * @param AbstractWorker $class
 		 */
-		foreach ($workers as $worker => $class) {
+		foreach ( $workers as $worker => $class ) {
 			# get the number of currently running workers of this type
-			if (!isset($currentWorkers[$worker])) {
+			if ( !isset($currentWorkers[$worker]) ) {
 				$currentNumber = 0;
 			} else {
 				$currentNumber = $currentWorkers[$worker];
@@ -87,8 +87,8 @@ class WorkerManager implements LoggerAwareInterface {
 			$workersToSpawn = $class->getNumberOfWorkers() - $currentNumber;
 
 			# spawn new workers
-			for ($i=0; $i < $workersToSpawn; $i++) {
-				$this->startWorker($worker);
+			for ( $i = 0; $i < $workersToSpawn; $i++ ) {
+				$this->startWorker( $worker );
 			}
 		}
 	}
@@ -97,17 +97,17 @@ class WorkerManager implements LoggerAwareInterface {
 	 * Spawn a new worker given the class name
 	 * @param string $worker class name
 	 */
-	public function startWorker($worker) {
-		if ( !file_exists($this->workerDir . $worker . ".php") ) {
-			$this->log->error("Worker: $worker doesn't exist");
+	public function startWorker( $worker ) {
+		if ( !file_exists( $this->workerDir . $worker . ".php" ) ) {
+			$this->log->error( "Worker: $worker doesn't exist" );
 			return;
 		}
-		$this->log->info("Starting worker: " . $worker);
+		$this->log->info( "Starting worker: " . $worker );
 		$this->execute(
-			"nohup php {$this->workerDir}{$worker}.php --run " .
-			"$this->host $this->port" .
-			//TODO: Use actual logger not redirection
-			" >> /var/log/gmo/beanstalkd/$worker.log 2>&1 &"
+		     "nohup php {$this->workerDir}{$worker}.php --run " .
+		     "$this->host $this->port" .
+		     //TODO: Use actual logger not redirection
+		     " >> /var/log/gmo/beanstalkd/$worker.log 2>&1 &"
 		);
 	}
 
@@ -117,11 +117,10 @@ class WorkerManager implements LoggerAwareInterface {
 	 */
 	public static function runWorker() {
 		global $argv;
-		if (in_array("--run", $argv)) {
-			try
-			{
+		if ( in_array( "--run", $argv ) ) {
+			try {
 				# get first class in called file
-				$classes = self::getPhpClasses($argv[0]);
+				$classes = self::getPhpClasses( $argv[0] );
 				/**
 				 * create instance
 				 * @param AbstractWorker $workerInstance
@@ -129,10 +128,8 @@ class WorkerManager implements LoggerAwareInterface {
 				$class = $classes[0];
 				$workerInstance = new $class;
 				# start it
-				$workerInstance->run($argv[2], $argv[3]);
-			}
-			catch( \Exception $ex )
-			{
+				$workerInstance->run( $argv[2], $argv[3] );
+			} catch ( \Exception $ex ) {
 				// TODO: Log the exception
 			}
 		}
@@ -144,24 +141,24 @@ class WorkerManager implements LoggerAwareInterface {
 	 * @return array key: class name, value: class instance
 	 */
 	public function getWorkers() {
-		$files = glob($this->workerDir . "*.php");
+		$files = glob( $this->workerDir . "*.php" );
 		$workers = array();
-		foreach ($files as $file) {
+		foreach ( $files as $file ) {
 			# parse classes in file
-			$classNames = $this->getPhpClasses($file);
+			$classNames = $this->getPhpClasses( $file );
 			# only use the first class
 			$classNameWithNamespace = $classNames[0];
 			# remove class name without namespace
-			$parts = explode("\\", $classNameWithNamespace);
-			$className = $parts[count($parts) - 1];
+			$parts = explode( "\\", $classNameWithNamespace );
+			$className = $parts[count( $parts ) - 1];
 
-			if ($className == "AbstractWorker") {
+			if ( $className == "AbstractWorker" ) {
 				continue;
 			}
 
 			# Add to workers if it's a subclass of AbstractWorker
 			$class = new $classNameWithNamespace;
-			if (is_subclass_of($class, "\\GMO\\Beanstalk\\AbstractWorker")) {
+			if ( is_subclass_of( $class, "\\GMO\\Beanstalk\\AbstractWorker" ) ) {
 				$workers[$className] = $class;
 			}
 		}
@@ -175,23 +172,23 @@ class WorkerManager implements LoggerAwareInterface {
 	 */
 	public function listWorkers() {
 		# get beanstalk processes
-		$processes = $this->listProcesses($this->workerDir);
+		$processes = $this->listProcesses( $this->workerDir );
 
 		# parse processes into workers array
 		$workers = array();
-		foreach ($processes as $process) {
+		foreach ( $processes as $process ) {
 			# remove ending run command
-			$process = trim(str_replace("--run", "", $process));
+			$process = trim( str_replace( "--run", "", $process ) );
 			# remove beginning junk
-			$process = substr($process, strpos($process, $this->workerDir));
+			$process = substr( $process, strpos( $process, $this->workerDir ) );
 			# remove worker directory
-			$process = str_replace($this->workerDir, "", $process);
+			$process = str_replace( $this->workerDir, "", $process );
 			# remove php extension
-			$process = str_replace(".php", "", $process);
+			$process = str_replace( ".php", "", $process );
 			$worker = $process;
 
 			# increment worker counter
-			if (!isset($workers[$worker])) {
+			if ( !isset($workers[$worker]) ) {
 				$workers[$worker] = 0;
 			}
 			$workers[$worker]++;
@@ -205,17 +202,17 @@ class WorkerManager implements LoggerAwareInterface {
 	 */
 	public function stopWorkers() {
 		# get beanstalk processes
-		$processes = $this->listProcesses($this->workerDir);
+		$processes = $this->listProcesses( $this->workerDir );
 
-		$this->log->info("Stopping workers: " . count($processes));
+		$this->log->info( "Stopping workers: " . count( $processes ) );
 
 		# kill each process
-		foreach ($processes as $process) {
+		foreach ( $processes as $process ) {
 			# parse process id
-			$parts = preg_split("/[\\s]+/", $process);
+			$parts = preg_split( "/[\\s]+/", $process );
 			$processId = $parts[1];
 
-			$this->execute("kill $processId");
+			$this->execute( "kill $processId" );
 		}
 	}
 
@@ -224,7 +221,7 @@ class WorkerManager implements LoggerAwareInterface {
 	 * @return bool
 	 */
 	public function isBeanstalkdRunning() {
-		$processes = $this->listProcesses("bin/beanstalkd");
+		$processes = $this->listProcesses( "bin/beanstalkd" );
 		return $processes > 0;
 	}
 
@@ -232,8 +229,8 @@ class WorkerManager implements LoggerAwareInterface {
 	 * Starts beanstalkd
 	 */
 	public function startBeanstalkd() {
-		$this->log->info("Starting beanstalkd");
-		$this->execute("/etc/init.d/beanstalkd start");
+		$this->log->info( "Starting beanstalkd" );
+		$this->execute( "/etc/init.d/beanstalkd start" );
 	}
 
 	/**
@@ -248,13 +245,13 @@ class WorkerManager implements LoggerAwareInterface {
 	/**
 	 * @param string          $workerDir Directory containing workers
 	 * @param LoggerInterface $logger
-	 * @param string          $host     Beanstalkd host
-	 * @param int             $port     Beanstalkd port
+	 * @param string          $host      Beanstalkd host
+	 * @param int             $port      Beanstalkd port
 	 */
-	function __construct( $workerDir, LoggerInterface $logger, $host, $port) {
-		$workerDir = realpath($workerDir);
+	function __construct( $workerDir, LoggerInterface $logger, $host, $port ) {
+		$workerDir = realpath( $workerDir );
 		# add ending slash if needed
-		if (substr($workerDir, -1) != "/") {
+		if ( substr( $workerDir, -1 ) != "/" ) {
 			$workerDir .= "/";
 		}
 		$this->workerDir = $workerDir;
@@ -270,8 +267,8 @@ class WorkerManager implements LoggerAwareInterface {
 	 * @param array $output
 	 * @param null  $return_var
 	 */
-	protected function execute($command, array &$output = null, &$return_var = null)  {
-		exec($command, $output, $return_var);
+	protected function execute( $command, array &$output = null, &$return_var = null ) {
+		exec( $command, $output, $return_var );
 	}
 
 	/**
@@ -279,15 +276,15 @@ class WorkerManager implements LoggerAwareInterface {
 	 * @param $grep
 	 * @return array
 	 */
-	protected function listProcesses($grep) {
+	protected function listProcesses( $grep ) {
 		# get list of workers
 		$lines = array();
-		$this->execute("ps aux | grep " . $grep, $lines);
+		$this->execute( "ps aux | grep " . $grep, $lines );
 
 		$processes = array();
-		foreach ($lines as $line) {
+		foreach ( $lines as $line ) {
 			# Remove our grep call
-			if (strpos($line, "grep") > 0) {
+			if ( strpos( $line, "grep" ) > 0 ) {
 				continue;
 			}
 			$processes[] = $line;
@@ -301,17 +298,15 @@ class WorkerManager implements LoggerAwareInterface {
 	 * @param string $file
 	 * @return array
 	 */
-	private static function getPhpClasses($file) {
+	private static function getPhpClasses( $file ) {
 		$classes = array();
-		$phpCode = file_get_contents($file);
-		$tokens = token_get_all($phpCode);
-		$namespace = self::getNamespaceFromTokens($tokens);
+		$phpCode = file_get_contents( $file );
+		$tokens = token_get_all( $phpCode );
+		$namespace = self::getNamespaceFromTokens( $tokens );
 
-		for ($i = 0; $i < count($tokens); $i++) {
+		for ( $i = 0; $i < count( $tokens ); $i++ ) {
 			# append fully qualified class name to list
-			if (   $tokens[$i][0] == T_CLASS
-			       && $tokens[$i + 1][0] == T_WHITESPACE
-			       && $tokens[$i + 2][0] == T_STRING
+			if ( $tokens[$i][0] == T_CLASS && $tokens[$i + 1][0] == T_WHITESPACE && $tokens[$i + 2][0] == T_STRING
 			) {
 				$className = $tokens[$i + 2][1];
 				$classNameWithNamespace = $namespace . "\\" . $className;
@@ -326,23 +321,21 @@ class WorkerManager implements LoggerAwareInterface {
 	 * @param $tokens
 	 * @return string
 	 */
-	private static function getNamespaceFromTokens($tokens) {
+	private static function getNamespaceFromTokens( $tokens ) {
 		$namespace = "\\";
 		$inNamespaceToken = false;
-		for ($i = 0; $i < count($tokens); $i++) {
-			if ($tokens[$i] === ";") {
+		for ( $i = 0; $i < count( $tokens ); $i++ ) {
+			if ( $tokens[$i] === ";" ) {
 				# end of namespace declaration
 				# or no namespace
 				break;
-			} elseif ($tokens[$i][0] == T_WHITESPACE) {
+			} elseif ( $tokens[$i][0] == T_WHITESPACE ) {
 				# skip whitespace tokens
 				continue;
-			} elseif ($inNamespaceToken && (
-					$tokens[$i][0] == T_STRING ||
-					$tokens[$i][0] == T_NS_SEPARATOR )) {
+			} elseif ( $inNamespaceToken && ($tokens[$i][0] == T_STRING || $tokens[$i][0] == T_NS_SEPARATOR) ) {
 				# append next part of namespace
 				$namespace .= $tokens[$i][1];
-			} elseif ($tokens[$i][0] == T_NAMESPACE) {
+			} elseif ( $tokens[$i][0] == T_NAMESPACE ) {
 				# start of namespace declaration
 				$inNamespaceToken = true;
 			}

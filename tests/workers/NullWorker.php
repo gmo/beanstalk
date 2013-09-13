@@ -13,7 +13,7 @@ class NullWorker extends AbstractWorker {
 		return new NullLogger();
 	}
 
-	protected function process($params) { }
+	protected function process( $params ) { }
 }
 
 UnitTestWorkerManager::runWorker();

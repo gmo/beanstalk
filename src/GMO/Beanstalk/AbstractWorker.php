@@ -72,7 +72,7 @@ abstract class AbstractWorker {
 		$this->log->info( "Beanstalkd: Running worker: " . $this->getTubeName() );
 
 		try {
-			$this->pheanstalk = new \Pheanstalk_Pheanstalk( $host, $port );
+			$this->pheanstalk = new \Pheanstalk_Pheanstalk($host, $port);
 			$this->setup();
 		} catch ( \Exception $e ) {
 			$this->log->critical(

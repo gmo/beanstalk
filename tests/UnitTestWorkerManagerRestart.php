@@ -2,8 +2,7 @@
 
 use GMO\Beanstalk\WorkerManager;
 
-class UnitTestWorkerManagerRestart extends WorkerManager
-{
+class UnitTestWorkerManagerRestart extends WorkerManager {
 
 	public $stopCalled = false;
 	public $startCalled = false;
