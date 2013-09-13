@@ -44,10 +44,10 @@ class Queue implements LoggerAwareInterface {
 					}
 					return "help";
 				case "stats":
-					return "viewStats";
+					return "getStats";
 				case "view":
 					$log->info("View ready jobs");
-					return "view";
+					return "getReadyJobsIn";
 				case "kick":
 					if (!$args[2]) {
 						return "buried";
@@ -76,13 +76,13 @@ class Queue implements LoggerAwareInterface {
 			case "help":
 				help( $filename );
 				break;
-			case "view":
-				echo "===\n";
-				foreach ($this->listTubes() as $tube)
-				{
-					echo $this->viewReadyJobsIn( $tube );
-					echo "===\n";
+			case "getStats":
+			case "getReadyJobsIn":
+				$tubes = array();
+				foreach ($this->listTubes() as $tube) {
+					$tubes[$tube] = $this->$method( $tube );
 				}
+				$this->log->info( print_r($tubes, true) );
 				break;
 			default:
 				foreach ($this->listTubes() as $tube) {
@@ -183,53 +183,40 @@ class Queue implements LoggerAwareInterface {
 	}
 
 	/**
-	 * Logs the stats for the given tube
+	 * Gets the stats for the given tube
 	 * @param string $tube
+	 * @return array
 	 */
-	public function viewStats( $tube ) {
-		$stats = $this->pheanstalk->statsTube( $tube );
-
-		$this->log->info("$tube stats", array( "stats" => $stats ) );
+	public function getStats( $tube ) {
+		$response = $this->pheanstalk->statsTube( $tube );
+		// Normalize ArrayObject to Array
+		$stats = $response->getArrayCopy();
+		return $stats;
 	}
 
 	/**
 	 * Gets all ready jobs and their data for the given tube
-	 * and puts it in a formatted string
 	 * @param string $tube
-	 * @return string
+	 * @return array
 	 */
-	public function viewReadyJobsIn( $tube ) {
-		$queuedJobs = array( "tube" => $tube );
-		$formattedJobs = "{\n";
-		$formattedJobs .= "  \"tube\":\"$tube\",\n";
+	public function getReadyJobsIn( $tube ) {
+		$queuedJobs = array();
 
 		try {
 			$stats = $this->pheanstalk->statsTube( $tube );
 
-			$formattedJobs .= "  \"jobs\":\n  {\n";
-
 			for ( $i = 0; $i < $stats["current-jobs-ready"]; $i++ ) {
 				$job = $this->pheanstalk->watch( $tube )->ignore( 'default' )->reserve();
 				$this->pheanstalk->bury( $job );
-				if ( $i > 0 ) {
-					$formattedJobs .= ",\n";
-				}
-				$queuedJobs["jobs"][] = $job->getData();
-				$formattedJobs .= "    " . $job->getData();
+
+				$queuedJobs[] = $job->getData();
 			}
 
 			$this->kickBuriedJobs( $tube );
 
-			$formattedJobs .= "\n  }\n}\n";
+		} catch ( \Pheanstalk_Exception_ServerException $e ) { }
 
-		} catch ( \Pheanstalk_Exception_ServerException $e ) {
-			$queuedJobs["jobs"] = array();
-			$formattedJobs .= "  \"jobs\":{}\n";
-			$formattedJobs .= "}\n";
-		}
-		$this->log->info("Ready jobs in $tube", array( "stats" => $queuedJobs ) );
-
-		return $formattedJobs;
+		return $queuedJobs;
 	}
 
 	// Functions to setup object
