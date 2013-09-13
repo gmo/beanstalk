@@ -29,7 +29,8 @@ class Queue implements LoggerAwareInterface {
 			switch ($args[1]) {
 				case "delete":
 					if (!$args[2]) {
-						return "ready";
+						$log->info("Deleting ready jobs");
+						return "deleteReadyJobs";
 					}
 					switch ($args[2]) {
 						case "buried":
@@ -44,13 +45,15 @@ class Queue implements LoggerAwareInterface {
 					}
 					return "help";
 				case "stats":
+					$log->info("View queue stats");
 					return "getStats";
 				case "view":
 					$log->info("View ready jobs");
 					return "getReadyJobsIn";
 				case "kick":
 					if (!$args[2]) {
-						return "buried";
+						$log->info("Kicking buried jobs");
+						return "kickBuriedJobs";
 					}
 					switch ($args[2]) {
 						case "delayed":
