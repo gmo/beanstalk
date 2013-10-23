@@ -2,10 +2,11 @@
 namespace workers;
 
 use GMO\Beanstalk\AbstractWorker;
+use GMO\Beanstalk\IJobAwareException;
 use Psr\Log\NullLogger;
 use UnitTestWorkerManager;
 
-class UnitTestWorkerProcessFails extends AbstractWorker {
+class UnitTestWorkerProcessJobAwareException extends AbstractWorker {
 	public static function getNumberOfWorkers() { return 0; }
 
 	protected function getLogger() {
@@ -20,10 +21,17 @@ class UnitTestWorkerProcessFails extends AbstractWorker {
 	protected function getRequiredParams() { return array( "param1", "param2" ); }
 
 	protected function process( $params ) {
-		throw new \Exception("The process fails");
+		throw new JobAwareException("The process fails");
 	}
 
 	public $processResult = null;
+}
+
+class JobAwareException extends \Exception implements IJobAwareException {
+
+	public function shouldDelete() { return true; }
+
+	public function deleteAfter() { return 2; }
 }
 
 UnitTestWorkerManager::runWorker();
