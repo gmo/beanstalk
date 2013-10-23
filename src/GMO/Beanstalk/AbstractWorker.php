@@ -106,14 +106,21 @@ abstract class AbstractWorker {
 				$this->log->debug( "Beanstalkd: Processing the job from: " . $this->getTubeName() );
 				$this->process( $this->params );
 				$this->deleteJob();
-			} catch ( IRetryException $e ) {
+			} catch ( IJobAwareException $e ) {
+				$numErrors = $this->handleNonFatal($e);
+				if ( $e->shouldDelete() && $numErrors >= $e->deleteAfter() ) {
+					$this->handleFatal($e);
+				}
+			}
+			//TODO: Remove in 2.0.0
+			catch ( IRetryException $e ) {
 				if ( $e->shouldRetry() ) {
 					$this->handleRetry( $e );
 				} else {
 					$this->handleFatal( $e );
 				}
 			} catch ( \Exception $e ) {
-				$this->handleRetry( $e );
+				$this->handleNonFatal( $e );
 			}
 		} while ( $this->keepRunning );
 	}
@@ -172,9 +179,35 @@ abstract class AbstractWorker {
 	}
 
 	/**
+	 * Log failure and return number of times it has failed.
+	 * @param \Exception $e
+	 * @return int Number of failures
+	 */
+	private function handleNonFatal( $e ) {
+		$id = $this->currentJob->getId();
+		# Increment job id errors
+		if ( !isset($this->jobErrors[$id]) ) {
+			$this->jobErrors[$id] = 0;
+		}
+		$numErrors = ++$this->jobErrors[$id];
+
+		$this->log->warning(
+			"Beanstalkd: Job: $id failed $numErrors times.",
+			array(
+			   "params" => $this->params,
+			   "exception" => $e
+			)
+		);
+
+		return $numErrors;
+	}
+
+	/**
 	 * Check if job has failed three times,
 	 * in which case it is deleted.
 	 * @param $e
+	 * @deprecated Use {@see \GMO\Beanstalk\AbstractWorker::handleNonFatal()} instead
+	 * @todo Remove in 2.0.0
 	 */
 	private function handleRetry( $e ) {
 		$id = $this->currentJob->getId();
@@ -182,8 +215,7 @@ abstract class AbstractWorker {
 		if ( !isset($this->jobErrors[$id]) ) {
 			$this->jobErrors[$id] = 0;
 		}
-		$this->jobErrors[$id]++;
-		$numErrors = $this->jobErrors[$id];
+		$numErrors = ++$this->jobErrors[$id];
 
 		$this->log->warning(
 			"Beanstalkd: Job: $id failed $numErrors times.",
