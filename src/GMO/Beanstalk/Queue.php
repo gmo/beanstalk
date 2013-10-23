@@ -6,7 +6,18 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Queue manages jobs in tubes and provides stats about jobs
+ *
+ * @example Push a job to a queue
+ *          $queue = Queue::getInstance( $logger, $host, $port );
+ *          $queue->push( "TubeA", array("message" => "Hello World") );
+ *
+ * @example queue.php file for command line usage
+ *          $queue = Queue::getInstance( $logger, $host, $port );
+ *          $queue->runCommand($argv);
+ *
  * @package GMO\Beanstalk
+ *
+ * @since 1.0.0
  */
 class Queue implements LoggerAwareInterface {
 

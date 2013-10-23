@@ -5,9 +5,19 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * WorkerManager controls beanstalk workers
- * Ex: starting/stopping worker
+ * WorkerManager controls beanstalk workers.
+ *
+ * @example restart workers in code
+ *          $manager = new WorkerManager( $workerDir, $logger, $host, $port );
+ *          $manager->restartWorkers();
+ *
+ * @example workers.php file for command line usage
+ *          $manager = new WorkerManager( $workerDir, $logger, $host, $port );
+ *          $manager->runCommand($argv);
+ *
  * @package GMO\Beanstalk
+ *
+ * @since 1.0.0
  */
 class WorkerManager implements LoggerAwareInterface {
 
@@ -343,23 +353,14 @@ class WorkerManager implements LoggerAwareInterface {
 		return $namespace;
 	}
 
-	/**
-	 * Directory containing workers
-	 * @var string
-	 */
+	/** @var string Directory containing workers */
 	protected $workerDir;
 
-	/**
-	 * @var LoggerInterface
-	 */
+	/** @var LoggerInterface */
 	private $log;
 
-	/**
-	 * @var string
-	 */
+	/** @var string */
 	private $host;
-	/**
-	 * @var int
-	 */
+	/** @var int */
 	private $port;
 }
