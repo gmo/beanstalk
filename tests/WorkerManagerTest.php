@@ -100,10 +100,12 @@ class Given_a_directory_get_number_of_workers extends ContextSpecification {
 
 	public function test_numbers_are_zero() {
 		$correctWorkers = array(
-			"UnitTestWorkerSetupFailure" => 0,
-			"UnitTestWorkerProcessFails" => 0,
-			"UnitTestWorker"             => 1,
-			"NullWorker"                 => 3
+			"NullWorker"                                     => 3,
+			"UnitTestWorker"                                 => 1,
+			"UnitTestWorkerProcessGenericException"          => 0,
+			"UnitTestWorkerProcessJobAwareException"         => 0,
+			"UnitTestWorkerProcessJobAwareExceptionNoDelete" => 0,
+			"UnitTestWorkerSetupFailure"                     => 0
 		);
 		foreach ( $correctWorkers as $workerName => $workerCount ) {
 			$this->assertEquals(
