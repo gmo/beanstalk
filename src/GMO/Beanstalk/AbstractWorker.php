@@ -6,7 +6,11 @@ use Psr\Log\LoggerInterface;
 /**
  * Abstracts the repetitive worker tasks, such as getting jobs and validating parameters.
  * This cleans up the concrete worker and allows it to focus on processing jobs.
+ *
  * @package GMO\Beanstalk
+ *
+ * @since 1.1.0 Added preProcess method
+ * @since 1.0.0
  */
 abstract class AbstractWorker {
 
@@ -29,6 +33,7 @@ abstract class AbstractWorker {
 
 	/**
 	 * Only process one job. Used for testing.
+	 * @internal
 	 */
 	public function setToRunOnce() {
 		$this->keepRunning = false;
@@ -63,9 +68,12 @@ abstract class AbstractWorker {
 
 	/**
 	 * Do not call this method directly.
-	 * Use \GMO\Beanstalk\WorkerManager to start a worker.
-	 * @param $host
-	 * @param $port
+	 * Use {@see \GMO\Beanstalk\WorkerManager} to start a worker.
+	 *
+	 * @internal
+	 * @access private
+	 * @param string $host
+	 * @param int $port
 	 * @throws \Exception
 	 */
 	public function run( $host, $port ) {
@@ -111,6 +119,24 @@ abstract class AbstractWorker {
 	}
 
 	/**
+	 * Gets the data from the job and
+	 * returns an associative array of job data.
+	 * By default data is json decoded and values are trimmed.
+	 * @param \Pheanstalk_Job $job
+	 * @return array job params
+	 * @since 1.1.0
+	 */
+	protected function preProcess( $job ) {
+		# Get params and trim values
+		$params = json_decode( $job->getData(), true );
+		foreach ( $params as $key => $value ) {
+			$params[$key] = trim( $value );
+		}
+
+		return $params;
+	}
+
+	/**
 	 * Pheanstalk is setup here.
 	 * Do NOT override this; instead override setup.
 	 */
@@ -123,11 +149,7 @@ abstract class AbstractWorker {
 		$this->currentJob = $this->pheanstalk->watch( $this->getTubeName() )->ignore( "default" )->reserve();
 		$this->pheanstalk->bury( $this->currentJob );
 
-		# Get params and trim values
-		$this->params = json_decode( $this->currentJob->getData(), true );
-		foreach ( $this->params as $key => $value ) {
-			$this->params[$key] = trim( $value );
-		}
+		$this->params = $this->preProcess($this->currentJob);
 	}
 
 	/**

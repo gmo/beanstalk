@@ -10,7 +10,10 @@ namespace GMO\Beanstalk;
  * Else, the worker deletes the job.
  * If the exception does not implement this interface
  * the worker will try again.
+ *
  * @package GMO\Beanstalk
+ *
+ * @since 1.0.0
  */
 interface IRetryException {
 
