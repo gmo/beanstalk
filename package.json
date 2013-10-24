@@ -1,0 +1,16 @@
+{
+	"name": "beanstalk-library",
+	"description": "Common beanstalk worker abstraction and queue utilities",
+	"devDependencies": {
+		"grunt": "~0.4.1",
+		"grunt-phpunit": "~0.3.0",
+		"grunt-exec": "~0.4.2",
+		"grunt-contrib-watch": "~0.5.3",
+		"grunt-force-switch": "gmodev/grunt-force-switch#0.0.2"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git@bitbucket.org:gmodev/beanstalk-library.git"
+	},
+	"private": true
+}
