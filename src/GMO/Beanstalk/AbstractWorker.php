@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
  *
  * @package GMO\Beanstalk
  *
+ * @since 1.2.0 Catching IJobAwareException
  * @since 1.1.0 Added preProcess method
  * @since 1.0.0
  */
@@ -107,7 +108,7 @@ abstract class AbstractWorker {
 				$this->process( $this->params );
 				$this->deleteJob();
 			} catch ( IJobAwareException $e ) {
-				$numErrors = $this->handleNonFatal($e);
+				$numErrors = $this->handleError($e);
 				if ( $e->shouldDelete() && $numErrors >= $e->deleteAfter() ) {
 					$this->handleFatal($e);
 				}
@@ -120,7 +121,7 @@ abstract class AbstractWorker {
 					$this->handleFatal( $e );
 				}
 			} catch ( \Exception $e ) {
-				$this->handleNonFatal( $e );
+				$this->handleError( $e );
 			}
 		} while ( $this->keepRunning );
 	}
@@ -183,7 +184,7 @@ abstract class AbstractWorker {
 	 * @param \Exception $e
 	 * @return int Number of failures
 	 */
-	private function handleNonFatal( $e ) {
+	private function handleError( $e ) {
 		$id = $this->currentJob->getId();
 		# Increment job id errors
 		if ( !isset($this->jobErrors[$id]) ) {
