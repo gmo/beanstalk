@@ -260,10 +260,7 @@ abstract class AbstractWorker {
 		}
 	}
 
-	/**
-	 * Current job being processed
-	 * @var \Pheanstalk_Job
-	 */
+	/** @var \Pheanstalk_Job Current job being processed */
 	protected $currentJob;
 
 	/**
@@ -273,26 +270,15 @@ abstract class AbstractWorker {
 	 */
 	protected $jobErrors = array();
 
-	/**
-	 * Worker logger
-	 * @var LoggerInterface
-	 */
+	/** @var LoggerInterface Worker logger */
 	protected $log;
 
-	/**
-	 * Current Job JSON decoded array
-	 * @var array
-	 */
+	/** @var array Current Job JSON decoded array */
 	private $params;
 
-	/**
-	 * @var \Pheanstalk_Pheanstalk
-	 */
+	/** @var \Pheanstalk_Pheanstalk */
 	private $pheanstalk;
 
-	/**
-	 * Boolean for running loop
-	 * @var bool
-	 */
+	/** @var bool Boolean for running loop */
 	private $keepRunning = true;
 }

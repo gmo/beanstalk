@@ -275,19 +275,13 @@ class Queue implements LoggerAwareInterface {
 		$this->log = $logger;
 	}
 
-	/**
-	 * @var Queue
-	 */
+	/** @var Queue */
 	private static $instance;
 
-	/**
-	 * @var \Pheanstalk_Pheanstalk
-	 */
+	/** @var \Pheanstalk_Pheanstalk */
 	private $pheanstalk;
 
-	/**
-	 * @var LoggerInterface
-	 */
+	/** @var LoggerInterface */
 	private $log;
 
 }
