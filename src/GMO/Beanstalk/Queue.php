@@ -167,13 +167,15 @@ class Queue implements LoggerAwareInterface {
 	 * @param string $tube
 	 */
 	private function deleteJobs( $state, $tube ) {
-		while ( $job = $this->pheanstalk->$state( $tube ) ) {
-			try {
-				$this->pheanstalk->delete( $job );
-			} catch ( \Pheanstalk_Exception_ServerException $e ) {
-				$this->log->warning( "Error deleting job", array("exception" => $e) );
+		try {
+			while ( $job = $this->pheanstalk->$state( $tube ) ) {
+				try {
+					$this->pheanstalk->delete( $job );
+				} catch ( \Pheanstalk_Exception_ServerException $e ) {
+					$this->log->warning( "Error deleting job", array("exception" => $e) );
+				}
 			}
-		}
+		} catch ( \Pheanstalk_Exception_ServerException $e ) { }
 	}
 
 	// Public functions that returns information about the queues
