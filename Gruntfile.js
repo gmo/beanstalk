@@ -27,7 +27,12 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-force-switch');
 
 	grunt.registerTask('default', function() { grunt.log(grunt.version); });
+
+	grunt.registerTask('force', function(task) {
+		grunt.task.run(['turnForceOn', task, 'turnForceOff']);
+	});
+
 	grunt.registerTask('build', ['exec:composerInstall']);
 	grunt.registerTask('test', ['build', 'phpunit']);
-	grunt.registerTask('test-force', ['turnForceOn', 'test', 'turnForceOff']);
+
 };
