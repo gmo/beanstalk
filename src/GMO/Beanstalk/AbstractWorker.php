@@ -252,7 +252,11 @@ abstract class AbstractWorker {
 
 	private function deleteJob() {
 		$this->log->debug( "Beanstalkd: Deleting the current job from: " . $this->getTubeName() );
-		$this->pheanstalk->delete( $this->currentJob );
+		try {
+			$this->pheanstalk->delete( $this->currentJob );
+		} catch ( \Pheanstalk_Exception_ServerException $e ) {
+			$this->log->warning( "Error deleting job", array("exception" => $e) );
+		}
 	}
 
 	/**
