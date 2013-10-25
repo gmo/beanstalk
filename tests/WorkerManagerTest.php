@@ -4,10 +4,6 @@ use Psr\Log\NullLogger;
 
 require_once __DIR__ . "/tester_autoload.php";
 
-define("WORKER_DIR", __DIR__ . "/workers");
-define("HOST", "127.0.0.1");
-define("PORT", 11300);
-
 class When_restarting_workers extends ContextSpecification {
 
 	protected static function given() {
