@@ -24,7 +24,7 @@ class When_restarting_workers extends ContextSpecification {
 	}
 
 	/**
-	 * @var UnitTestWorkerManager
+	 * @var UnitTestWorkerManagerRestart
 	 */
 	private static $workerManager;
 }
@@ -136,6 +136,13 @@ class Given_a_directory_get_workers extends ContextSpecification {
 	public function test_workers_are_subclasses_of_abstract_worker() {
 		foreach ( self::$workers as $worker ) {
 			$this->assertInstanceOf( "\\GMO\\Beanstalk\\AbstractWorker", $worker );
+		}
+	}
+
+	public function test_workers_are_instantiable() {
+		foreach ( self::$workers as $worker ) {
+			$cls = new ReflectionClass($worker);
+			$this->assertTrue($cls->isInstantiable());
 		}
 	}
 

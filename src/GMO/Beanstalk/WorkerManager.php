@@ -162,14 +162,9 @@ class WorkerManager implements LoggerAwareInterface {
 			$parts = explode( "\\", $classNameWithNamespace );
 			$className = $parts[count( $parts ) - 1];
 
-			if ( $className == "AbstractWorker" ) {
-				continue;
-			}
-
-			# Add to workers if it's a subclass of AbstractWorker
-			$class = new $classNameWithNamespace;
-			if ( is_subclass_of( $class, "\\GMO\\Beanstalk\\AbstractWorker" ) ) {
-				$workers[$className] = $class;
+			$cls = new \ReflectionClass($classNameWithNamespace);
+			if ($cls->isInstantiable() && $cls->isSubclassOf('\GMO\Beanstalk\AbstractWorker')) {
+				$workers[$className] = $cls->newInstance();
 			}
 		}
 		return $workers;
