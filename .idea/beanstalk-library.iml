@@ -3,6 +3,7 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/gmo/common" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/pda/pheanstalk" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/phpunit/php-code-coverage" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/phpunit/php-file-iterator" />
@@ -22,6 +23,7 @@
           <root url="file://$MODULE_DIR$/vendor/phpunit/phpunit-mock-objects" />
           <root url="file://$MODULE_DIR$/vendor/composer" />
           <root url="file://$MODULE_DIR$/vendor/phpunit/php-code-coverage" />
+          <root url="file://$MODULE_DIR$/vendor/gmo/common" />
           <root url="file://$MODULE_DIR$/vendor/phpunit/php-text-template" />
           <root url="file://$MODULE_DIR$/vendor/phpunit/phpunit" />
           <root url="file://$MODULE_DIR$/vendor/symfony/yaml" />
@@ -35,6 +37,7 @@
           <root url="file://$MODULE_DIR$/vendor/phpunit/phpunit-mock-objects" />
           <root url="file://$MODULE_DIR$/vendor/composer" />
           <root url="file://$MODULE_DIR$/vendor/phpunit/php-code-coverage" />
+          <root url="file://$MODULE_DIR$/vendor/gmo/common" />
           <root url="file://$MODULE_DIR$/vendor/phpunit/php-text-template" />
           <root url="file://$MODULE_DIR$/vendor/phpunit/phpunit" />
           <root url="file://$MODULE_DIR$/vendor/symfony/yaml" />
