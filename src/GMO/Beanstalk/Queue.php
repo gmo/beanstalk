@@ -225,7 +225,7 @@ class Queue implements LoggerAwareInterface {
 			$stats = $this->pheanstalk->statsTube( $tube );
 
 			for ( $i = 0; $i < $stats["current-jobs-ready"]; $i++ ) {
-				$job = $this->pheanstalk->watch( $tube )->ignore( 'default' )->reserve();
+				$job = $this->pheanstalk->watchOnly( $tube )->reserve();
 				$this->pheanstalk->bury( $job );
 
 				$queuedJobs[] = $job->getData();
@@ -255,6 +255,7 @@ class Queue implements LoggerAwareInterface {
 	 * @param string          $host
 	 * @param int             $port
 	 * @return Queue
+	 * @TODO In 2.0 make $logger optional
 	 */
 	public static function getInstance( LoggerInterface $logger, $host, $port ) {
 		if ( self::$instance == null ) {

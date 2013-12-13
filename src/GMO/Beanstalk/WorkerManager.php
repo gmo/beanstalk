@@ -122,30 +122,6 @@ class WorkerManager implements LoggerAwareInterface {
 	}
 
 	/**
-	 * Should not be called directly, only from the worker file.
-	 * Relies on the parameters in startWorker.
-	 */
-	public static function runWorker() {
-		global $argv;
-		if ( in_array( "--run", $argv ) ) {
-			try {
-				# get first class in called file
-				$classes = self::getPhpClasses( $argv[0] );
-				/**
-				 * create instance
-				 * @param AbstractWorker $workerInstance
-				 */
-				$class = $classes[0];
-				$workerInstance = new $class;
-				# start it
-				$workerInstance->run( $argv[2], $argv[3] );
-			} catch ( \Exception $ex ) {
-				// TODO: Log the exception
-			}
-		}
-	}
-
-	/**
 	 * Get an array of workers that have the
 	 * AbstractWorker as their parent class
 	 * @return array key: class name, value: class instance
@@ -162,14 +138,9 @@ class WorkerManager implements LoggerAwareInterface {
 			$parts = explode( "\\", $classNameWithNamespace );
 			$className = $parts[count( $parts ) - 1];
 
-			if ( $className == "AbstractWorker" ) {
-				continue;
-			}
-
-			# Add to workers if it's a subclass of AbstractWorker
-			$class = new $classNameWithNamespace;
-			if ( is_subclass_of( $class, "\\GMO\\Beanstalk\\AbstractWorker" ) ) {
-				$workers[$className] = $class;
+			$cls = new \ReflectionClass($classNameWithNamespace);
+			if ($cls->isInstantiable() && $cls->isSubclassOf('\GMO\Beanstalk\AbstractWorker')) {
+				$workers[$className] = $cls->newInstance();
 			}
 		}
 		return $workers;
@@ -269,6 +240,30 @@ class WorkerManager implements LoggerAwareInterface {
 		$this->log = $logger;
 		$this->host = $host;
 		$this->port = $port;
+	}
+
+	/**
+	 * Should not be called directly, only from the worker file.
+	 * Relies on the parameters in startWorker.
+	 */
+	public static function runWorker() {
+		global $argv;
+		if ( in_array( "--run", $argv ) ) {
+			try {
+				# get first class in called file
+				$classes = self::getPhpClasses( $argv[0] );
+				/**
+				 * create instance
+				 * @param AbstractWorker $workerInstance
+				 */
+				$class = $classes[0];
+				$workerInstance = new $class;
+				# start it
+				$workerInstance->run( $argv[2], $argv[3] );
+			} catch ( \Exception $ex ) {
+				// TODO: Log the exception
+			}
+		}
 	}
 
 	/**

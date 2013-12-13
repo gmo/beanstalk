@@ -107,21 +107,21 @@ abstract class AbstractWorker {
 				$this->log->debug( "Beanstalkd: Processing the job from: " . $this->getTubeName() );
 				$this->process( $this->params );
 				$this->deleteJob();
-			} catch ( IJobAwareException $e ) {
-				$numErrors = $this->handleError($e);
-				if ( $e->shouldDelete() && $numErrors >= $e->deleteAfter() ) {
-					$this->handleFatal($e);
-				}
-			}
-			//TODO: Remove in 2.0.0
-			catch ( IRetryException $e ) {
-				if ( $e->shouldRetry() ) {
-					$this->handleRetry( $e );
+			} catch ( \Exception $e ) { //TODO: Remove exceptions in 2.0.0
+				if ($e instanceof IJobAwareException || $e instanceof Exception\IJobAwareException) {
+					$numErrors = $this->handleError($e);
+					if ( $e->shouldDelete() && $numErrors >= $e->deleteAfter() ) {
+						$this->handleFatal($e);
+					}
+				} elseif ($e instanceof IRetryException) {
+					if ( $e->shouldRetry() ) {
+						$this->handleRetry( $e );
+					} else {
+						$this->handleFatal( $e );
+					}
 				} else {
-					$this->handleFatal( $e );
+					$this->handleError( $e );
 				}
-			} catch ( \Exception $e ) {
-				$this->handleError( $e );
 			}
 		} while ( $this->keepRunning );
 	}
@@ -154,7 +154,7 @@ abstract class AbstractWorker {
 
 	private function getJob() {
 		# Get job and bury
-		$this->currentJob = $this->pheanstalk->watch( $this->getTubeName() )->ignore( "default" )->reserve();
+		$this->currentJob = $this->pheanstalk->watchOnly( $this->getTubeName() )->reserve();
 		$this->pheanstalk->bury( $this->currentJob );
 
 		$this->params = $this->preProcess($this->currentJob);
@@ -207,7 +207,7 @@ abstract class AbstractWorker {
 	 * Check if job has failed three times,
 	 * in which case it is deleted.
 	 * @param $e
-	 * @deprecated Use {@see \GMO\Beanstalk\AbstractWorker::handleNonFatal()} instead
+	 * @deprecated Use {@see \GMO\Beanstalk\AbstractWorker::handleError()} instead
 	 * @todo Remove in 2.0.0
 	 */
 	private function handleRetry( $e ) {
@@ -227,12 +227,7 @@ abstract class AbstractWorker {
 		);
 
 		if ( $numErrors > 2 ) {
-			$this->log->error(
-				"Beanstalkd: Job: $id failed 3 times...will be deleted.",
-				array(
-				     "params" => $this->params
-				)
-			);
+			$this->log->error("Beanstalkd: Job: $id failed 3 times...job will be deleted.");
 			$this->deleteJob();
 		}
 	}
@@ -246,7 +241,10 @@ abstract class AbstractWorker {
 
 		$this->log->warning(
 			"Beanstalkd: Not retrying job: $id fatal error...job will be deleted.",
-			array( "params" => $this->params )
+			array(
+			     "params" => $this->params,
+			     "exception" => $e
+			)
 		);
 		$this->deleteJob();
 	}
@@ -260,15 +258,15 @@ abstract class AbstractWorker {
 		}
 	}
 
-	/** @var \Pheanstalk_Job Current job being processed */
-	protected $currentJob;
-
 	/**
 	 * Associative array of job ids with the number
 	 * of times they've thrown an exception
 	 * @var array
 	 */
 	protected $jobErrors = array();
+
+	/** @var \Pheanstalk_Job Current job being processed */
+	protected $currentJob;
 
 	/** @var LoggerInterface Worker logger */
 	protected $log;
