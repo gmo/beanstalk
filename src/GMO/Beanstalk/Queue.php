@@ -255,6 +255,7 @@ class Queue implements LoggerAwareInterface {
 	 * @param string          $host
 	 * @param int             $port
 	 * @return Queue
+	 * @TODO In 2.0 make $logger optional
 	 */
 	public static function getInstance( LoggerInterface $logger, $host, $port ) {
 		if ( self::$instance == null ) {
