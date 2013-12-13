@@ -15,7 +15,7 @@ namespace GMO\Beanstalk;
  *
  * @since 1.0.0
  *
- * @deprecated Use {@see \GMO\Beanstalk\IJobAwareException} instead
+ * @deprecated Use {@see \GMO\Beanstalk\Exception\IJobAwareException} instead
  * @todo Remove in version 2.0.0
  */
 interface IRetryException {
