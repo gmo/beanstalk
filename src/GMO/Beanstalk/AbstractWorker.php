@@ -258,15 +258,15 @@ abstract class AbstractWorker {
 		}
 	}
 
-	/** @var \Pheanstalk_Job Current job being processed */
-	protected $currentJob;
-
 	/**
 	 * Associative array of job ids with the number
 	 * of times they've thrown an exception
 	 * @var array
 	 */
 	protected $jobErrors = array();
+
+	/** @var \Pheanstalk_Job Current job being processed */
+	protected $currentJob;
 
 	/** @var LoggerInterface Worker logger */
 	protected $log;
