@@ -16,7 +16,7 @@ abstract class SerializableWorker extends AbstractWorker {
 	 * @param ISerializable $obj
 	 * @return void
 	 */
-	abstract protected function processSerializableObject(ISerializable $obj);
+	abstract protected function processSerializableObject($obj);
 
 	/**
 	 * Gets the class name of the current job
