@@ -79,7 +79,7 @@ class WorkerManager implements LoggerAwareInterface {
 		$workers = $this->getWorkers( $this->workerDir );
 
 		# get currently running workers
-		$currentWorkers = $this->listWorkers();
+		$currentWorkers = $this->getRunningWorkers();
 
 		/**
 		 * loop through workers
@@ -151,7 +151,7 @@ class WorkerManager implements LoggerAwareInterface {
 	 * key: worker name, value: number of workers
 	 * @return array
 	 */
-	public function listWorkers() {
+	public function getRunningWorkers() {
 		# get beanstalk processes
 		$processes = $this->listProcesses( $this->workerDir );
 
