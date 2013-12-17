@@ -14,7 +14,7 @@ class TestSerializableWorker extends SerializableWorker {
 		return new NullLogger();
 	}
 
-	protected function processSerializableObject(ISerializable $obj) {
+	protected function processSerializableObject($obj) {
 		$this->processResult = $obj->toArray();
 	}
 
