@@ -1,6 +1,8 @@
 <?php
 namespace GMO\Beanstalk;
 
+use GMO\Common\Collection;
+use GMO\Common\String;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -20,10 +22,7 @@ abstract class AbstractWorker {
 	 * @return string
 	 */
 	public static function getTubeName() {
-		$classWithNamespace = get_called_class();
-		$parts = explode( "\\", $classWithNamespace );
-		$class = $parts[count( $parts ) - 1];
-		return $class;
+		return String::splitLast(get_called_class(), "\\");
 	}
 
 	/**
@@ -187,10 +186,8 @@ abstract class AbstractWorker {
 	private function handleError( $e ) {
 		$id = $this->currentJob->getId();
 		# Increment job id errors
-		if ( !isset($this->jobErrors[$id]) ) {
-			$this->jobErrors[$id] = 0;
-		}
-		$numErrors = ++$this->jobErrors[$id];
+		$this->jobErrors = Collection::increment($this->jobErrors, $id);
+		$numErrors = $this->jobErrors[$id];
 
 		$this->log->warning(
 			"Beanstalkd: Job: $id failed $numErrors times.",
@@ -213,10 +210,8 @@ abstract class AbstractWorker {
 	private function handleRetry( $e ) {
 		$id = $this->currentJob->getId();
 		# Increment job id errors
-		if ( !isset($this->jobErrors[$id]) ) {
-			$this->jobErrors[$id] = 0;
-		}
-		$numErrors = ++$this->jobErrors[$id];
+		$this->jobErrors = Collection::increment($this->jobErrors, $id);
+		$numErrors = $this->jobErrors[$id];
 
 		$this->log->warning(
 			"Beanstalkd: Job: $id failed $numErrors times.",

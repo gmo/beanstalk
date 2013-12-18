@@ -1,6 +1,8 @@
 <?php
 namespace GMO\Beanstalk;
 
+use GMO\Common\Collection;
+use GMO\Common\String;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
@@ -30,7 +32,7 @@ class WorkerManager implements LoggerAwareInterface {
 		$filename = basename( $args[0] );
 
 		function help( $filename ) {
-			echo "php $filename [restart|start|stop|beanstalkd]\n";
+			echo "php $filename [restart|start|stop|stats|beanstalkd]\n";
 			echo "beanstalkd: Starts beanstalkd if not running (also starts workers if beanstalkd stopped)\n";
 			exit(1);
 		}
@@ -54,6 +56,9 @@ class WorkerManager implements LoggerAwareInterface {
 				break;
 			case "start":
 				$this->startWorkers();
+				break;
+			case "stats":
+				$this->log->info(print_r($this->getStats(), true));
 				break;
 			default:
 				help( $filename );
@@ -79,7 +84,7 @@ class WorkerManager implements LoggerAwareInterface {
 		$workers = $this->getWorkers( $this->workerDir );
 
 		# get currently running workers
-		$currentWorkers = $this->listWorkers();
+		$currentWorkers = $this->getRunningWorkers();
 
 		/**
 		 * loop through workers
@@ -87,11 +92,7 @@ class WorkerManager implements LoggerAwareInterface {
 		 */
 		foreach ( $workers as $worker => $class ) {
 			# get the number of currently running workers of this type
-			if ( !isset($currentWorkers[$worker]) ) {
-				$currentNumber = 0;
-			} else {
-				$currentNumber = $currentWorkers[$worker];
-			}
+			$currentNumber = Collection::get($currentWorkers, $worker, 0);
 
 			# set number of new workers to spawn from this difference
 			$workersToSpawn = $class->getNumberOfWorkers() - $currentNumber;
@@ -135,8 +136,7 @@ class WorkerManager implements LoggerAwareInterface {
 			# only use the first class
 			$classNameWithNamespace = $classNames[0];
 			# remove class name without namespace
-			$parts = explode( "\\", $classNameWithNamespace );
-			$className = $parts[count( $parts ) - 1];
+			$className = String::splitLast($classNameWithNamespace, "\\");
 
 			$cls = new \ReflectionClass($classNameWithNamespace);
 			if ($cls->isInstantiable() && $cls->isSubclassOf('\GMO\Beanstalk\AbstractWorker')) {
@@ -151,7 +151,7 @@ class WorkerManager implements LoggerAwareInterface {
 	 * key: worker name, value: number of workers
 	 * @return array
 	 */
-	public function listWorkers() {
+	public function getRunningWorkers() {
 		# get beanstalk processes
 		$processes = $this->listProcesses( $this->workerDir );
 
@@ -168,14 +168,28 @@ class WorkerManager implements LoggerAwareInterface {
 			$process = str_replace( ".php", "", $process );
 			$worker = $process;
 
-			# increment worker counter
-			if ( !isset($workers[$worker]) ) {
-				$workers[$worker] = 0;
-			}
-			$workers[$worker]++;
+			Collection::increment($workers, $worker);
 		}
 
 		return $workers;
+	}
+
+	/**
+	 * Returns an array containing: WorkerName => # Running / # Total
+	 * @return array
+	 */
+	public function getStats() {
+		$stats = array();
+
+		$workers = $this->getWorkers();
+		$runningWorkers = $this->getRunningWorkers();
+		/** @param AbstractWorker $class */
+		foreach ( $workers as $worker => $class ) {
+			$currentNum = Collection::get($runningWorkers, $worker, 0);
+			$stats[$worker] = $currentNum . "/" . $class->getNumberOfWorkers();
+		}
+
+		return $stats;
 	}
 
 	/**
@@ -228,14 +242,10 @@ class WorkerManager implements LoggerAwareInterface {
 	 * @param LoggerInterface $logger
 	 * @param string          $host      Beanstalkd host
 	 * @param int             $port      Beanstalkd port
+	 * @TODO In 2.0 make logger optional
 	 */
 	function __construct( $workerDir, LoggerInterface $logger, $host, $port ) {
-		$workerDir = realpath( $workerDir );
-		# add ending slash if needed
-		if ( substr( $workerDir, -1 ) != "/" ) {
-			$workerDir .= "/";
-		}
-		$this->workerDir = $workerDir;
+		$this->workerDir = realpath( $workerDir ) . "/";
 
 		$this->log = $logger;
 		$this->host = $host;

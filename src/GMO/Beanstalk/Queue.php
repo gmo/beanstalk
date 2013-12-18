@@ -37,9 +37,12 @@ class Queue implements LoggerAwareInterface {
 		}
 
 		function getMethod( $args, LoggerInterface $log ) {
+			if ( !isset($args[1]) ) {
+				return "help";
+			}
 			switch ( $args[1] ) {
 				case "delete":
-					if ( !$args[2] ) {
+					if ( !isset($args[2]) ) {
 						$log->info( "Deleting ready jobs" );
 						return "deleteReadyJobs";
 					}
@@ -62,7 +65,7 @@ class Queue implements LoggerAwareInterface {
 					$log->info( "View ready jobs" );
 					return "getReadyJobsIn";
 				case "kick":
-					if ( !$args[2] ) {
+					if ( !isset($args[2]) ) {
 						$log->info( "Kicking buried jobs" );
 						return "kickBuriedJobs";
 					}
@@ -82,10 +85,6 @@ class Queue implements LoggerAwareInterface {
 			return "help";
 		}
 
-		if ( count( $args ) == 1 ) {
-			help( $filename );
-		}
-
 		$method = getMethod( $args, $this->log );
 
 		switch ( $method ) {
@@ -94,16 +93,11 @@ class Queue implements LoggerAwareInterface {
 				break;
 			case "getStats":
 			case "getReadyJobsIn":
-				$tubes = array();
-				foreach ( $this->listTubes() as $tube ) {
-					$tubes[$tube] = $this->$method( $tube );
-				}
+				$tubes = $this->forEachTube( array($this, $method) );
 				$this->log->info( print_r( $tubes, true ) );
 				break;
 			default:
-				foreach ( $this->listTubes() as $tube ) {
-					$this->$method( $tube );
-				}
+				$this->forEachTube( array($this, $method) );
 		}
 
 	}
@@ -193,12 +187,21 @@ class Queue implements LoggerAwareInterface {
 	 * @return int
 	 */
 	public function getNumberOfJobsReady( $tube ) {
-		$stats = $this->pheanstalk->statsTube( $tube );
-		if ( isset($stats["current-jobs-ready"]) ) {
-			return $stats["current-jobs-ready"];
-		}
-
+		try {
+			$stats = $this->pheanstalk->statsTube( $tube );
+			if ( isset($stats["current-jobs-ready"]) ) {
+				return $stats["current-jobs-ready"];
+			}
+		} catch ( \Pheanstalk_Exception_ServerException $e ) { }
 		return 0;
+	}
+
+	/**
+	 * Gets the stats for every tube
+	 * @return array
+	 */
+	public function getAllStats() {
+		return $this->forEachTube( array($this, 'getStats') );
 	}
 
 	/**
@@ -211,6 +214,14 @@ class Queue implements LoggerAwareInterface {
 		// Normalize ArrayObject to Array
 		$stats = $response->getArrayCopy();
 		return $stats;
+	}
+
+	/**
+	 * Gets all ready jobs and their data for every tube
+	 * @return array
+	 */
+	public function getAllReadyJobs() {
+		return $this->forEachTube( array($this, 'getReadyJobsIn') );
 	}
 
 	/**
@@ -274,6 +285,14 @@ class Queue implements LoggerAwareInterface {
 	private function __construct( LoggerInterface $logger, $host, $port ) {
 		$this->pheanstalk = new \Pheanstalk_Pheanstalk($host, $port);
 		$this->log = $logger;
+	}
+
+	private function forEachTube($method) {
+		$tubes = array();
+		foreach ( $this->listTubes() as $tube ) {
+			$tubes[$tube] = $method( $tube );
+		}
+		return $tubes;
 	}
 
 	/** @var Queue */

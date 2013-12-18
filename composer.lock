@@ -3,15 +3,15 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "fd7b97093b376dca1a0340a506a0bf99",
+    "hash": "c3fa9db1b723ca5bf65f098dfb9a09a9",
     "packages": [
         {
             "name": "gmo/common",
-            "version": "v1.5.0",
+            "version": "v1.7.0",
             "source": {
                 "type": "git",
                 "url": "git@bitbucket.org:gmodev/common-library.git",
-                "reference": "751b908de8ae0247793d044f88a8a3f04733cf38"
+                "reference": "35d1a6130ff5eedaf0c93818012575f806b55a4c"
             },
             "require": {
                 "psr/log": "1.0.0"
@@ -26,7 +26,7 @@
                 }
             },
             "description": "A library for common code",
-            "time": "2013-12-13 16:04:33"
+            "time": "2013-12-18 15:34:47"
         },
         {
             "name": "pda/pheanstalk",

@@ -65,7 +65,7 @@ class Given_workers_are_currently_running extends ContextSpecification {
 	}
 
 	protected static function when() {
-		self::$currentlyRunningWorkers = self::$workerManager->listWorkers();
+		self::$currentlyRunningWorkers = self::$workerManager->getRunningWorkers();
 	}
 
 	public function test_list_workers_correctly() {
