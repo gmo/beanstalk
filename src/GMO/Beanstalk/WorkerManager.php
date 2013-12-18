@@ -32,7 +32,7 @@ class WorkerManager implements LoggerAwareInterface {
 		$filename = basename( $args[0] );
 
 		function help( $filename ) {
-			echo "php $filename [restart|start|stop|beanstalkd]\n";
+			echo "php $filename [restart|start|stop|stats|beanstalkd]\n";
 			echo "beanstalkd: Starts beanstalkd if not running (also starts workers if beanstalkd stopped)\n";
 			exit(1);
 		}
@@ -56,6 +56,9 @@ class WorkerManager implements LoggerAwareInterface {
 				break;
 			case "start":
 				$this->startWorkers();
+				break;
+			case "stats":
+				$this->log->info(print_r($this->getStats(), true));
 				break;
 			default:
 				help( $filename );
@@ -169,6 +172,24 @@ class WorkerManager implements LoggerAwareInterface {
 		}
 
 		return $workers;
+	}
+
+	/**
+	 * Returns an array containing: WorkerName => # Running / # Total
+	 * @return array
+	 */
+	public function getStats() {
+		$stats = array();
+
+		$workers = $this->getWorkers();
+		$runningWorkers = $this->getRunningWorkers();
+		/** @param AbstractWorker $class */
+		foreach ( $workers as $worker => $class ) {
+			$currentNum = Collection::get($runningWorkers, $worker, 0);
+			$stats[$worker] = $currentNum . "/" . $class->getNumberOfWorkers();
+		}
+
+		return $stats;
 	}
 
 	/**
