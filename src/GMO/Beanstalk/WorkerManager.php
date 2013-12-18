@@ -1,6 +1,8 @@
 <?php
 namespace GMO\Beanstalk;
 
+use GMO\Common\Collection;
+use GMO\Common\String;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
@@ -87,11 +89,7 @@ class WorkerManager implements LoggerAwareInterface {
 		 */
 		foreach ( $workers as $worker => $class ) {
 			# get the number of currently running workers of this type
-			if ( !isset($currentWorkers[$worker]) ) {
-				$currentNumber = 0;
-			} else {
-				$currentNumber = $currentWorkers[$worker];
-			}
+			$currentNumber = Collection::get($currentWorkers, $worker, 0);
 
 			# set number of new workers to spawn from this difference
 			$workersToSpawn = $class->getNumberOfWorkers() - $currentNumber;
@@ -135,8 +133,7 @@ class WorkerManager implements LoggerAwareInterface {
 			# only use the first class
 			$classNameWithNamespace = $classNames[0];
 			# remove class name without namespace
-			$parts = explode( "\\", $classNameWithNamespace );
-			$className = $parts[count( $parts ) - 1];
+			$className = String::splitLast($classNameWithNamespace, "\\");
 
 			$cls = new \ReflectionClass($classNameWithNamespace);
 			if ($cls->isInstantiable() && $cls->isSubclassOf('\GMO\Beanstalk\AbstractWorker')) {
@@ -168,11 +165,7 @@ class WorkerManager implements LoggerAwareInterface {
 			$process = str_replace( ".php", "", $process );
 			$worker = $process;
 
-			# increment worker counter
-			if ( !isset($workers[$worker]) ) {
-				$workers[$worker] = 0;
-			}
-			$workers[$worker]++;
+			Collection::increment($workers, $worker);
 		}
 
 		return $workers;
@@ -228,14 +221,10 @@ class WorkerManager implements LoggerAwareInterface {
 	 * @param LoggerInterface $logger
 	 * @param string          $host      Beanstalkd host
 	 * @param int             $port      Beanstalkd port
+	 * @TODO In 2.0 make logger optional
 	 */
 	function __construct( $workerDir, LoggerInterface $logger, $host, $port ) {
-		$workerDir = realpath( $workerDir );
-		# add ending slash if needed
-		if ( substr( $workerDir, -1 ) != "/" ) {
-			$workerDir .= "/";
-		}
-		$this->workerDir = $workerDir;
+		$this->workerDir = realpath( $workerDir ) . "/";
 
 		$this->log = $logger;
 		$this->host = $host;
