@@ -233,9 +233,9 @@ class Queue implements LoggerAwareInterface {
 		$queuedJobs = array();
 
 		try {
-			$stats = $this->pheanstalk->statsTube( $tube );
+			$num = $this->getNumberOfJobsReady( $tube );
 
-			for ( $i = 0; $i < $stats["current-jobs-ready"]; $i++ ) {
+			for ( $i = 0; $i < $num; $i++ ) {
 				$job = $this->pheanstalk->watchOnly( $tube )->reserve();
 				$this->pheanstalk->bury( $job );
 

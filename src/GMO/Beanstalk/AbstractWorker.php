@@ -153,7 +153,7 @@ abstract class AbstractWorker {
 
 	private function getJob() {
 		# Get job and bury
-		$this->currentJob = $this->pheanstalk->watchOnly( $this->getTubeName() )->reserve();
+		$this->currentJob = $this->pheanstalk->reserveFromTube( $this->getTubeName() );
 		$this->pheanstalk->bury( $this->currentJob );
 
 		$this->params = $this->preProcess($this->currentJob);
