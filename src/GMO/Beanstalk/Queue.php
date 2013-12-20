@@ -106,9 +106,10 @@ class Queue implements LoggerAwareInterface {
 	 * Push a job to a queue
 	 * @param string $tube tube name
 	 * @param array  $data job data
+	 * @param bool   $jsonEncode Optional. Default true.
 	 */
-	public function push( $tube, $data ) {
-		$data = json_encode( $data );
+	public function push( $tube, $data, $jsonEncode = true ) {
+		$data = $jsonEncode ? json_encode( $data ) : $data;
 		$this->pheanstalk->useTube( $tube )->put( $data );
 	}
 
@@ -233,9 +234,9 @@ class Queue implements LoggerAwareInterface {
 		$queuedJobs = array();
 
 		try {
-			$stats = $this->pheanstalk->statsTube( $tube );
+			$num = $this->getNumberOfJobsReady( $tube );
 
-			for ( $i = 0; $i < $stats["current-jobs-ready"]; $i++ ) {
+			for ( $i = 0; $i < $num; $i++ ) {
 				$job = $this->pheanstalk->watchOnly( $tube )->reserve();
 				$this->pheanstalk->bury( $job );
 
