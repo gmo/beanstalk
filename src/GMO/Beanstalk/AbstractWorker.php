@@ -77,33 +77,31 @@ abstract class AbstractWorker {
 	 * @throws \Exception
 	 */
 	public function run( $host, $port ) {
-		$this->log->info( "Beanstalkd: Running worker: " . $this->getTubeName() );
+		$this->log->info( "Running worker: " . $this->getTubeName() );
 
 		try {
 			$this->pheanstalk = new \Pheanstalk_Pheanstalk($host, $port);
 			$this->setup();
 		} catch ( \Exception $e ) {
 			$this->log->critical(
-				"Beanstalkd: An error occurred in setting up the worker: " . $this->getTubeName(),
+				"An error occurred when setting up the worker",
 				array( "exception" => $e )
 			);
 			throw $e;
 		}
 
 		do {
-			$this->log->debug( "Beanstalkd: Getting next job from: " . $this->getTubeName() );
+			$this->log->debug( "Getting next job" );
 			$this->getJob();
 
 			$isValid = $this->validateParams( $this->params );
 			if ( !$isValid ) {
-				$this->log->error(
-					"Beanstalkd: \"{$this->getTubeName()}\" current job missing required params is being deleted!"
-				);
+				$this->log->error("Job missing required params is being deleted!");
 				$this->deleteJob();
 				continue;
 			}
 			try {
-				$this->log->debug( "Beanstalkd: Processing the job from: " . $this->getTubeName() );
+				$this->log->debug( "Processing job" );
 				$this->process( $this->params );
 				$this->deleteJob();
 			} catch ( \Exception $e ) { //TODO: Remove exceptions in 2.0.0
@@ -168,7 +166,8 @@ abstract class AbstractWorker {
 		foreach ( $this->getRequiredParams() as $reqParam ) {
 			if ( !array_key_exists( $reqParam, $params ) ) {
 				$this->log->error(
-					"Beanstalkd: \"{$this->getTubeName()}\" current job is missing required param: \"$reqParam\""
+					"Job is missing required param: \"$reqParam\"",
+					array( "params" => $params )
 				);
 
 				return false;
@@ -189,8 +188,9 @@ abstract class AbstractWorker {
 		$this->jobErrors = Collection::increment($this->jobErrors, $id);
 		$numErrors = $this->jobErrors[$id];
 
+		$this->log->warning($e->getMessage());
 		$this->log->warning(
-			"Beanstalkd: Job: $id failed $numErrors times.",
+			"Job failed $numErrors times.",
 			array(
 			   "params" => $this->params,
 			   "exception" => $e
@@ -203,7 +203,7 @@ abstract class AbstractWorker {
 	/**
 	 * Check if job has failed three times,
 	 * in which case it is deleted.
-	 * @param $e
+	 * @param \Exception $e
 	 * @deprecated Use {@see \GMO\Beanstalk\AbstractWorker::handleError()} instead
 	 * @todo Remove in 2.0.0
 	 */
@@ -213,8 +213,9 @@ abstract class AbstractWorker {
 		$this->jobErrors = Collection::increment($this->jobErrors, $id);
 		$numErrors = $this->jobErrors[$id];
 
+		$this->log->warning($e->getMessage());
 		$this->log->warning(
-			"Beanstalkd: Job: $id failed $numErrors times.",
+			"Job failed $numErrors times.",
 			array(
 			     "params" => $this->params,
 			     "exception" => $e
@@ -222,20 +223,19 @@ abstract class AbstractWorker {
 		);
 
 		if ( $numErrors > 2 ) {
-			$this->log->error("Beanstalkd: Job: $id failed 3 times...job will be deleted.");
+			$this->log->error("Job failed 3 times...deleting.");
 			$this->deleteJob();
 		}
 	}
 
 	/**
 	 * Job should not be retried and is deleted.
-	 * @param $e
+	 * @param \Exception $e
 	 */
 	private function handleFatal( $e ) {
-		$id = $this->currentJob->getId();
-
+		$this->log->warning($e->getMessage());
 		$this->log->warning(
-			"Beanstalkd: Not retrying job: $id fatal error...job will be deleted.",
+			"Not retrying job...deleting.",
 			array(
 			     "params" => $this->params,
 			     "exception" => $e
@@ -245,7 +245,7 @@ abstract class AbstractWorker {
 	}
 
 	private function deleteJob() {
-		$this->log->debug( "Beanstalkd: Deleting the current job from: " . $this->getTubeName() );
+		$this->log->debug( "Deleting the current job from: " . $this->getTubeName() );
 		try {
 			$this->pheanstalk->delete( $this->currentJob );
 		} catch ( \Pheanstalk_Exception_ServerException $e ) {
