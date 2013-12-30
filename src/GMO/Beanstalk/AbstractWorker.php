@@ -56,7 +56,7 @@ abstract class AbstractWorker {
 	/**
 	 * Process each job
 	 * @param array $params json decoded trimmed parameters
-	 * @return void
+	 * @return void|mixed
 	 */
 	protected abstract function process( $params );
 
@@ -102,7 +102,8 @@ abstract class AbstractWorker {
 			}
 			try {
 				$this->log->debug( "Processing job" );
-				$this->process( $this->params );
+				$this->result = $this->process( $this->params );
+				$this->postProcess( $job );
 				$this->deleteJob();
 			} catch ( \Exception $e ) { //TODO: Remove exceptions in 2.0.0
 				if ($e instanceof IJobAwareException || $e instanceof Exception\IJobAwareException) {
@@ -140,6 +141,13 @@ abstract class AbstractWorker {
 
 		return $params;
 	}
+	
+	/**
+	 * Hook to allow any extensions to do things after processing a job
+	 * @param \Pheanstalk_Job $job
+	 * @since 1.3.0
+	 */
+	protected function postProcess( $job ) { }
 
 	/**
 	 * Pheanstalk is setup here.
@@ -263,6 +271,9 @@ abstract class AbstractWorker {
 	/** @var \Pheanstalk_Job Current job being processed */
 	protected $currentJob;
 
+	/** @var mixed Results of call to process() */
+	protected $result;
+	
 	/** @var LoggerInterface Worker logger */
 	protected $log;
 
