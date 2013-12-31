@@ -54,12 +54,45 @@ abstract class AbstractRpcWorker extends AbstractWorker {
 	
 	/**
 	 * Returns true if the tube has at least one watcher
-	 * @param bool $tube
+	 * @param string $tube
+	 * @return bool
 	 */
 	private function isTubeWatched( $tube ) {
 		
-		// TODO: Implement this function
-		return true;
+		if(!$this->doesTubeExist( $tube )) {
+			return false;
+		}
+		
+		$stats = $this->queue->getStats( $tube );
+		if( !isset($stats['current-watching']) ) {
+			return false;
+		}
+
+		return intval($stats['current-watching']) > 0;
+	}
+	
+	/**
+	 * Returns true if the tube exists
+	 * @param string $tube
+	 * @return bool
+	 */
+	private function doesTubeExist( $tube ) {
+		$maxRetry = 3;
+		$retry = 0;
+		do {
+			if($retry > 0) {
+				usleep(100000);
+			}
+			
+			$tubeList = $this->queue->listTubes();
+				
+			if(array_search( $tube, $tubeList ) !== false) {
+				return true;
+			}
+			$retry++;
+		} while ($retry < $maxRetry);
+		
+		return false;		
 	}
 	
 	const RPC_REPLY_TO_FIELD = 'rpcReplyTo';
