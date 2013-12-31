@@ -103,7 +103,7 @@ abstract class AbstractWorker {
 			try {
 				$this->log->debug( "Processing job" );
 				$this->result = $this->process( $this->params );
-				$this->postProcess( $job );
+				$this->postProcess( $this->currentJob );
 				$this->deleteJob();
 			} catch ( \Exception $e ) { //TODO: Remove exceptions in 2.0.0
 				if ($e instanceof IJobAwareException || $e instanceof Exception\IJobAwareException) {

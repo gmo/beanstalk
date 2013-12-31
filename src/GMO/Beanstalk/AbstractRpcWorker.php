@@ -1,9 +1,8 @@
 <?php
 namespace GMO\Beanstalk;
 
-use GMO\Common\Collection;
-use GMO\Common\String;
-use Psr\Log\LoggerInterface;
+use GMO\Beanstalk\Queue;
+use Psr\Log\NullLogger;
 
 /**
  * Abstracts the repetitive worker tasks for Remote Procedure Call (RPC).
@@ -15,10 +14,17 @@ use Psr\Log\LoggerInterface;
  * @since 1.3.0
  */
 abstract class AbstractRpcWorker extends AbstractWorker {
-		
+	
 	/**
-	 * Get the replyTo when pre processing job data
-	 * @param \Pheanstalk_Job $job
+	 * {@inheritDoc}
+	 */
+	public function run( $host, $port ) {
+		$this->queue = Queue::getInstance($this->getLogger(), $host, $port );
+		parent::run( $host, $port );
+	}
+	
+	/**
+	 * {@inheritDoc}
 	 */
 	protected function preProcess( $job ) {
 		$result = parent::preProcess( $job );
@@ -38,14 +44,12 @@ abstract class AbstractRpcWorker extends AbstractWorker {
 			return;
 		}
 		
-		if(!$this->isTubeWatched( $tube )) {
+		if(!$this->isTubeWatched( $this->replyTo )) {
 			return;
 		}
 		
-		$result = array(
-			'result' => $this->result);
-		$data = json_encode( $result );
-		$this->pheanstalk->useTube( $this->replyTo )->put( $data );
+		$data = array('result' => $this->result);
+		$this->queue->push( $this->replyTo, $data );
 	}
 	
 	/**
@@ -53,6 +57,7 @@ abstract class AbstractRpcWorker extends AbstractWorker {
 	 * @param bool $tube
 	 */
 	private function isTubeWatched( $tube ) {
+		
 		// TODO: Implement this function
 		return true;
 	}
@@ -64,4 +69,8 @@ abstract class AbstractRpcWorker extends AbstractWorker {
 	 * @var string
 	 */
 	private $replyTo;
+
+
+	/** @var Queue */
+	private $queue;
 }

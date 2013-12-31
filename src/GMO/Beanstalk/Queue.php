@@ -271,7 +271,8 @@ class Queue implements LoggerAwareInterface {
 	 */
 	public static function getInstance( LoggerInterface $logger, $host, $port ) {
 		if ( self::$instance == null ) {
-			self::$instance = new Queue($logger, $host, $port);
+			$queueClass = get_called_class();
+			self::$instance = new $queueClass($logger, $host, $port);
 		}
 
 		return self::$instance;
@@ -296,11 +297,11 @@ class Queue implements LoggerAwareInterface {
 		return $tubes;
 	}
 
+	/** @var \Pheanstalk_Pheanstalk */
+	protected $pheanstalk;
+	
 	/** @var Queue */
 	private static $instance;
-
-	/** @var \Pheanstalk_Pheanstalk */
-	private $pheanstalk;
 
 	/** @var LoggerInterface */
 	private $log;
