@@ -1,6 +1,9 @@
 <?php
 namespace GMO\Beanstalk;
 
+use GMO\Beanstalk\Exception\RpcTimeoutException;
+use GMO\Beanstalk\Exception\RpcInvalidResponseException;
+
 class RpcQueue extends Queue {
 	
 	public function runRpc( $tube, $data, $timeout = 30, $jsonEncode = true ) {
@@ -36,6 +39,3 @@ class RpcQueue extends Queue {
 	const RPC_REPLY_TO_FIELD = 'rpcReplyTo';
 	
 }
-
-class RpcTimeoutException extends \Exception {}
-class RpcInvalidResponseException extends \Exception {}
