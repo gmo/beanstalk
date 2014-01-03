@@ -294,18 +294,8 @@ class WorkerManager implements LoggerAwareInterface {
 	protected function listProcesses( $grep ) {
 		# get list of workers
 		$lines = array();
-		$this->execute( "ps aux | grep " . $grep, $lines );
-
-		$processes = array();
-		foreach ( $lines as $line ) {
-			# Remove our grep call
-			if ( strpos( $line, "grep" ) > 0 ) {
-				continue;
-			}
-			$processes[] = $line;
-		}
-
-		return $processes;
+		$this->execute( "ps aux | grep -v grep | grep " . $grep, $lines );
+		return $lines;
 	}
 
 	/**

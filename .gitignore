@@ -1,3 +1,4 @@
 workspace.xml
 vendor
 atlassian-ide-plugin.xml
+/.project
