@@ -1,9 +1,6 @@
 <?php
 namespace GMO\Beanstalk;
 
-use GMO\Beanstalk\Queue;
-use Psr\Log\NullLogger;
-
 /**
  * Abstracts the repetitive worker tasks for Remote Procedure Call (RPC).
  * RPC involves doing work and sending the result back to the producer.
@@ -11,21 +8,17 @@ use Psr\Log\NullLogger;
  *
  * @package GMO\Beanstalk
  * 
- * @since 1.3.0
+ * @since 1.5.0
  */
 abstract class AbstractRpcWorker extends AbstractWorker {
-	
-	/**
-	 * {@inheritDoc}
-	 */
+
+	/** {@inheritDoc} */
 	public function run( $host, $port ) {
 		$this->queue = Queue::getInstance($this->getLogger(), $host, $port );
 		parent::run( $host, $port );
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	protected function preProcess( $job ) {
 		$result = parent::preProcess( $job );
 		if(isset($result[static::RPC_REPLY_TO_FIELD]) && !empty($result[static::RPC_REPLY_TO_FIELD])) {
@@ -37,7 +30,7 @@ abstract class AbstractRpcWorker extends AbstractWorker {
 	/**
 	 * In post-processing, send the results back to the producer
 	 * @param \Pheanstalk_Job $job
-	 * @since 1.3.0
+	 * @since 1.5.0
 	 */
 	protected function postProcess( $job ) {
 		if(empty($this->replyTo)) {
@@ -102,7 +95,6 @@ abstract class AbstractRpcWorker extends AbstractWorker {
 	 * @var string
 	 */
 	private $replyTo;
-
 
 	/** @var Queue */
 	private $queue;

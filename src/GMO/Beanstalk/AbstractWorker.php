@@ -145,7 +145,7 @@ abstract class AbstractWorker {
 	/**
 	 * Hook to allow any extensions to do things after processing a job
 	 * @param \Pheanstalk_Job $job
-	 * @since 1.3.0
+	 * @since 1.5.0
 	 */
 	protected function postProcess( $job ) { }
 
