@@ -136,7 +136,10 @@ abstract class AbstractWorker {
 		# Get params and trim values
 		$params = json_decode( $job->getData(), true );
 		foreach ( $params as $key => $value ) {
-			$params[$key] = trim( $value );
+			if (is_string($value)) {
+				$value = trim($value);
+			}
+			$params[$key] = $value;
 		}
 
 		return $params;

@@ -60,10 +60,10 @@ class Queue implements LoggerAwareInterface {
 					return "help";
 				case "stats":
 					$log->info( "View queue stats" );
-					return "getStats";
+					return "getAllStats";
 				case "view":
 					$log->info( "View ready jobs" );
-					return "getReadyJobsIn";
+					return "getAllReadyJobs";
 				case "kick":
 					if ( !isset($args[2]) ) {
 						$log->info( "Kicking buried jobs" );
@@ -91,13 +91,15 @@ class Queue implements LoggerAwareInterface {
 			case "help":
 				help( $filename );
 				break;
-			case "getStats":
-			case "getReadyJobsIn":
-				$tubes = $this->forEachTube( array($this, $method) );
+			case "getAllStats":
+			case "getAllReadyJobs":
+				$tubes = $this->$method();
 				$this->log->info( print_r( $tubes, true ) );
 				break;
 			default:
-				$this->forEachTube( array($this, $method) );
+				foreach ( $this->listTubes() as $tube ) {
+					$this->$method( $tube );
+				}
 		}
 
 	}
@@ -202,7 +204,11 @@ class Queue implements LoggerAwareInterface {
 	 * @return array
 	 */
 	public function getAllStats() {
-		return $this->forEachTube( array($this, 'getStats') );
+		$tubes = array();
+		foreach ( $this->listTubes() as $tube ) {
+			$tubes[$tube] = $this->getStats( $tube );
+		}
+		return $tubes;
 	}
 
 	/**
@@ -222,7 +228,11 @@ class Queue implements LoggerAwareInterface {
 	 * @return array
 	 */
 	public function getAllReadyJobs() {
-		return $this->forEachTube( array($this, 'getReadyJobsIn') );
+		$tubes = array();
+		foreach ( $this->listTubes() as $tube ) {
+			$tubes[$tube] = $this->getReadyJobsIn( $tube );
+		}
+		return $tubes;
 	}
 
 	/**
@@ -287,14 +297,6 @@ class Queue implements LoggerAwareInterface {
 	private function __construct( LoggerInterface $logger, $host, $port ) {
 		$this->pheanstalk = new \Pheanstalk_Pheanstalk($host, $port);
 		$this->log = $logger;
-	}
-
-	private function forEachTube($method) {
-		$tubes = array();
-		foreach ( $this->listTubes() as $tube ) {
-			$tubes[$tube] = $method( $tube );
-		}
-		return $tubes;
 	}
 
 	/** @var \Pheanstalk_Pheanstalk */
