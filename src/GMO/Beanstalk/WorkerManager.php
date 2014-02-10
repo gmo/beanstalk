@@ -194,16 +194,23 @@ class WorkerManager implements LoggerAwareInterface {
 	public function stopWorkers() {
 		# get beanstalk processes
 		$processes = $this->listProcesses( $this->workerDir );
+		$processes = array_map(function($process) {
+				# parse process id
+				$parts = preg_split( "/[\\s]+/", $process );
+				return $parts[1];
+			}, $processes);
 
 		$this->log->info( "Stopping workers: " . count( $processes ) );
 
-		# kill each process
-		foreach ( $processes as $process ) {
-			# parse process id
-			$parts = preg_split( "/[\\s]+/", $process );
-			$processId = $parts[1];
-
-			$this->execute( "kill -15 $processId" );
+		// Send signal to workers to stop
+		foreach ($processes as $process) {
+			$this->log->debug("Sending terminate signal to: $process");
+			posix_kill($process, SIGTERM);
+		}
+		// Wait for them to exit
+		foreach ($processes as $process) {
+			$this->log->debug("Waiting for: $process...");
+			pcntl_waitpid($process, $status);
 		}
 	}
 
