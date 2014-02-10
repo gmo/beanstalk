@@ -14,10 +14,13 @@ class RpcQueue extends Queue {
 		
 		try {
 			$job = $this->pheanstalk->reserveFromTube($replyToTube, $timeout);
+			$this->stopWatchingRpcTubes();
 			
 			if(empty($job)) {
 				throw new RpcTimeoutException('Timed Out'); 
 			}
+			
+			$this->pheanstalk->delete($job);
 			
 			$result = json_decode( $job->getData(), true );
 			
@@ -34,6 +37,10 @@ class RpcQueue extends Queue {
 	private static function makeRpcUid() {
 		// TODO: Consider replacing this with a UUID generator
 		return bin2hex(openssl_random_pseudo_bytes(90));
+	}
+	
+	private function stopWatchingRpcTubes() {
+		$this->pheanstalk->watchOnly('default');
 	}
 
 	const RPC_REPLY_TO_FIELD = 'rpcReplyTo';
