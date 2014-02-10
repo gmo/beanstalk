@@ -165,7 +165,7 @@ class Given_a_directory_start_workers extends ContextSpecification {
 	}
 
 	public function test_start_only_needed_count() {
-		$expected = array( "NullWorker" => 2 );
+		$expected = array( "NullWorker" => 2, "UnitTestRpcWorker" => 1 );
 		$this->assertEquals( $expected, self::$workerManager->calledWorkers );
 	}
 
