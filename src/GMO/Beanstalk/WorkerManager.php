@@ -203,7 +203,7 @@ class WorkerManager implements LoggerAwareInterface {
 			$parts = preg_split( "/[\\s]+/", $process );
 			$processId = $parts[1];
 
-			$this->execute( "kill $processId" );
+			$this->execute( "kill -15 $processId" );
 		}
 	}
 

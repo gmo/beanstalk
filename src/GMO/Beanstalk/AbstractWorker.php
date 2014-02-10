@@ -79,6 +79,8 @@ abstract class AbstractWorker {
 	public function run( $host, $port ) {
 		$this->log->info( "Running worker: " . $this->getTubeName() );
 
+		pcntl_signal(SIGTERM, array($this, 'signalHandler'));
+
 		try {
 			$this->pheanstalk = new \Pheanstalk_Pheanstalk($host, $port);
 			$this->setup();
@@ -122,6 +124,7 @@ abstract class AbstractWorker {
 				}
 			}
 		} while ( $this->keepRunning );
+		$this->log->info("Worker stopped");
 	}
 
 	/**
@@ -262,6 +265,10 @@ abstract class AbstractWorker {
 		} catch ( \Pheanstalk_Exception_ServerException $e ) {
 			$this->log->warning( "Error deleting job", array("exception" => $e) );
 		}
+	}
+
+	private function signalHandler($signalNum) {
+		$this->keepRunning = false;
 	}
 
 	/**
