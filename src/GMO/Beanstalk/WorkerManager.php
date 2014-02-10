@@ -158,17 +158,13 @@ class WorkerManager implements LoggerAwareInterface {
 		# parse processes into workers array
 		$workers = array();
 		foreach ( $processes as $process ) {
-			# remove ending run command
-			$process = trim( str_replace( "--run", "", $process ) );
-			# remove beginning junk
-			$process = substr( $process, strpos( $process, $this->workerDir ) );
-			# remove worker directory
-			$process = str_replace( $this->workerDir, "", $process );
-			# remove php extension
-			$process = str_replace( ".php", "", $process );
-			$worker = $process;
-
-			Collection::increment($workers, $worker);
+			$matches = array();
+			$preg_worker_dir = str_replace('/', '\/', $this->workerDir);
+			if(!preg_match('/' . $preg_worker_dir . '(.*?)[.]php/', $process, $matches)) {
+				continue;
+			}
+			$worker = $matches[1];
+			$workers = Collection::increment($workers, $worker);
 		}
 
 		return $workers;

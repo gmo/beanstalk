@@ -38,6 +38,7 @@ abstract class AbstractRpcWorker extends AbstractWorker {
 		}
 		
 		if(!$this->isTubeWatched( $this->replyTo )) {
+			$this->log->debug("No one is listening, not pushing to return queue");
 			return;
 		}
 		
