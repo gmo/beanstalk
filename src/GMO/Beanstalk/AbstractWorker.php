@@ -95,6 +95,7 @@ abstract class AbstractWorker {
 		do {
 			$this->log->debug( "Getting next job" );
 			$this->getJob();
+			if (!$this->currentJob) { continue; }
 
 			$isValid = $this->validateParams( $this->params );
 			if ( !$isValid ) {
@@ -164,10 +165,27 @@ abstract class AbstractWorker {
 	}
 
 	private function getJob() {
-		# Get job and bury
-		$this->currentJob = $this->pheanstalk->reserveFromTube( $this->getTubeName() );
-		$this->pheanstalk->bury( $this->currentJob );
+		$this->checkForTerminationSignal();
 
+		# if last reserve timed out we don't want to spam the log
+		# null check for first job
+		if ($this->currentJob || $this->currentJob === null) {
+			$this->log->debug( "Getting next job..." );
+		}
+
+		try {
+			$this->currentJob = $this->pheanstalk->reserveFromTube( $this->getTubeName(), 5 );
+		} catch (\Pheanstalk_Exception_SocketException $e) {
+			$this->currentJob = false;
+		}
+
+		$this->checkForTerminationSignal();
+
+		if (!$this->currentJob) {
+			return;
+		}
+
+		$this->pheanstalk->bury( $this->currentJob );
 		$this->params = $this->preProcess($this->currentJob);
 	}
 
@@ -269,6 +287,10 @@ abstract class AbstractWorker {
 
 	private function signalHandler($signalNum) {
 		$this->keepRunning = false;
+	}
+
+	private function checkForTerminationSignal() {
+		pcntl_signal_dispatch();
 	}
 
 	/**
