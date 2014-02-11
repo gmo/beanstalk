@@ -93,7 +93,6 @@ abstract class AbstractWorker {
 		}
 
 		do {
-			$this->log->debug( "Getting next job" );
 			$this->getJob();
 			if (!$this->currentJob) { continue; }
 
