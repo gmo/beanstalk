@@ -3,6 +3,7 @@ namespace GMO\Beanstalk;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * Queue manages jobs in tubes and provides stats about jobs
@@ -272,38 +273,52 @@ class Queue implements LoggerAwareInterface {
 	}
 
 	/**
-	 * Gets a singleton instance of Queue
-	 * @param LoggerInterface $logger
-	 * @param string          $host
-	 * @param int             $port
+	 * @deprecated Use constructor instead
+	 * @param string $host
+	 * @param int    $port
+	 * @param string $logger [Optional] Default: NullLogger
 	 * @return Queue
-	 * @TODO In 2.0 make $logger optional
 	 */
-	public static function getInstance( LoggerInterface $logger, $host, $port ) {
-		if ( self::$instance == null ) {
-			$queueClass = get_called_class();
-			self::$instance = new $queueClass($logger, $host, $port);
-		}
-
-		return self::$instance;
+	public static function getInstance( $host, $port, $logger = null ) {
+		$queueClass = get_called_class();
+		return new $queueClass($host, $port, $logger);
 	}
 
 	/**
 	 * Sets up a new Queue
-	 * @param LoggerInterface $logger
-	 * @param string          $host
-	 * @param int             $port
+	 *
+	 * @example new Queue($host, $port, LoggerInterface $logger = null)
+	 * @example BC: new Queue($logger, $host, $port)
+	 *
+	 * @param string $host
+	 * @param int    $port
+	 * @param string $logger [Optional] Default: NullLogger
 	 */
-	private function __construct( LoggerInterface $logger, $host, $port ) {
-		$this->pheanstalk = new \Pheanstalk_Pheanstalk($host, $port);
-		$this->log = $logger;
+	public function __construct( $host, $port, $logger = null ) {
+		$args = func_get_args();
+
+		if ($args[0] instanceof LoggerInterface) {
+			$logger = array_shift($args);
+			$this->log = $logger;
+		}
+
+		if ($args[0] === null) {
+			array_shift($args);
+		}
+
+		$this->pheanstalk = new \Pheanstalk_Pheanstalk($args[0], $args[1]);
+
+		if (isset($args[2]) && $args[2] instanceof LoggerInterface) {
+			$this->log = $args[2];
+		}
+
+		if (!$this->log) {
+			$this->log = new NullLogger();
+		}
 	}
 
 	/** @var \Pheanstalk_Pheanstalk */
 	protected $pheanstalk;
-	
-	/** @var Queue */
-	private static $instance;
 
 	/** @var LoggerInterface */
 	private $log;
