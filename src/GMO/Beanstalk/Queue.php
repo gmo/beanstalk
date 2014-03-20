@@ -1,6 +1,7 @@
 <?php
 namespace GMO\Beanstalk;
 
+use GMO\Common\String;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -31,73 +32,134 @@ class Queue implements LoggerAwareInterface {
 		$filename = basename( $args[0] );
 
 		function help( $filename ) {
-			echo "php $filename [stats|view|delete|kick]\n";
-			echo "              delete [ready|buried|delayed] (Default: ready)\n";
-			echo "              kick   [buried|delayed]       (Default: buried)\n";
+			echo "Usage:\n";
+			echo "  php $filename stats|view|list|delete|kick [tube]\n";
+			echo "                kick   [buried|delayed]       (Default: buried)\n";
+			echo "                delete [ready|buried|delayed] (Default: ready)\n";
+			echo "\n";
+			echo "Examples:\n";
+			echo "  php $filename stats\n";
+			echo "  php $filename kick ExampleTube\n";
+			echo "  php $filename delete buried ExampleTube\n";
+			echo "\n";
+			echo "Args in [] are optional.\n";
+			echo "If no tube is specified command is applied to all tubes.\n";
+			echo "Tube name can be approximate.\n";
+			echo "\n\n";
 			exit(1);
 		}
 
-		function getMethod( $args, LoggerInterface $log ) {
-			if ( !isset($args[1]) ) {
-				return "help";
-			}
+		function getMethod( $args ) {
+			$args = array_merge($args, array("", "", ""));
+
+			$msg = "";
+			$method = "help";
+			$tube = "";
+
 			switch ( $args[1] ) {
 				case "delete":
-					if ( !isset($args[2]) ) {
-						$log->info( "Deleting ready jobs" );
-						return "deleteReadyJobs";
-					}
+					$tube = $args[3];
 					switch ( $args[2] ) {
 						case "buried":
-							$log->info( "Deleting buried jobs" );
-							return "deleteBuriedJobs";
+							$msg = "Deleting buried jobs";
+							$method = "deleteBuriedJobs";
+							break;
 						case "delayed":
-							$log->info( "Deleting delayed jobs" );
-							return "deleteDelayedJobs";
+							$msg = "Deleting delayed jobs";
+							$method = "deleteDelayedJobs";
+							break;
 						case "ready":
-							$log->info( "Deleting ready jobs" );
-							return "deleteReadyJobs";
+							$msg = "Deleting ready jobs";
+							$method = "deleteReadyJobs";
+							break;
+						default:
+							if (!$tube) {
+								$tube = $args[2];
+							}
+							$msg = "Deleting ready jobs";
+							$method = "deleteReadyJobs";
+							break;
 					}
-					return "help";
+					break;
 				case "stats":
-					$log->info( "View queue stats" );
-					return "getAllStats";
+					$msg = "View queue stats";
+					$tube = $args[2];
+					$method = $tube ? "getStats" : "getAllStats";
+					break;
 				case "view":
-					$log->info( "View ready jobs" );
-					return "getAllReadyJobs";
+					$msg = "View ready jobs";
+					$tube = $args[2];
+					$method = $tube ? "getReadyJobsIn" : "getAllReadyJobs";
+					break;
 				case "kick":
-					if ( !isset($args[2]) ) {
-						$log->info( "Kicking buried jobs" );
-						return "kickBuriedJobs";
-					}
+					$tube = $args[3];
 					switch ( $args[2] ) {
 						case "delayed":
-							$log->info( "Kicking delayed jobs" );
-							return "kickDelayedJobs";
+							$msg = "Kicking delayed jobs";
+							$method = "kickDelayedJobs";
+							break;
 						case "ready":
-							$log->info( "Cannot kick ready jobs" );
-							return "help";
+							$msg = "Cannot kick ready jobs";
+							$method = "help";
+							break;
 						case "buried":
-							$log->info( "Kicking buried jobs" );
-							return "kickBuriedJobs";
+							$msg = "Kicking buried jobs";
+							$method = "kickBuriedJobs";
+							break;
+						default:
+							if (!$tube) {
+								$tube = $args[2];
+							}
+							$msg = "Kicking buried jobs";
+							$method = "kickBuriedJobs";
+							break;
 					}
-					return "help";
+					break;
+				case "list":
+					$msg = "List tubes";
+					$method = "listTubes";
+					break;
 			}
-			return "help";
-		}
 
-		$method = getMethod( $args, $this->log );
+			return array($method, $tube, $msg);
+		}
+		list ($method, $tube, $msg) = getMethod( $args );
+
+		if ($tube) {
+			$tubesMatched = $this->findTubeName($tube);
+			if (empty($tubesMatched)) {
+				$this->log->info("Tube doesn't exist");
+				$method = "listTubes";
+			} elseif (count($tubesMatched) > 1) {
+				$this->log->info("Multiple tubes found, not sure which one to pick");
+				$method = "listTubes";
+			} else {
+				$tube = reset($tubesMatched);
+				$this->log->info("$msg in $tube");
+			}
+		} elseif (!empty($msg)) {
+			$this->log->info($msg);
+		}
 
 		switch ( $method ) {
 			case "help":
 				help( $filename );
 				break;
+			case "getStats":
 			case "getAllStats":
+			case "getReadyJobsIn":
 			case "getAllReadyJobs":
-				$tubes = $this->$method();
+				$tubes = $tube ? $this->$method($tube) : $this->$method();
 				$this->log->info( print_r( $tubes, true ) );
 				break;
+			case "listTubes":
+				$this->log->info( print_r( $this->listTubes(), true ) );
+				break;
 			default:
+				if ($tube) {
+					$this->$method($tube);
+					break;
+				}
 				foreach ( $this->listTubes() as $tube ) {
 					$this->$method( $tube );
 				}
@@ -315,6 +377,17 @@ class Queue implements LoggerAwareInterface {
 		if (!$this->log) {
 			$this->log = new NullLogger();
 		}
+	}
+
+	/**
+	 * Returns a list of tubes that match the tube given
+	 * @param $tubeName
+	 * @return array matched tubes
+	 */
+	protected function findTubeName($tubeName) {
+		return array_filter($this->listTubes(), function($tube) use ($tubeName) {
+				return String::containsInsensitive($tube, $tubeName);
+			});
 	}
 
 	/** @var \Pheanstalk_Pheanstalk */
