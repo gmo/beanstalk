@@ -210,7 +210,9 @@ class WorkerManager implements LoggerAwareInterface {
 		// Wait for them to exit
 		foreach ($processes as $process) {
 			$this->log->debug("Waiting for: $process...");
-			pcntl_waitpid($process, $status);
+			while($this->isProcessRunning($process)) {
+				usleep(200 * 1000); // 200 milliseconds
+			}
 		}
 	}
 
@@ -295,10 +297,22 @@ class WorkerManager implements LoggerAwareInterface {
 	 * @return array
 	 */
 	protected function listProcesses( $grep ) {
+		$grep = preg_replace('/ /', '\ ', $grep);
+
 		# get list of workers
 		$lines = array();
 		$this->execute( "ps aux | grep -v grep | grep " . $grep, $lines );
 		return $lines;
+	}
+
+	/**
+	 * Checks if pid is running
+	 * @param $pid
+	 * @return bool
+	 */
+	public function isProcessRunning($pid) {
+		$this->execute("ps $pid", $lines, $exitCode);
+		return $exitCode === 0;
 	}
 
 	/**
