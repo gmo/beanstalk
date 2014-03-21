@@ -32,14 +32,15 @@ class WorkerManager implements LoggerAwareInterface {
 		$filename = basename( $args[0] );
 
 		function help( $filename ) {
-			echo "php $filename [restart|start|stop|stats|beanstalkd]\n";
+			echo "php $filename restart|start|stop|stats|beanstalkd\n";
+			echo "              restart|start|stop [worker]\n";
 			echo "beanstalkd: Starts beanstalkd if not running (also starts workers if beanstalkd stopped)\n";
+			echo "\n\n";
 			exit(1);
 		}
 
-		if ( count( $args ) == 1 ) {
-			help( $filename );
-		}
+		$args = array_merge($args, array("", ""));
+		$workerName = $args[2];
 
 		switch ( $args[1] ) {
 			case "beanstalkd":
@@ -49,13 +50,13 @@ class WorkerManager implements LoggerAwareInterface {
 				}
 				break;
 			case "restart":
-				$this->restartWorkers();
+				$this->restartWorkers($workerName);
 				break;
 			case "stop":
-				$this->stopWorkers();
+				$this->stopWorkers($workerName);
 				break;
 			case "start":
-				$this->startWorkers();
+				$this->startWorkers($workerName);
 				break;
 			case "stats":
 				$this->log->info(print_r($this->getStats(), true));
@@ -68,20 +69,22 @@ class WorkerManager implements LoggerAwareInterface {
 
 	/**
 	 * Restarts all beanstalk workers
+	 * @param string $workerName [optional] worker name filter
 	 */
-	public function restartWorkers() {
-		$this->stopWorkers();
-		$this->startWorkers();
+	public function restartWorkers($workerName = null) {
+		$this->stopWorkers($workerName);
+		$this->startWorkers($workerName);
 	}
 
 	/**
 	 * Spawns workers of each type up to the number of
 	 * workers specified in each worker class.
+	 * @param string $workerName [optional] worker name filter
 	 */
-	public function startWorkers() {
+	public function startWorkers($workerName = null) {
 		$this->log->info( "Starting workers..." );
 		# get workers
-		$workers = $this->getWorkers( $this->workerDir );
+		$workers = $this->getWorkers( $workerName );
 
 		# get currently running workers
 		$currentWorkers = $this->getRunningWorkers();
@@ -125,9 +128,10 @@ class WorkerManager implements LoggerAwareInterface {
 	/**
 	 * Get an array of workers that have the
 	 * AbstractWorker as their parent class
+	 * @param string $workerName [optional] worker name filter
 	 * @return array key: class name, value: class instance
 	 */
-	public function getWorkers() {
+	public function getWorkers($workerName = null) {
 		$files = glob( $this->workerDir . "*.php" );
 		$workers = array();
 		foreach ( $files as $file ) {
@@ -137,6 +141,10 @@ class WorkerManager implements LoggerAwareInterface {
 			$classNameWithNamespace = $classNames[0];
 			# remove class name without namespace
 			$className = String::splitLast($classNameWithNamespace, "\\");
+
+			if ($workerName && !String::containsInsensitive($className, $workerName)) {
+				continue;
+			}
 
 			$cls = new \ReflectionClass($classNameWithNamespace);
 			if ($cls->isInstantiable() && $cls->isSubclassOf('\GMO\Beanstalk\AbstractWorker')) {
@@ -190,10 +198,15 @@ class WorkerManager implements LoggerAwareInterface {
 
 	/**
 	 * Stops all beanstalk workers
+	 * @param string $workerName [optional] worker name filter
 	 */
-	public function stopWorkers() {
+	public function stopWorkers($workerName = null) {
 		# get beanstalk processes
-		$processes = $this->listProcesses( $this->workerDir );
+		$workers = array_keys($this->getWorkers($workerName));
+		$processes = array();
+		foreach ($workers as $worker) {
+			$processes = array_merge($processes, $this->listProcesses( $this->workerDir . $worker ));
+		}
 		$processes = array_map(function($process) {
 				# parse process id
 				$parts = preg_split( "/[\\s]+/", $process );
