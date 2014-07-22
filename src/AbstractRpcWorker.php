@@ -29,7 +29,7 @@ abstract class AbstractRpcWorker extends AbstractWorker {
 	
 	/**
 	 * In post-processing, send the results back to the producer
-	 * @param \Pheanstalk_Job $job
+	 * @param \Pheanstalk\Job $job
 	 * @since 1.5.0
 	 */
 	protected function postProcess( $job ) {

@@ -27,14 +27,10 @@ class given_the_worker_runs_when_one_message_is_put_in_the_queue extends Context
 	}
 
 	/**
-	 * @var Queue
+	 * @var RpcQueue
 	 */
 	private static $queue;
-	/**
-	 * @var UnitTestWorker
-	 */
-	private static $sut;
-	
+
 	/**
 	 * @var UnitTestWorkerManager
 	 */

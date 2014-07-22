@@ -91,7 +91,7 @@ class WorkerManager implements LoggerAwareInterface {
 
 		/**
 		 * loop through workers
-		 * @param AbstractWorker $class
+		 * @var AbstractWorker $class
 		 */
 		foreach ( $workers as $worker => $class ) {
 			# get the number of currently running workers of this type
@@ -187,7 +187,7 @@ class WorkerManager implements LoggerAwareInterface {
 
 		$workers = $this->getWorkers();
 		$runningWorkers = $this->getRunningWorkers();
-		/** @param AbstractWorker $class */
+		/** @var AbstractWorker $class */
 		foreach ( $workers as $worker => $class ) {
 			$currentNum = Collection::get($runningWorkers, $worker, 0);
 			$stats[$worker] = $currentNum . "/" . $class->getNumberOfWorkers();
@@ -282,7 +282,7 @@ class WorkerManager implements LoggerAwareInterface {
 				$classes = self::getPhpClasses( $argv[0] );
 				/**
 				 * create instance
-				 * @param AbstractWorker $workerInstance
+				 * @var AbstractWorker $workerInstance
 				 */
 				$class = $classes[0];
 				$workerInstance = new $class;

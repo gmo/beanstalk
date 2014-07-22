@@ -3,6 +3,10 @@ namespace GMO\Beanstalk;
 
 use GMO\Common\Collection;
 use GMO\Common\String;
+use Pheanstalk\Exception\ServerException;
+use Pheanstalk\Exception\SocketException;
+use Pheanstalk\Job;
+use Pheanstalk\Pheanstalk;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -82,7 +86,7 @@ abstract class AbstractWorker {
 		pcntl_signal(SIGTERM, array($this, 'signalHandler'));
 
 		try {
-			$this->pheanstalk = new \Pheanstalk_Pheanstalk($host, $port);
+			$this->pheanstalk = new Pheanstalk($host, $port);
 			$this->setup();
 		} catch ( \Exception $e ) {
 			$this->log->critical(
@@ -131,7 +135,7 @@ abstract class AbstractWorker {
 	 * Gets the data from the job and
 	 * returns an associative array of job data.
 	 * By default data is json decoded and values are trimmed.
-	 * @param \Pheanstalk_Job $job
+	 * @param Job $job
 	 * @return array job params
 	 * @since 1.1.0
 	 */
@@ -150,7 +154,7 @@ abstract class AbstractWorker {
 	
 	/**
 	 * Hook to allow any extensions to do things after processing a job
-	 * @param \Pheanstalk_Job $job
+	 * @param Job $job
 	 * @since 1.5.0
 	 */
 	protected function postProcess( $job ) { }
@@ -174,7 +178,7 @@ abstract class AbstractWorker {
 
 		try {
 			$this->currentJob = $this->pheanstalk->reserveFromTube( $this->getTubeName(), 5 );
-		} catch (\Pheanstalk_Exception_SocketException $e) {
+		} catch (SocketException $e) {
 			$this->currentJob = false;
 		}
 
@@ -279,7 +283,7 @@ abstract class AbstractWorker {
 		$this->log->debug( "Deleting the current job from: " . $this->getTubeName() );
 		try {
 			$this->pheanstalk->delete( $this->currentJob );
-		} catch ( \Pheanstalk_Exception_ServerException $e ) {
+		} catch ( ServerException $e ) {
 			$this->log->warning( "Error deleting job", array("exception" => $e) );
 		}
 	}
@@ -299,7 +303,7 @@ abstract class AbstractWorker {
 	 */
 	protected $jobErrors = array();
 
-	/** @var \Pheanstalk_Job Current job being processed */
+	/** @var Job Current job being processed */
 	protected $currentJob;
 
 	/** @var mixed Results of call to process() */
@@ -311,7 +315,7 @@ abstract class AbstractWorker {
 	/** @var array Current Job JSON decoded array */
 	private $params;
 
-	/** @var \Pheanstalk_Pheanstalk */
+	/** @var Pheanstalk */
 	private $pheanstalk;
 
 	/** @var bool Boolean for running loop */

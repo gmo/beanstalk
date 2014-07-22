@@ -3,6 +3,7 @@ namespace GMO\Beanstalk;
 
 use GMO\Beanstalk\Exception\RpcTimeoutException;
 use GMO\Beanstalk\Exception\RpcInvalidResponseException;
+use Pheanstalk\Exception\ServerException;
 
 class RpcQueue extends Queue {
 	
@@ -27,7 +28,7 @@ class RpcQueue extends Queue {
 			if(!is_array($result) || !isset($result['result'])) {
 				throw new RpcInvalidResponseException('Result not sent');
 			}
-		} catch ( \Pheanstalk_Exception_ServerException $e ) {
+		} catch ( ServerException $e ) {
 			throw new RpcInvalidResponseException('Queue Server Exception: ' . $e->getMessage());
 		}
 		

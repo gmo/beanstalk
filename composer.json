@@ -3,7 +3,7 @@
 	"description": "Common beanstalk worker abstraction and queue utilities",
 	"require": {
 		"psr/log": "1.0.0",
-		"pda/pheanstalk": "2.1.0",
+		"pda/pheanstalk": "~3.0",
 		"gmo/common": "~1.7"
 	},
 	"require-dev": {

@@ -2,7 +2,6 @@
 namespace workers;
 
 use GMO\Beanstalk\SerializableWorker;
-use GMO\Common\ISerializable;
 use Psr\Log\NullLogger;
 use UnitTestWorkerManager;
 

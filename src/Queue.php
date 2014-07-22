@@ -2,6 +2,8 @@
 namespace GMO\Beanstalk;
 
 use GMO\Common\String;
+use Pheanstalk\Exception\ServerException;
+use Pheanstalk\Pheanstalk;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -231,11 +233,11 @@ class Queue implements LoggerAwareInterface {
 			while ( $job = $this->pheanstalk->$state( $tube ) ) {
 				try {
 					$this->pheanstalk->delete( $job );
-				} catch ( \Pheanstalk_Exception_ServerException $e ) {
+				} catch ( ServerException $e ) {
 					$this->log->warning( "Error deleting job", array("exception" => $e) );
 				}
 			}
-		} catch ( \Pheanstalk_Exception_ServerException $e ) { }
+		} catch ( ServerException $e ) { }
 	}
 
 	// Public functions that returns information about the queues
@@ -258,7 +260,7 @@ class Queue implements LoggerAwareInterface {
 			if ( isset($stats["current-jobs-ready"]) ) {
 				return $stats["current-jobs-ready"];
 			}
-		} catch ( \Pheanstalk_Exception_ServerException $e ) { }
+		} catch ( ServerException $e ) { }
 		return 0;
 	}
 
@@ -318,7 +320,7 @@ class Queue implements LoggerAwareInterface {
 
 			$this->kickBuriedJobs( $tube );
 
-		} catch ( \Pheanstalk_Exception_ServerException $e ) {
+		} catch ( ServerException $e ) {
 		}
 
 		return $queuedJobs;
@@ -368,7 +370,7 @@ class Queue implements LoggerAwareInterface {
 			array_shift($args);
 		}
 
-		$this->pheanstalk = new \Pheanstalk_Pheanstalk($args[0], $args[1]);
+		$this->pheanstalk = new Pheanstalk($args[0], $args[1]);
 
 		if (isset($args[2]) && $args[2] instanceof LoggerInterface) {
 			$this->log = $args[2];
@@ -390,7 +392,7 @@ class Queue implements LoggerAwareInterface {
 			});
 	}
 
-	/** @var \Pheanstalk_Pheanstalk */
+	/** @var Pheanstalk */
 	protected $pheanstalk;
 
 	/** @var LoggerInterface */
