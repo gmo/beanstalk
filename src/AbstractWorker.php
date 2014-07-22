@@ -288,7 +288,7 @@ abstract class AbstractWorker {
 		}
 	}
 
-	private function signalHandler($signalNum) {
+	private function signalHandler(/** @noinspection PhpUnusedParameterInspection */ $signalNum) {
 		$this->keepRunning = false;
 	}
 

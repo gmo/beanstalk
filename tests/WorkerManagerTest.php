@@ -104,9 +104,11 @@ class Given_a_directory_get_number_of_workers extends ContextSpecification {
 			"UnitTestWorkerSetupFailure"                     => 0
 		);
 		foreach ( $correctWorkers as $workerName => $workerCount ) {
+			/** @var \GMO\Beanstalk\AbstractWorker $worker */
+			$worker = self::$workers[$workerName];
 			$this->assertEquals(
 			     $workerCount,
-			     self::$workers[$workerName]->getNumberOfWorkers()
+			     $worker->getNumberOfWorkers()
 			);
 		}
 	}
