@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "aa2815045dec3d442a36053fd9e881ee",
+    "hash": "ddbf29cfab397e7d1b35ad4ef9a04e01",
     "packages": [
         {
             "name": "gmo/common",
@@ -121,6 +121,32 @@
         }
     ],
     "packages-dev": [
+        {
+            "name": "gmo/dependency-injection",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "git@bitbucket.org:gmodev/dependency-injection-library.git",
+                "reference": "2aaefcecc17045b249c24ff9e8d94b016bc704b2"
+            },
+            "require": {
+                "pimple/pimple": "~1.0"
+            },
+            "require-dev": {
+                "silex/silex": "~1.1"
+            },
+            "suggest": {
+                "silex/silex": "Provides wrapper for Silex Application to handle ServiceProviderInterface"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "GMO\\DependencyInjection\\": "src/"
+                }
+            },
+            "description": "A library that allows you to standardize and centralize the way objects are constructed",
+            "time": "2014-07-02 19:52:15"
+        },
         {
             "name": "phpunit/php-code-coverage",
             "version": "1.2.17",
@@ -486,6 +512,54 @@
                 "xunit"
             ],
             "time": "2013-01-13 10:24:48"
+        },
+        {
+            "name": "pimple/pimple",
+            "version": "v1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fabpot/Pimple.git",
+                "reference": "2019c145fe393923f3441b23f29bbdfaa5c58c4d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fabpot/Pimple/zipball/2019c145fe393923f3441b23f29bbdfaa5c58c4d",
+                "reference": "2019c145fe393923f3441b23f29bbdfaa5c58c4d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Pimple": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com",
+                    "homepage": "http://fabien.potencier.org",
+                    "role": "Lead Developer"
+                }
+            ],
+            "description": "Pimple is a simple Dependency Injection Container for PHP 5.3",
+            "homepage": "http://pimple.sensiolabs.org",
+            "keywords": [
+                "container",
+                "dependency injection"
+            ],
+            "time": "2013-11-22 08:30:29"
         },
         {
             "name": "symfony/yaml",
