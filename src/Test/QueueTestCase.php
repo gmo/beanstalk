@@ -52,15 +52,44 @@ abstract class QueueTestCase extends \PHPUnit_Framework_TestCase {
 		static::$queue->deleteBuriedJobs($tube);
 	}
 
+	protected static function getJobs($tube, $decode = true) {
+		$jobs = static::$queue->getReadyJobsIn($tube);
+		if ($decode) {
+			$jobs = array_map(function($job) { return json_decode($job, true); }, $jobs);
+		}
+		return $jobs;
+	}
+
+	protected static function getFirstJob($tube, $decode = true) {
+		$jobs = static::getJobs($tube, $decode);
+		return $jobs[0];
+	}
+
 	protected static function assertTubeContains($value, $tube, $message = '', $ignoreCase = false) {
-		static::assertContains($value, static::$queue->getReadyJobsIn($tube), $message, $ignoreCase);
+		$jobs = static::getJobs($tube, is_array($value));
+		static::assertContains($value, $jobs, $message, $ignoreCase);
 	}
 
 	protected static function assertTubeNotContains($value, $tube, $message = '', $ignoreCase = false) {
-		static::assertNotContains($value, static::$queue->getReadyJobsIn($tube), $message, $ignoreCase);
+		$jobs = static::getJobs($tube, is_array($value));
+		static::assertNotContains($value, $jobs, $message, $ignoreCase);
 	}
 
 	protected static function assertTubeEquals($expected, $tube, $message = '', $ignoreCase = false, $delta = 0, $maxDepth = 10, $canonicalize = false) {
-		static::assertEquals($expected, static::$queue->getReadyJobsIn($tube), $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
+		$jobs = static::getJobs($tube, is_array($expected[0]));
+		static::assertEquals($expected, $jobs, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
+	}
+
+	protected static function assertTubeCount($expectedCount, $tube, $message = '') {
+		static::assertCount($expectedCount, static::$queue->getReadyJobsIn($tube), $message);
+	}
+
+	protected static function assertTubeEmpty($tube, $message = '') {
+		static::assertTubeCount(0, $tube, $message);
+	}
+
+	protected static function assertFirstJobParameter($expectedValue, $tube, $key, $message = '') {
+		$job = static::getFirstJob($tube);
+		static::assertEquals($expectedValue, $job[$key], $message);
 	}
 }
