@@ -3,6 +3,8 @@ namespace GMO\Beanstalk;
 
 use GMO\Common\String;
 use Pheanstalk\Exception\ServerException;
+use Pheanstalk\Exception\SocketException;
+use Pheanstalk\Job;
 use Pheanstalk\Pheanstalk;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -186,7 +188,7 @@ class Queue implements LoggerAwareInterface {
 	 * @param string $tube
 	 */
 	public function kickBuriedJobs( $tube ) {
-		$stats = $this->pheanstalk->statsTube( $tube );
+		$stats = $this->getStats( $tube );
 		$this->pheanstalk->useTube( $tube )->kick( $stats["current-jobs-buried"] );
 	}
 
@@ -195,7 +197,7 @@ class Queue implements LoggerAwareInterface {
 	 * @param string $tube
 	 */
 	public function kickDelayedJobs( $tube ) {
-		$stats = $this->pheanstalk->statsTube( $tube );
+		$stats = $this->getStats( $tube );
 		$this->pheanstalk->useTube( $tube )->kick( $stats["current-jobs-delayed"] );
 	}
 
@@ -325,6 +327,40 @@ class Queue implements LoggerAwareInterface {
 		}
 
 		return $queuedJobs;
+	}
+
+	/**
+	 * Reserves a job from the specified tube or false if error or timeout
+	 * @param string   $tube
+	 * @param int|null $timeout
+	 * @return Job|false
+	 */
+	public function getJob($tube, $timeout = null) {
+		try {
+			return $this->pheanstalk->reserveFromTube($tube, $timeout);
+		} catch (SocketException $e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Buries a job
+	 * @param Job $job
+	 */
+	public function buryJob($job) {
+		$this->pheanstalk->bury($job);
+	}
+
+	/**
+	 * Deletes a job
+	 * @param Job $job
+	 */
+	public function deleteJob($job) {
+		try {
+			$this->pheanstalk->delete($job);
+		} catch (ServerException $e) {
+			$this->log->warning("Error deleting job", array( "exception" => $e ));
+		}
 	}
 
 	// Functions to setup object

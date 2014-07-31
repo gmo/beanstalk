@@ -3,10 +3,7 @@ namespace GMO\Beanstalk;
 
 use GMO\Common\Collection;
 use GMO\Common\String;
-use Pheanstalk\Exception\ServerException;
-use Pheanstalk\Exception\SocketException;
 use Pheanstalk\Job;
-use Pheanstalk\Pheanstalk;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -81,12 +78,12 @@ abstract class AbstractWorker {
 	 * @throws \Exception
 	 */
 	public function run( $host, $port ) {
-		$this->log->info( "Running worker: " . $this->getTubeName() );
+		$this->log->info( "Running worker: " . $this->tubeName );
 
 		pcntl_signal(SIGTERM, array($this, 'signalHandler'));
 
 		try {
-			$this->pheanstalk = new Pheanstalk($host, $port);
+			$this->queue = new Queue($host, $port, $this->log);
 			$this->setup();
 		} catch ( \Exception $e ) {
 			$this->log->critical(
@@ -165,6 +162,7 @@ abstract class AbstractWorker {
 	 */
 	public function __construct() {
 		$this->log = $this->getLogger();
+		$this->tubeName = $this->getTubeName();
 	}
 
 	private function getJob() {
@@ -176,11 +174,7 @@ abstract class AbstractWorker {
 			$this->log->debug( "Getting next job..." );
 		}
 
-		try {
-			$this->currentJob = $this->pheanstalk->reserveFromTube( $this->getTubeName(), 5 );
-		} catch (SocketException $e) {
-			$this->currentJob = false;
-		}
+		$this->currentJob = $this->queue->getJob($this->tubeName, 5);
 
 		$this->checkForTerminationSignal();
 
@@ -188,7 +182,7 @@ abstract class AbstractWorker {
 			return;
 		}
 
-		$this->pheanstalk->bury( $this->currentJob );
+		$this->queue->buryJob($this->currentJob);
 		$this->params = $this->preProcess($this->currentJob);
 	}
 
@@ -280,12 +274,8 @@ abstract class AbstractWorker {
 	}
 
 	private function deleteJob() {
-		$this->log->debug( "Deleting the current job from: " . $this->getTubeName() );
-		try {
-			$this->pheanstalk->delete( $this->currentJob );
-		} catch ( ServerException $e ) {
-			$this->log->warning( "Error deleting job", array("exception" => $e) );
-		}
+		$this->log->debug( "Deleting the current job from: " . $this->tubeName );
+		$this->queue->deleteJob($this->currentJob);
 	}
 
 	private function signalHandler(/** @noinspection PhpUnusedParameterInspection */ $signalNum) {
@@ -303,6 +293,9 @@ abstract class AbstractWorker {
 	 */
 	protected $jobErrors = array();
 
+	/** @var string */
+	protected $tubeName;
+
 	/** @var Job Current job being processed */
 	protected $currentJob;
 
@@ -315,8 +308,8 @@ abstract class AbstractWorker {
 	/** @var array Current Job JSON decoded array */
 	private $params;
 
-	/** @var Pheanstalk */
-	private $pheanstalk;
+	/** @var Queue */
+	private $queue;
 
 	/** @var bool Boolean for running loop */
 	private $keepRunning = true;
