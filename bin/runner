@@ -1,0 +1,19 @@
+#!/usr/bin/env php
+<?php
+
+exec('"' . __DIR__ . '/findAutoloader"', $output);
+$autoloader = $output[0];
+/** @noinspection PhpIncludeInspection */
+require_once $autoloader;
+
+list(
+	$cmd,
+	$workerDir,
+	$workerName,
+	$host,
+	$port,
+) = $argv;
+
+/** @var \GMO\Beanstalk\AbstractWorker $worker */
+$worker = new $workerName;
+$worker->run($host, $port);
