@@ -5,6 +5,7 @@ use GMO\Common\Collection;
 use GMO\Common\String;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * WorkerManager controls beanstalk workers.
@@ -32,17 +33,14 @@ class WorkerManager implements LoggerAwareInterface {
 		$filename = basename( $args[0] );
 
 		function help( $filename ) {
-			echo "php $filename restart|start|stop|stats|beanstalkd\n";
-			echo "              restart|start|stop [worker]\n";
-			echo "beanstalkd: Starts beanstalkd if not running (also starts workers if beanstalkd stopped)\n";
-			echo "\n\n";
+			echo "php $filename restart|start|stop|stats [worker ...]\n";
+			echo "\n";
 			exit(1);
 		}
 
-		$args = array_merge($args, array("", ""));
-		$workerName = $args[2];
+		$filter = array_slice($args, 2);
 
-		switch ( $args[1] ) {
+		switch (Collection::get($args, 1)) {
 			case "beanstalkd":
 				if ( !$this->isBeanstalkdRunning() ) {
 					$this->startBeanstalkd();
@@ -50,16 +48,16 @@ class WorkerManager implements LoggerAwareInterface {
 				}
 				break;
 			case "restart":
-				$this->restartWorkers($workerName);
+				$this->restartWorkers($filter);
 				break;
 			case "stop":
-				$this->stopWorkers($workerName);
+				$this->stopWorkers($filter);
 				break;
 			case "start":
-				$this->startWorkers($workerName);
+				$this->startWorkers($filter);
 				break;
 			case "stats":
-				$this->log->info(print_r($this->getStats(), true));
+				$this->log->info(print_r($this->getStats($filter), true));
 				break;
 			default:
 				help( $filename );
@@ -69,40 +67,32 @@ class WorkerManager implements LoggerAwareInterface {
 
 	/**
 	 * Restarts all beanstalk workers
-	 * @param string $workerName [optional] worker name filter
+	 * @param null|string|array $filter [optional] worker(s) filter
 	 */
-	public function restartWorkers($workerName = null) {
-		$this->stopWorkers($workerName);
-		$this->startWorkers($workerName);
+	public function restartWorkers($filter = null) {
+		$this->stopWorkers($filter);
+		$this->startWorkers($filter);
 	}
 
 	/**
 	 * Spawns workers of each type up to the number of
 	 * workers specified in each worker class.
-	 * @param string $workerName [optional] worker name filter
+	 * @param null|string|array $filter [optional] worker(s) filter
 	 */
-	public function startWorkers($workerName = null) {
+	public function startWorkers($filter = null) {
 		$this->log->info( "Starting workers..." );
 		# get workers
-		$workers = $this->getWorkers( $workerName );
+		$workers = $this->getWorkers( $filter );
 
-		# get currently running workers
-		$currentWorkers = $this->getRunningWorkers();
+		foreach ($workers as $worker) {
+			$workersToSpawn = $worker->getTotal() - $worker->getNumRunning();
 
-		/**
-		 * loop through workers
-		 * @var AbstractWorker $class
-		 */
-		foreach ( $workers as $worker => $class ) {
-			# get the number of currently running workers of this type
-			$currentNumber = Collection::get($currentWorkers, $worker, 0);
-
-			# set number of new workers to spawn from this difference
-			$workersToSpawn = $class->getNumberOfWorkers() - $currentNumber;
-
+			if ($workersToSpawn > 0) {
+				$this->log->info("Starting $workersToSpawn workers: " . $worker->getName());
+			}
 			# spawn new workers
 			for ( $i = 0; $i < $workersToSpawn; $i++ ) {
-				$this->startWorker( $worker );
+				$this->spawnWorker($worker);
 			}
 		}
 	}
@@ -116,63 +106,48 @@ class WorkerManager implements LoggerAwareInterface {
 			$this->log->error( "Worker: $worker doesn't exist" );
 			return;
 		}
-		$this->log->info( "Starting worker: " . $worker );
-		$this->execute(
-		     "nohup php {$this->workerDir}{$worker}.php --run " .
-		     "$this->host $this->port" .
-		     //TODO: Use actual logger not redirection
-		     " >> /var/log/gmo/beanstalkd/$worker.log 2>&1 &"
-		);
+
+		$classes = $this->getPhpClasses($this->workerDir . $worker . '.php');
+		$worker = new WorkerInfo($classes[0]);
+
+		$this->log->info("Starting worker: " . $worker->getName());
+		$this->spawnWorker($worker);
 	}
 
 	/**
 	 * Get an array of workers that have the
 	 * AbstractWorker as their parent class
-	 * @param string $workerName [optional] worker name filter
-	 * @return array key: class name, value: class instance
+	 * @param null|string|array $filter [optional] worker(s) filter
+	 * @return WorkerInfo[]
 	 */
-	public function getWorkers($workerName = null) {
+	public function getWorkers($filter = null) {
 		$files = glob( $this->workerDir . "*.php" );
+		/** @var WorkerInfo[] $workers */
 		$workers = array();
 		foreach ( $files as $file ) {
-			# parse classes in file
+			# parse classes in file and use first
 			$classNames = $this->getPhpClasses( $file );
-			# only use the first class
-			$classNameWithNamespace = $classNames[0];
-			# remove class name without namespace
-			$className = String::splitLast($classNameWithNamespace, "\\");
+			$workerInfo = new WorkerInfo($classNames[0]);
 
-			if ($workerName && !String::containsInsensitive($className, $workerName)) {
+			if (!$this->filterWorkers($workerInfo->getName(), $filter)) {
 				continue;
 			}
 
-			$cls = new \ReflectionClass($classNameWithNamespace);
+			$cls = $workerInfo->getReflectionClass();
 			if ($cls->isInstantiable() && $cls->isSubclassOf('\GMO\Beanstalk\AbstractWorker')) {
-				$workers[$className] = $cls->newInstance();
+				$workers[$workerInfo->getFullyQualifiedName()] = $workerInfo;
 			}
 		}
-		return $workers;
-	}
 
-	/**
-	 * Get a key/value array of currently running workers
-	 * key: worker name, value: number of workers
-	 * @return array
-	 */
-	public function getRunningWorkers() {
-		# get beanstalk processes
-		$processes = $this->listProcesses( $this->workerDir );
-
-		# parse processes into workers array
-		$workers = array();
+		$this->execute(sprintf('ps ax -o pid,command | grep -v grep | grep "runner \"%s\""', $this->workerDir), $processes);
 		foreach ( $processes as $process ) {
-			$matches = array();
-			$preg_worker_dir = str_replace('/', '\/', $this->workerDir);
-			if(!preg_match('/' . $preg_worker_dir . '(.*?)[.]php/', $process, $matches)) {
+			if (!preg_match_all('/"[^"]+"|\S+/', $process, $matches)) {
 				continue;
 			}
-			$worker = $matches[1];
-			$workers = Collection::increment($workers, $worker);
+			$parts = $matches[0];
+			if (isset($workers[$parts[4]])) {
+				$workers[$parts[4]]->addPid($parts[0]);
+			}
 		}
 
 		return $workers;
@@ -180,17 +155,15 @@ class WorkerManager implements LoggerAwareInterface {
 
 	/**
 	 * Returns an array containing: WorkerName => # Running / # Total
+	 * @param null|string|array $filter [optional] worker(s) filter
 	 * @return array
 	 */
-	public function getStats() {
+	public function getStats($filter = null) {
 		$stats = array();
 
-		$workers = $this->getWorkers();
-		$runningWorkers = $this->getRunningWorkers();
-		/** @var AbstractWorker $class */
-		foreach ( $workers as $worker => $class ) {
-			$currentNum = Collection::get($runningWorkers, $worker, 0);
-			$stats[$worker] = $currentNum . "/" . $class->getNumberOfWorkers();
+		$workers = $this->getWorkers($filter);
+		foreach ($workers as $worker) {
+			$stats[$worker->getName()] = $worker->getNumRunning() . "/" . $worker->getTotal();
 		}
 
 		return $stats;
@@ -198,61 +171,59 @@ class WorkerManager implements LoggerAwareInterface {
 
 	/**
 	 * Stops all beanstalk workers
-	 * @param string $workerName [optional] worker name filter
+	 * @param null|string|array $filter [optional] worker(s) filter
 	 */
-	public function stopWorkers($workerName = null) {
-		# get beanstalk processes
-		$workers = array_keys($this->getWorkers($workerName));
-		$processes = array();
+	public function stopWorkers($filter = null) {
+		$workers = $this->getWorkers($filter);
 		foreach ($workers as $worker) {
-			$processes = array_merge($processes, $this->listProcesses( $this->workerDir . $worker ));
+			if (count($worker->getPids()) === 0) {
+				continue;
+			}
+			$this->log->info( "Stopping workers: " . $worker->getName() );
+			foreach ($worker->getPids() as $pid) {
+				$this->log->debug(sprintf("Terminating: [%s] %s", $pid, $worker->getName()));
+				posix_kill($pid, SIGTERM);
+			}
 		}
-		$processes = array_map(function($process) {
-				# parse process id
-				$parts = preg_split( "/[\\s]+/", $process );
-				return $parts[1];
-			}, $processes);
-
-		$this->log->info( "Stopping workers: " . count( $processes ) );
-
-		// Send signal to workers to stop
-		foreach ($processes as $process) {
-			$this->log->debug("Sending terminate signal to: $process");
-			posix_kill($process, SIGTERM);
-		}
-		// Wait for them to exit
-		foreach ($processes as $process) {
-			$this->log->debug("Waiting for: $process...");
-			while($this->isProcessRunning($process)) {
-				usleep(200 * 1000); // 200 milliseconds
+		foreach ($workers as $worker) {
+			foreach ($worker->getPids() as $pid) {
+				$this->log->debug(sprintf("Waiting for: [%s] %s...", $pid, $worker->getName()));
+				$this->waitForProcess($pid);
+				$worker->removePid($pid);
 			}
 		}
 	}
 
 	/**
-	 * Checks if beanstalkd is running
 	 * @return bool
+	 * @deprecated
 	 */
-	public function isBeanstalkdRunning() {
-		$processes = $this->listProcesses( "bin/beanstalkd" );
-		return $processes > 0;
-	}
+	public function isBeanstalkdRunning() { return true; }
 
 	/**
-	 * Starts beanstalkd
+	 * @deprecated
 	 */
-	public function startBeanstalkd() {
-		$this->log->info( "Starting beanstalkd" );
-		$this->execute( "/etc/init.d/beanstalkd start" );
-	}
+	public function startBeanstalkd() { }
 
-	/**
-	 * Sets a logger instance on the object
-	 * @param LoggerInterface $logger
-	 * @return null
-	 */
+	/** @inheritdoc */
 	public function setLogger( LoggerInterface $logger ) {
 		$this->log = $logger;
+	}
+
+	private function spawnWorker(WorkerInfo $worker) {
+		//TODO: Use actual logger not redirection
+		$cmd = sprintf('%s "\"%s\"" "%s" %s %d >> /var/log/gmo/beanstalkd/%s.log 2>&1 &',
+			'./runner',
+			$this->workerDir,
+			$worker->getFullyQualifiedName(),
+			$this->host,
+			$this->port,
+			$worker->getName()
+		);
+		$cwd = getcwd();
+		chdir(__DIR__ . '/../bin');
+		$this->execute($cmd);
+		chdir($cwd);
 	}
 
 	/**
@@ -260,39 +231,17 @@ class WorkerManager implements LoggerAwareInterface {
 	 * @param LoggerInterface $logger
 	 * @param string          $host      Beanstalkd host
 	 * @param int             $port      Beanstalkd port
-	 * @TODO In 2.0 make logger optional
 	 */
-	function __construct( $workerDir, LoggerInterface $logger, $host, $port ) {
+	public function __construct($workerDir, LoggerInterface $logger = null, $host = 'localhost', $port = 11300) {
 		$this->workerDir = realpath( $workerDir ) . "/";
 
-		$this->log = $logger;
+		$this->setLogger($logger ?: new NullLogger());
 		$this->host = $host;
 		$this->port = $port;
 	}
 
-	/**
-	 * Should not be called directly, only from the worker file.
-	 * Relies on the parameters in startWorker.
-	 */
-	public static function runWorker() {
-		global $argv;
-		if ( in_array( "--run", $argv ) ) {
-			try {
-				# get first class in called file
-				$classes = self::getPhpClasses( $argv[0] );
-				/**
-				 * create instance
-				 * @var AbstractWorker $workerInstance
-				 */
-				$class = $classes[0];
-				$workerInstance = new $class;
-				# start it
-				$workerInstance->run( $argv[2], $argv[3] );
-			} catch ( \Exception $ex ) {
-				// TODO: Log the exception
-			}
-		}
-	}
+	/** @deprecated */
+	public static function runWorker() { }
 
 	/**
 	 * Wraps the exec() function. Used for testing.
@@ -319,11 +268,38 @@ class WorkerManager implements LoggerAwareInterface {
 	}
 
 	/**
+	 * Fuzzy matching for worker name against one or multiple filters
+	 * @param string            $workerName
+	 * @param null|string|array $filters worker(s) filter
+	 * @return bool
+	 */
+	private function filterWorkers($workerName, $filters) {
+		if (!$filters) {
+			return true;
+		}
+		if (!is_array($filters)) {
+			$filters = array($filters);
+		}
+		foreach ($filters as $filter) {
+			if (String::contains($workerName, $filter, false)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private function waitForProcess($pid) {
+		while($this->isProcessRunning($pid)) {
+			usleep(200 * 1000); // 200 milliseconds
+		}
+	}
+
+	/**
 	 * Checks if pid is running
 	 * @param $pid
 	 * @return bool
 	 */
-	public function isProcessRunning($pid) {
+	private function isProcessRunning($pid) {
 		$this->execute("ps $pid", $lines, $exitCode);
 		return $exitCode === 0;
 	}
