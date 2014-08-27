@@ -18,6 +18,11 @@
 			"GMO\\Beanstalk\\": "src/"
 		}
 	},
+	"autoload-dev": {
+		"psr-0": {
+			"": "tests/"
+		}
+	},
 	"repositories": [
 		{ "type": "composer", "url": "composer.gmodev.com" }
 	]
