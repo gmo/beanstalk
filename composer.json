@@ -25,5 +25,12 @@
 	},
 	"repositories": [
 		{ "type": "composer", "url": "composer.gmodev.com" }
-	]
+	],
+	"archive": {
+		"exclude": [
+			"node_modules/",
+			"package.json",
+			"tests"
+		]
+	}
 }

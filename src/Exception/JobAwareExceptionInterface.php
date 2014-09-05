@@ -11,14 +11,14 @@ namespace GMO\Beanstalk\Exception;
  *
  * @package GMO\Beanstalk
  *
- * @since 1.3.0
+ * @since 2.0.0
  */
-interface IJobAwareException {
+interface JobAwareExceptionInterface {
 
 	/**
 	 * Check whether the job should be deleted
 	 * after number of failures specified in
-	 * {@see \GMO\Beanstalk\IJobAwareException::deleteAfter()}
+	 * {@see JobAwareExceptionInterface::deleteAfter deleteAfter()}
 	 * @return bool
 	 */
 	public function shouldDelete();
