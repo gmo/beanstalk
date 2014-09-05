@@ -1,6 +1,7 @@
 <?php
 namespace GMO\Beanstalk\Manager;
 
+use GMO\Beanstalk\Processor;
 use GMO\Common\Collection;
 use GMO\Common\String;
 use Psr\Log\LoggerAwareInterface;
@@ -126,7 +127,7 @@ class WorkerManager implements LoggerAwareInterface {
 		foreach ($workers as $worker) {
 			foreach ($worker->getPids() as $pid) {
 				$this->log->debug(sprintf("Waiting for: [%s] %s...", $pid, $worker->getName()));
-				$this->waitForProcess($pid);
+				$this->processor->waitForProcess($pid);
 				$worker->removePid($pid);
 			}
 		}
@@ -150,20 +151,15 @@ class WorkerManager implements LoggerAwareInterface {
 			}
 
 			$cls = $workerInfo->getReflectionClass();
-			if ($cls->isInstantiable() && $cls->isSubclassOf('\GMO\Beanstalk\AbstractWorker')) {
+			if ($cls->isInstantiable() && $cls->isSubclassOf('\GMO\Beanstalk\Worker\AbstractWorker')) {
 				$workers[$workerInfo->getFullyQualifiedName()] = $workerInfo;
 			}
 		}
 
-		$this->execute(sprintf('ps ax -o pid,command | grep -v grep | grep "runner \"%s\""', $this->workerDir),
-			$processes);
+		$processes = $this->processor->grepForPids(sprintf('runner \"%s\"', $this->workerDir));
 		foreach ($processes as $process) {
-			if (!preg_match_all('/"[^"]+"|\S+/', $process, $matches)) {
-				continue;
-			}
-			$parts = $matches[0];
-			if (isset($workers[$parts[4]])) {
-				$workers[$parts[4]]->addPid($parts[0]);
+			if (isset($workers[$process[0]])) {
+				$workers[$process[0]]->addPid($process[1]);
 			}
 		}
 
@@ -191,25 +187,12 @@ class WorkerManager implements LoggerAwareInterface {
 		$this->log = $logger;
 	}
 
-	/**
-	 * Wraps the exec() function. Used for testing.
-	 * @param       $command
-	 * @param array $output
-	 * @param null  $return_var
-	 */
-	protected function execute($command, array &$output = null, &$return_var = null) {
-		exec($command, $output, $return_var);
-	}
-
 	protected function spawnWorker(WorkerInfo $worker) {
 		//TODO: Use actual logger not redirection
 		$cmd =
 			sprintf('%s "\"%s\"" "%s" %s %d >> /var/log/gmo/beanstalkd/%s.log 2>&1 &', './runner', $this->workerDir,
 				$worker->getFullyQualifiedName(), $this->host, $this->port, $worker->getName());
-		$cwd = getcwd();
-		chdir(__DIR__ . '/../bin');
-		$this->execute($cmd);
-		chdir($cwd);
+		$this->processor->executeFromDir($cmd, __DIR__ . '/../../bin');
 	}
 
 	/**
@@ -231,22 +214,6 @@ class WorkerManager implements LoggerAwareInterface {
 			}
 		}
 		return false;
-	}
-
-	private function waitForProcess($pid) {
-		while ($this->isProcessRunning($pid)) {
-			usleep(200 * 1000); // 200 milliseconds
-		}
-	}
-
-	/**
-	 * Checks if pid is running
-	 * @param $pid
-	 * @return bool
-	 */
-	private function isProcessRunning($pid) {
-		$this->execute("ps $pid", $lines, $exitCode);
-		return $exitCode === 0;
 	}
 
 	/**
@@ -280,10 +247,17 @@ class WorkerManager implements LoggerAwareInterface {
 	 * @param LoggerInterface $logger
 	 * @param string          $host      Beanstalkd host
 	 * @param int             $port      Beanstalkd port
+	 * @param Processor       $processor
 	 */
-	public function __construct($workerDir, LoggerInterface $logger = null, $host = 'localhost', $port = 11300) {
+	public function __construct(
+		$workerDir,
+		LoggerInterface $logger = null,
+		$host = 'localhost',
+		$port = 11300,
+		Processor $processor = null
+	) {
 		$this->workerDir = realpath($workerDir) . "/";
-
+		$this->processor = $processor ?: new Processor();
 		$this->setLogger($logger ?: new NullLogger());
 		$this->host = $host;
 		$this->port = $port;
@@ -291,12 +265,12 @@ class WorkerManager implements LoggerAwareInterface {
 
 	/** @var string Directory containing workers */
 	protected $workerDir;
-
+	/** @var Processor */
+	protected $processor;
 	/** @var LoggerInterface */
-	private $log;
-
+	protected $log;
 	/** @var string */
-	private $host;
+	protected $host;
 	/** @var int */
-	private $port;
+	protected $port;
 }
