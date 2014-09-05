@@ -1,5 +1,5 @@
 <?php
-namespace GMO\Beanstalk;
+namespace GMO\Beanstalk\Manager;
 
 use GMO\Common\Collection;
 use GMO\Common\String;
@@ -41,12 +41,6 @@ class WorkerManager implements LoggerAwareInterface {
 		$filter = array_slice($args, 2);
 
 		switch (Collection::get($args, 1)) {
-			case "beanstalkd":
-				if ( !$this->isBeanstalkdRunning() ) {
-					$this->startBeanstalkd();
-					$this->startWorkers();
-				}
-				break;
 			case "restart":
 				$this->restartWorkers($filter);
 				break;
@@ -107,8 +101,7 @@ class WorkerManager implements LoggerAwareInterface {
 			return;
 		}
 
-		$classes = $this->getPhpClasses($this->workerDir . $worker . '.php');
-		$worker = new WorkerInfo($classes[0]);
+		$worker = new WorkerInfo($this->getPhpClass($this->workerDir . $worker . '.php'));
 
 		$this->log->info("Starting worker: " . $worker->getName());
 		$this->spawnWorker($worker);
@@ -125,9 +118,7 @@ class WorkerManager implements LoggerAwareInterface {
 		/** @var WorkerInfo[] $workers */
 		$workers = array();
 		foreach ( $files as $file ) {
-			# parse classes in file and use first
-			$classNames = $this->getPhpClasses( $file );
-			$workerInfo = new WorkerInfo($classNames[0]);
+			$workerInfo = new WorkerInfo($this->getPhpClass($file));
 
 			if (!$this->filterWorkers($workerInfo->getName(), $filter)) {
 				continue;
@@ -194,19 +185,8 @@ class WorkerManager implements LoggerAwareInterface {
 		}
 	}
 
-	/**
-	 * @return bool
-	 * @deprecated
-	 */
-	public function isBeanstalkdRunning() { return true; }
-
-	/**
-	 * @deprecated
-	 */
-	public function startBeanstalkd() { }
-
 	/** @inheritdoc */
-	public function setLogger( LoggerInterface $logger ) {
+	public function setLogger(LoggerInterface $logger) {
 		$this->log = $logger;
 	}
 
@@ -240,9 +220,6 @@ class WorkerManager implements LoggerAwareInterface {
 		$this->port = $port;
 	}
 
-	/** @deprecated */
-	public static function runWorker() { }
-
 	/**
 	 * Wraps the exec() function. Used for testing.
 	 * @param       $command
@@ -251,20 +228,6 @@ class WorkerManager implements LoggerAwareInterface {
 	 */
 	protected function execute( $command, array &$output = null, &$return_var = null ) {
 		exec( $command, $output, $return_var );
-	}
-
-	/**
-	 * Lists processes matching a search term
-	 * @param $grep
-	 * @return array
-	 */
-	protected function listProcesses( $grep ) {
-		$grep = preg_replace('/ /', '\ ', $grep);
-
-		# get list of workers
-		$lines = array();
-		$this->execute( "ps aux | grep -v grep | grep " . $grep, $lines );
-		return $lines;
 	}
 
 	/**
@@ -309,7 +272,7 @@ class WorkerManager implements LoggerAwareInterface {
 	 * @param string $file
 	 * @return array
 	 */
-	private static function getPhpClasses( $file ) {
+	private static function getPhpClass( $file ) {
 		$classes = array();
 		$phpCode = file_get_contents( $file );
 		$tokens = token_get_all( $phpCode );
@@ -324,7 +287,7 @@ class WorkerManager implements LoggerAwareInterface {
 				$classes[] = $classNameWithNamespace;
 			}
 		}
-		return $classes;
+		return $classes[0];
 	}
 
 	/**

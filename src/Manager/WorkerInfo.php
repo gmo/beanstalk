@@ -1,5 +1,5 @@
 <?php
-namespace GMO\Beanstalk;
+namespace GMO\Beanstalk\Manager;
 
 use GMO\Common\String;
 
@@ -35,7 +35,7 @@ class WorkerInfo {
 		return $this->refCls;
 	}
 
-	/** @return AbstractWorker */
+	/** @return \GMO\Beanstalk\Worker\WorkerInterface */
 	public function getInstance() {
 		if (!$this->instance) {
 			$this->instance = $this->getReflectionClass()->newInstance();
