@@ -5,7 +5,6 @@ use GMO\Common\String;
 use Pheanstalk\Exception\ServerException;
 use Pheanstalk\Exception\SocketException;
 use Pheanstalk\Pheanstalk;
-use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -22,7 +21,7 @@ use Psr\Log\NullLogger;
  *
  * @package GMO\Beanstalk
  */
-class Queue implements QueueInterface, LoggerAwareInterface {
+class Queue implements QueueInterface {
 
 	/**
 	 * Use this method when running from command-line.

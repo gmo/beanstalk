@@ -30,4 +30,5 @@ abstract class AbstractWorker implements WorkerInterface {
 	 */
 	public function getRequiredParams() { return array(); }
 
+	public function setup() { }
 }
