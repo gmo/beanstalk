@@ -250,53 +250,29 @@ class WorkerManager implements LoggerAwareInterface {
 	}
 
 	/**
-	 * Get class names from file
+	 * Get first class name from file
 	 * @param string $file
-	 * @return array
+	 * @return string|false fully qualified class name
 	 */
 	private static function getPhpClass($file) {
-		$classes = array();
+		$parser = new \PHPParser_Parser(new \PHPParser_Lexer());
 		$phpCode = file_get_contents($file);
-		$tokens = token_get_all($phpCode);
-		$namespace = self::getNamespaceFromTokens($tokens);
-
-		for ($i = 0; $i < count($tokens); $i++) {
-			# append fully qualified class name to list
-			if ($tokens[$i][0] == T_CLASS && $tokens[$i + 1][0] == T_WHITESPACE && $tokens[$i + 2][0] == T_STRING
-			) {
-				$className = $tokens[$i + 2][1];
-				$classNameWithNamespace = $namespace . "\\" . $className;
-				$classes[] = $classNameWithNamespace;
+		try {
+			$stmts = $parser->parse($phpCode);
+		} catch (\PHPParser_Error $e) {
+			return false;
+		}
+		foreach ($stmts as $stmt) {
+			if ($stmt instanceof \PHPParser_Node_Stmt_Namespace) {
+				$namespace = implode("\\", $stmt->name->parts);
+				foreach($stmt->stmts as $subStmt) {
+					if ($subStmt instanceof \PHPParser_Node_Stmt_Class) {
+						return $namespace . "\\" . $subStmt->name;
+					}
+				}
 			}
 		}
-		return $classes[0];
-	}
-
-	/**
-	 * Gets namespace from tokenized php file
-	 * @param $tokens
-	 * @return string
-	 */
-	private static function getNamespaceFromTokens($tokens) {
-		$namespace = "\\";
-		$inNamespaceToken = false;
-		for ($i = 0; $i < count($tokens); $i++) {
-			if ($tokens[$i] === ";") {
-				# end of namespace declaration
-				# or no namespace
-				break;
-			} elseif ($tokens[$i][0] == T_WHITESPACE) {
-				# skip whitespace tokens
-				continue;
-			} elseif ($inNamespaceToken && ($tokens[$i][0] == T_STRING || $tokens[$i][0] == T_NS_SEPARATOR)) {
-				# append next part of namespace
-				$namespace .= $tokens[$i][1];
-			} elseif ($tokens[$i][0] == T_NAMESPACE) {
-				# start of namespace declaration
-				$inNamespaceToken = true;
-			}
-		}
-		return $namespace;
+		return false;
 	}
 
 	/**
