@@ -1,7 +1,7 @@
 <?php
 namespace GMO\Beanstalk\Test;
 
-use GMO\Beanstalk\Queue;
+use GMO\Beanstalk\Queue\Queue;
 
 /**
  * Class QueueTestCase
@@ -53,7 +53,7 @@ abstract class QueueTestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	protected static function getJobs($tube, $decode = true) {
-		$jobs = static::$queue->getReadyJobsIn($tube);
+		$jobs = static::$queue->readyJobsFromTube($tube);
 		if ($decode) {
 			$jobs = array_map(function($job) { return json_decode($job, true); }, $jobs);
 		}
@@ -81,7 +81,7 @@ abstract class QueueTestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	protected static function assertTubeCount($expectedCount, $tube, $message = '') {
-		static::assertCount($expectedCount, static::$queue->getReadyJobsIn($tube), $message);
+		static::assertCount($expectedCount, static::$queue->readyJobsFromTube($tube), $message);
 	}
 
 	protected static function assertTubeEmpty($tube, $message = '') {
