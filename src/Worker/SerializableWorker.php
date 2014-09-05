@@ -1,5 +1,5 @@
 <?php
-namespace GMO\Beanstalk;
+namespace GMO\Beanstalk\Worker;
 
 use GMO\Beanstalk\Exception\NotSerializableJobException;
 use GMO\Common\ISerializable;
@@ -12,7 +12,6 @@ use GMO\Common\ISerializable;
 abstract class SerializableWorker extends AbstractWorker {
 
 	/**
-	 *
 	 * @param ISerializable $obj
 	 * @return void
 	 */
@@ -28,14 +27,14 @@ abstract class SerializableWorker extends AbstractWorker {
 
 	/**
 	 * Unserialize array into ISerializable object and call processSerializableObject()
-	 * @param array $params json decoded trimmed parameters
-	 * @throws Exception\NotSerializableJobException
+	 * @param \GMO\Beanstalk\Job $job
+	 * @throws NotSerializableJobException
 	 * @return void
 	 */
-	protected function process($params) {
+	public function process($job) {
 		if (!isset($params["class"])) {
 			throw new NotSerializableJobException('Job params are missing the "class" attribute');
-		} elseif (!is_subclass_of($params["class"], 'GMO\Common\ISerializable')) {
+		} elseif (!$params["class"] instanceof ISerializable) {
 			throw new NotSerializableJobException($params["class"] . ' does not implement GMO\Common\ISerializable');
 		}
 

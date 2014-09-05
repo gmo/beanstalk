@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+use GMO\Beanstalk\Queue\Queue;
+
 exec('"' . __DIR__ . '/findAutoloader"', $output);
 $autoloader = $output[0];
 /** @noinspection PhpIncludeInspection */
@@ -14,6 +16,10 @@ list(
 	$port,
 ) = $argv;
 
-/** @var \GMO\Beanstalk\AbstractWorker $worker */
-$worker = new $workerName;
-$worker->run($host, $port);
+/** @var GMO\Beanstalk\Worker\WorkerInterface $worker */
+$worker = new $workerName();
+$runnerClass = $worker->getRunnerClass();
+/** @var GMO\Beanstalk\Runner\RunnerInterface $runner */
+$runner = new $runnerClass();
+$runner->setup(new Queue($host, $port), $worker);
+$runner->run();
