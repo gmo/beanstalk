@@ -290,6 +290,10 @@ class Queue implements LoggerAwareInterface {
 		$response = $this->pheanstalk->statsTube( $tube );
 		// Normalize ArrayObject to Array
 		$stats = $response->getArrayCopy();
+		foreach ($stats as $key => $value) {
+			$response[$key] = intval($value);
+		}
+		$response['name'] = $tube;
 		return $stats;
 	}
 
