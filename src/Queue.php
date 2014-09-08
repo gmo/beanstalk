@@ -291,9 +291,9 @@ class Queue implements LoggerAwareInterface {
 		// Normalize ArrayObject to Array
 		$stats = $response->getArrayCopy();
 		foreach ($stats as $key => $value) {
-			$response[$key] = intval($value);
+			$stats[$key] = intval($value);
 		}
-		$response['name'] = $tube;
+		$stats['name'] = $tube;
 		return $stats;
 	}
 
