@@ -248,7 +248,9 @@ class Queue implements LoggerAwareInterface {
 	 * @return array
 	 */
 	public function listTubes() {
-		return $this->pheanstalk->listTubes();
+		$tubes = $this->pheanstalk->listTubes();
+		array_shift($tubes);
+		return $tubes;
 	}
 
 	/**
