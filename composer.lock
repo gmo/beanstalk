@@ -4,21 +4,29 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "988f0b8cba8f5ecf096ad5173bbc6262",
+    "hash": "6fbd423519b4c75dc4c2e19191ae310c",
     "packages": [
         {
             "name": "gmo/common",
-            "version": "v1.15.0",
+            "version": "v1.19.2",
             "source": {
                 "type": "git",
                 "url": "git@bitbucket.org:gmodev/common-library.git",
-                "reference": "c8572c58aa677e2e368c2b347632affee162df27"
+                "reference": "0f3dbc1100754274380206a17832d5c0d0a1b072"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "http://composer.gmodev.com/dist/gmo-common-v1.19.2-e98e5f.zip",
+                "reference": "0f3dbc1100754274380206a17832d5c0d0a1b072",
+                "shasum": "273948c73effef6b284ed33ac754874c15b78d69"
             },
             "require-dev": {
+                "monolog/monolog": "~1.6",
                 "phpunit/phpunit": "3.7.*",
                 "psr/log": "1.0.0"
             },
             "suggest": {
+                "monolog/monolog": "Provides serializable formatter",
                 "psr/log": "Provides a basic console logger for PSR-3 interface"
             },
             "type": "library",
@@ -28,8 +36,13 @@
                     "GMO\\TestHelper\\": "TestHelper/"
                 }
             },
+            "autoload-dev": {
+                "psr-4": {
+                    "": "tests/"
+                }
+            },
             "description": "A library for common code",
-            "time": "2014-08-05 19:43:37"
+            "time": "2014-10-17 20:35:07"
         },
         {
             "name": "nikic/php-parser",
@@ -438,16 +451,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "3.7.37",
+            "version": "3.7.38",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "ae6cefd7cc84586a5ef27e04bae11ee940ec63dc"
+                "reference": "38709dc22d519a3d1be46849868aa2ddf822bcf6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/ae6cefd7cc84586a5ef27e04bae11ee940ec63dc",
-                "reference": "ae6cefd7cc84586a5ef27e04bae11ee940ec63dc",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/38709dc22d519a3d1be46849868aa2ddf822bcf6",
+                "reference": "38709dc22d519a3d1be46849868aa2ddf822bcf6",
                 "shasum": ""
             },
             "require": {
@@ -507,7 +520,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-04-30 12:24:19"
+            "time": "2014-10-17 09:04:17"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -608,17 +621,17 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v2.5.4",
+            "version": "v2.5.5",
             "target-dir": "Symfony/Component/Yaml",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Yaml.git",
-                "reference": "01a7695bcfb013d0a15c6757e15aae120342986f"
+                "reference": "b1dbc53593b98c2d694ebf383660ac9134d30b96"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Yaml/zipball/01a7695bcfb013d0a15c6757e15aae120342986f",
-                "reference": "01a7695bcfb013d0a15c6757e15aae120342986f",
+                "url": "https://api.github.com/repos/symfony/Yaml/zipball/b1dbc53593b98c2d694ebf383660ac9134d30b96",
+                "reference": "b1dbc53593b98c2d694ebf383660ac9134d30b96",
                 "shasum": ""
             },
             "require": {
@@ -651,7 +664,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
-            "time": "2014-08-31 03:22:04"
+            "time": "2014-09-22 09:14:18"
         }
     ],
     "aliases": [],

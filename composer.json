@@ -4,7 +4,7 @@
 	"require": {
 		"psr/log": "1.0.0",
 		"pda/pheanstalk": "~3.0",
-		"gmo/common": "~1.7",
+		"gmo/common": "~1.17",
 		"nikic/php-parser": "~0.9"
 	},
 	"require-dev": {
