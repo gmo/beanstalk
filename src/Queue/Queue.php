@@ -10,6 +10,7 @@ use GMO\Common\ISerializable;
 use Pheanstalk\Exception\ServerException;
 use Pheanstalk\Exception\SocketException;
 use Pheanstalk\Pheanstalk;
+use Pheanstalk\PheanstalkInterface;
 use Pheanstalk\Response\ArrayResponse;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -52,11 +53,13 @@ class Queue implements QueueInterface {
 	}
 
 	public function kickTube($tube) {
+		$kicked = 0;
 		$stats = $this->statsTube($tube);
 		if ($stats->buriedJobs() > 0) {
-			$this->pheanstalk->kick($stats->buriedJobs());
+			$kicked += $this->pheanstalk->kick($stats->buriedJobs());
 		}
-		$this->pheanstalk->kick($stats->delayedJobs());
+		$kicked += $this->pheanstalk->kick($stats->delayedJobs());
+		return $kicked;
 	}
 
 	public function deleteReadyJobs($tube) {
@@ -132,7 +135,9 @@ class Queue implements QueueInterface {
 	//endregion
 
 	public function listTubes() {
-		return ArrayCollection::create($this->pheanstalk->listTubes());
+		$tubes = ArrayCollection::create($this->pheanstalk->listTubes());
+		$tubes->removeElement(PheanstalkInterface::DEFAULT_TUBE);
+		return $tubes;
 	}
 
 	/** @inheritdoc */

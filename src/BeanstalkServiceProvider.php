@@ -1,6 +1,9 @@
 <?php
 namespace GMO\Beanstalk;
 
+use GMO\Beanstalk\Manager\WorkerManager;
+use GMO\Beanstalk\Queue\Queue;
+use GMO\Beanstalk\Queue\RpcQueue;
 use GMO\DependencyInjection\ServiceProviderInterface;
 use Pimple;
 use Psr\Log\NullLogger;
