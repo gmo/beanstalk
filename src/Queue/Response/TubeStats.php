@@ -16,7 +16,7 @@ class TubeStats extends AbstractStats {
 	 * @return int
 	 */
 	public function urgentJobs() {
-		return $this->get('current-jobs-urgent');
+		return $this->get('current-jobs-urgent', 0);
 	}
 
 	/**
@@ -24,7 +24,7 @@ class TubeStats extends AbstractStats {
 	 * @return int
 	 */
 	public function readyJobs() {
-		return $this->get('current-jobs-ready');
+		return $this->get('current-jobs-ready', 0);
 	}
 
 	/**
@@ -32,7 +32,7 @@ class TubeStats extends AbstractStats {
 	 * @return int
 	 */
 	public function reservedJobs() {
-		return $this->get('current-jobs-reserved');
+		return $this->get('current-jobs-reserved', 0);
 	}
 
 	/**
@@ -40,7 +40,7 @@ class TubeStats extends AbstractStats {
 	 * @return int
 	 */
 	public function delayedJobs() {
-		return $this->get('current-jobs-delayed');
+		return $this->get('current-jobs-delayed', 0);
 	}
 
 	/**
@@ -48,7 +48,7 @@ class TubeStats extends AbstractStats {
 	 * @return int
 	 */
 	public function buriedJobs() {
-		return $this->get('current-jobs-buried');
+		return $this->get('current-jobs-buried', 0);
 	}
 
 	/**
@@ -57,7 +57,7 @@ class TubeStats extends AbstractStats {
 	 * @return int
 	 */
 	public function totalJobs() {
-		return $this->get('total-jobs');
+		return $this->get('total-jobs', 0);
 	}
 
 	/**
@@ -65,7 +65,7 @@ class TubeStats extends AbstractStats {
 	 * @return int
 	 */
 	public function usingCount() {
-		return $this->get('current-using');
+		return $this->get('current-using', 0);
 	}
 
 	/**
@@ -74,7 +74,7 @@ class TubeStats extends AbstractStats {
 	 * @return int
 	 */
 	public function waitingCount() {
-		return $this->get('current-waiting');
+		return $this->get('current-waiting', 0);
 	}
 
 	/**
@@ -82,7 +82,7 @@ class TubeStats extends AbstractStats {
 	 * @return int
 	 */
 	public function watchingCount() {
-		return $this->get('current-watching');
+		return $this->get('current-watching', 0);
 	}
 
 	/**
@@ -90,7 +90,7 @@ class TubeStats extends AbstractStats {
 	 * @return int
 	 */
 	public function pause() {
-		return $this->get('pause');
+		return $this->get('pause', 0);
 	}
 
 	/**
@@ -98,7 +98,7 @@ class TubeStats extends AbstractStats {
 	 * @return int
 	 */
 	public function pauseTimeLeft() {
-		return $this->get('pause-time-left');
+		return $this->get('pause-time-left', 0);
 	}
 
 	/**
@@ -106,7 +106,7 @@ class TubeStats extends AbstractStats {
 	 * @return int
 	 */
 	public function cmdDeleteCount() {
-		return $this->get('cmd-delete');
+		return $this->get('cmd-delete', 0);
 	}
 
 	/**
@@ -114,6 +114,6 @@ class TubeStats extends AbstractStats {
 	 * @return int
 	 */
 	public function cmdPauseTubeCount() {
-		return $this->get('cmd-pause-tube');
+		return $this->get('cmd-pause-tube', 0);
 	}
 }

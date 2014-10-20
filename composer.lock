@@ -4,21 +4,21 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6fbd423519b4c75dc4c2e19191ae310c",
+    "hash": "22380e7dc4aaa3075e8b611c6a580e8c",
     "packages": [
         {
             "name": "gmo/common",
-            "version": "v1.19.2",
+            "version": "v1.19.3",
             "source": {
                 "type": "git",
                 "url": "git@bitbucket.org:gmodev/common-library.git",
-                "reference": "0f3dbc1100754274380206a17832d5c0d0a1b072"
+                "reference": "bf23e27c86439187ed8375ab15bdebfe887400fe"
             },
             "dist": {
                 "type": "zip",
-                "url": "http://composer.gmodev.com/dist/gmo-common-v1.19.2-e98e5f.zip",
-                "reference": "0f3dbc1100754274380206a17832d5c0d0a1b072",
-                "shasum": "273948c73effef6b284ed33ac754874c15b78d69"
+                "url": "http://composer.gmodev.com/dist/gmo-common-v1.19.3-7dab21.zip",
+                "reference": "bf23e27c86439187ed8375ab15bdebfe887400fe",
+                "shasum": "4ff5e02ae7509e110dfe78ae03423ecc02fa0a42"
             },
             "require-dev": {
                 "monolog/monolog": "~1.6",
@@ -42,7 +42,40 @@
                 }
             },
             "description": "A library for common code",
-            "time": "2014-10-17 20:35:07"
+            "time": "2014-10-17 22:11:40"
+        },
+        {
+            "name": "gmo/console",
+            "version": "v1.1.2",
+            "source": {
+                "type": "git",
+                "url": "git@bitbucket.org:gmodev/console-library.git",
+                "reference": "53478fdbf2f7f6be8f16d0da1cf3607eac9ac8e5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "http://composer.gmodev.com/dist/gmo-console-v1.1.2-7f25fe.zip",
+                "reference": "53478fdbf2f7f6be8f16d0da1cf3607eac9ac8e5",
+                "shasum": "2b490d7f2a462ddd8136e580f183f04a38c72143"
+            },
+            "require": {
+                "symfony/console": "~2.5",
+                "symfony/event-dispatcher": "~2.5"
+            },
+            "require-dev": {
+                "gmo/dependency-injection": "~1.0"
+            },
+            "suggest": {
+                "gmo/dependency-injection": "Provides container aware commands"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "GMO\\Console\\": "src/"
+                }
+            },
+            "description": "A library that eases the creation of beautiful and testable command line interfaces",
+            "time": "2014-10-20 17:20:24"
         },
         {
             "name": "nikic/php-parser",
@@ -176,6 +209,118 @@
                 "psr-3"
             ],
             "time": "2012-12-21 11:40:51"
+        },
+        {
+            "name": "symfony/console",
+            "version": "v2.5.5",
+            "target-dir": "Symfony/Component/Console",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/Console.git",
+                "reference": "ca053eaa031c93afb68a71e4eb1f4168dfd4a661"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/Console/zipball/ca053eaa031c93afb68a71e4eb1f4168dfd4a661",
+                "reference": "ca053eaa031c93afb68a71e4eb1f4168dfd4a661",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "psr/log": "~1.0",
+                "symfony/event-dispatcher": "~2.1"
+            },
+            "suggest": {
+                "psr/log": "For using the console logger",
+                "symfony/event-dispatcher": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.5-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\Console\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                },
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "Symfony Console Component",
+            "homepage": "http://symfony.com",
+            "time": "2014-09-25 09:53:56"
+        },
+        {
+            "name": "symfony/event-dispatcher",
+            "version": "v2.5.5",
+            "target-dir": "Symfony/Component/EventDispatcher",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/EventDispatcher.git",
+                "reference": "f6281337bf5f985f585d1db6a83adb05ce531f46"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/EventDispatcher/zipball/f6281337bf5f985f585d1db6a83adb05ce531f46",
+                "reference": "f6281337bf5f985f585d1db6a83adb05ce531f46",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "psr/log": "~1.0",
+                "symfony/config": "~2.0",
+                "symfony/dependency-injection": "~2.0,<2.6.0",
+                "symfony/stopwatch": "~2.2"
+            },
+            "suggest": {
+                "symfony/dependency-injection": "",
+                "symfony/http-kernel": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.5-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\EventDispatcher\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                },
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "Symfony EventDispatcher Component",
+            "homepage": "http://symfony.com",
+            "time": "2014-09-28 15:56:11"
         }
     ],
     "packages-dev": [
