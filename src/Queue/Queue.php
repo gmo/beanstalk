@@ -6,6 +6,7 @@ use GMO\Beanstalk\Queue\Response\JobStats;
 use GMO\Beanstalk\Queue\Response\ServerStats;
 use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Common\Collections\ArrayCollection;
+use GMO\Common\ISerializable;
 use Pheanstalk\Exception\ServerException;
 use Pheanstalk\Exception\SocketException;
 use Pheanstalk\Pheanstalk;
@@ -21,6 +22,25 @@ use Psr\Log\NullLogger;
 class Queue implements QueueInterface {
 
 	//region Tube Control
+
+	public function push($tube, $data, $priority = null, $delay = null, $ttr = null) {
+		if ($data instanceof ISerializable) {
+			$data = $data->toJson();
+		} elseif ($data instanceof \Traversable) {
+			$data = iterator_to_array($data, true);
+		}
+		if (is_array($data)) {
+			$data = json_encode($data);
+		}
+
+		return $this->pheanstalk->putInTube(
+			$tube,
+			$data,
+			$priority ?: Pheanstalk::DEFAULT_PRIORITY,
+			$delay ?: Pheanstalk::DEFAULT_DELAY,
+			$ttr ?: Pheanstalk::DEFAULT_TTR
+		);
+	}
 
 	public function reserve($tube, $timeout = null) {
 		try {

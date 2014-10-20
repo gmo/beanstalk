@@ -7,6 +7,17 @@ use GMO\Beanstalk\Queue\Response\TubeStats;
 interface TubeControlInterface {
 
 	/**
+	 * Pushes a job to the specified tube
+	 * @param string   $tube     Tube name
+	 * @param \GMO\Common\ISerializable|\Traversable|array|mixed $data Job data
+	 * @param int|null $priority From 0 (most urgent) to 4294967295 (least urgent)
+	 * @param int|null $delay    Seconds to wait before job becomes ready
+	 * @param int|null $ttr      Time To Run: seconds a job can be reserved for
+	 * @return int The new job ID
+	 */
+	public function push($tube, $data, $priority = null, $delay = null, $ttr = null);
+
+	/**
 	 * Reserves a job from the specified tube or false if error or timeout
 	 * @param string   $tube
 	 * @param int|null $timeout
