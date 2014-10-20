@@ -3,7 +3,6 @@ namespace Runner;
 
 use GMO\Beanstalk\Job;
 use GMO\Beanstalk\Runner\BaseRunner;
-use GMO\Common\Collection;
 
 /**
  * Abstracts the repetitive worker tasks for Remote Procedure Call (RPC).
@@ -17,7 +16,7 @@ class RpcRunner extends BaseRunner {
 
 	public function preProcessJob(Job $job) {
 		parent::preProcessJob($job);
-		$this->replyTo = Collection::get($job->getData(), static::RPC_REPLY_TO_FIELD);
+		$this->replyTo = $job->getData()->get(static::RPC_REPLY_TO_FIELD);
 	}
 
 	public function postProcessJob(Job $job) {
@@ -47,12 +46,7 @@ class RpcRunner extends BaseRunner {
 			return false;
 		}
 
-		$stats = $this->queue->stats($tube);
-		if (!isset($stats['current-watching'])) {
-			return false;
-		}
-
-		return intval($stats['current-watching']) > 0;
+		return $this->queue->statsTube($tube)->watchingCount() > 0;
 	}
 
 	/**
@@ -70,7 +64,7 @@ class RpcRunner extends BaseRunner {
 
 			$tubeList = $this->queue->listTubes();
 
-			if (array_search($tube, $tubeList) !== false) {
+			if ($tubeList->contains($tube)) {
 				return true;
 			}
 			$retry++;

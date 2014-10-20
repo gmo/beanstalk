@@ -10,6 +10,9 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate {
 		$this->parsedData = $data;
 	}
 
+	/**
+	 * @return string|mixed|\GMO\Common\Collections\ArrayCollection
+	 */
 	public function getData() {
 		return $this->parsedData ?: parent::getData();
 	}

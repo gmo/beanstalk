@@ -6,6 +6,7 @@ use GMO\Beanstalk\Exception\JobAwareExceptionInterface;
 use GMO\Beanstalk\Job;
 use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Worker\WorkerInterface;
+use GMO\Common\Collections\ArrayCollection;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
@@ -56,7 +57,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 
 		if (!$this->validateJob($job)) {
 			$this->log->error('Job missing required params is being deleted!');
-			$this->queue->deleteJob($job);
+			$this->queue->delete($job);
 			return;
 		}
 
@@ -76,7 +77,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 					"params"    => $job->getData(),
 					"exception" => $ex
 				));
-				$this->queue->deleteJob($job);
+				$this->queue->delete($job);
 			} else {
 				$this->log->warning("Job failed $numErrors times.", array(
 					"params"    => $job->getData(),
@@ -97,7 +98,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 			}
 			$params[$key] = $value;
 		}
-		$job->setParsedData($params);
+		$job->setParsedData(new ArrayCollection($params));
 	}
 
 	public function validateJob(Job $job) {
@@ -113,7 +114,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 
 	public function postProcessJob(Job $job) {
 		$this->log->debug("Deleting the current job from: " . $this->tubeName);
-		$this->queue->deleteJob($job);
+		$this->queue->delete($job);
 	}
 
 	protected function setupWorker(WorkerInterface $worker) {
@@ -133,14 +134,14 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 			$this->log->debug("Getting next job...");
 		}
 
-		$job = $this->queue->getJob($this->tubeName, static::JOB_RESERVATION_TIMEOUT);
+		$job = $this->queue->reserve($this->tubeName, static::JOB_RESERVATION_TIMEOUT);
 		if (!$job) {
 			return new Job(-1, null);
 		}
 
 		$this->checkForTerminationSignal();
 
-		$this->queue->buryJob($job);
+		$this->queue->bury($job);
 
 		return new Job($job->getId(), $job->getData());
 	}
@@ -159,11 +160,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 	}
 
 	protected function getNumberOfErrors(Job $job) {
-		$stats = $this->queue->jobStats($job);
-		// TODO: Will using kickes / buries be affected by Queue stats commands?
-		$kicks = $stats['kicks'];
-		$buries = $stats['buries'];
-		return $buries;
+		return $this->queue->statsJob($job)->reserves();
 	}
 
 	protected function attachSignalHandler() {
