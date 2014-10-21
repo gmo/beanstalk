@@ -10,6 +10,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class AbstractWorkerCommand extends AbstractCommand {
 
+	public function setName($name) {
+		return parent::setName("workers:$name");
+	}
+
 	protected function configure() {
 		parent::configure();
 		$this->addArgument(
