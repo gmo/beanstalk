@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ServerStatsCommand extends AbstractQueueCommand {
 
 	protected function configure() {
+		parent::configure();
 		$this->setName('server-stats')
 			->setDescription('Displays information about the beanstalkd server')
 			->addOption('list', 	'l', InputOption::VALUE_NONE, 'List all the stat names')
@@ -26,7 +27,7 @@ class ServerStatsCommand extends AbstractQueueCommand {
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		parent::execute($input, $output);
 
-		$stats = $this->getQueue()->serverStats();
+		$stats = $this->getQueue($input)->serverStats();
 
 		if ($input->getOption('list')) {
 			foreach ($stats->getKeys() as $key) {

@@ -10,6 +10,7 @@ class ListCommand extends AbstractQueueCommand {
 	const NAME = 'tubes';
 
 	protected function configure() {
+		parent::configure();
 		$this->setName(static::NAME)
 			->setDescription('Get list of tubes');
 	}
@@ -17,7 +18,7 @@ class ListCommand extends AbstractQueueCommand {
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		parent::execute($input, $output);
 
-		$tubes = $this->getQueue()->listTubes();
+		$tubes = $this->getQueue($input)->listTubes();
 		if ($tubes->isEmpty()) {
 			$output->writeln("There are no current tubes");
 			return;

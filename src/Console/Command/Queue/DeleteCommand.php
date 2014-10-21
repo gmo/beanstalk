@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class DeleteCommand extends AbstractQueueCommand {
 
 	protected function configure() {
+		parent::configure();
 		$this->setName('delete')
 			->addArgument(
 				'tube',
@@ -33,9 +34,9 @@ class DeleteCommand extends AbstractQueueCommand {
 			throw new \RuntimeException('One or more tubes must be specified.');
 		}
 
-		$queue = $this->getQueue();
+		$queue = $this->getQueue($input);
 
-		list($tubes, $error) = $this->matchTubeNames($input->getArgument('tube'), $output);
+		list($tubes, $error) = $this->matchTubeNames($input->getArgument('tube'), $input, $output);
 		if ($input->getOption('all')) {
 			$tubes = $queue->listTubes();
 			if ($tubes->isEmpty()) {

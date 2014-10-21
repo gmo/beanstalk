@@ -15,6 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class StatsCommand extends AbstractQueueCommand {
 
 	protected function configure() {
+		parent::configure();
 		$this->setName('stats')
 			->addArgument(
 				'tube',
@@ -42,12 +43,12 @@ class StatsCommand extends AbstractQueueCommand {
 	}
 
 	private function getStats(InputInterface $input, OutputInterface $output) {
-		$queue = $this->getQueue();
+		$queue = $this->getQueue($input);
 		if (!$tubes = $input->getArgument('tube')) {
 			$stats = $queue->statsAllTubes();
 			$error = false;
 		} else {
-			list($tubes, $error) = $this->matchTubeNames($tubes, $output);
+			list($tubes, $error) = $this->matchTubeNames($tubes, $input, $output);
 			$stats = new ArrayCollection();
 			foreach ($tubes as $tube) {
 				$stats->set($tube, $queue->statsTube($tube));

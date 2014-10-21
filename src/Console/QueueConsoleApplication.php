@@ -24,7 +24,9 @@ class QueueConsoleApplication extends ConsoleApplication {
 		return new InputDefinition(array(
 			new InputArgument('command', InputArgument::REQUIRED, 'The command to execute'),
 
-			new InputOption('--help',           '-h', InputOption::VALUE_NONE, 'Display this help message.'),
+			new InputOption('--help',   '-h', InputOption::VALUE_NONE,     'Display this help message.'),
+			new InputOption('host',     null, InputOption::VALUE_REQUIRED, 'Override beanstalk host'),
+			new InputOption('port',     null, InputOption::VALUE_REQUIRED, 'Override beanstalk port'),
 		));
 	}
 }

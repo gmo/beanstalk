@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class KickCommand extends AbstractQueueCommand {
 
 	protected function configure() {
+		parent::configure();
 		$this->setName('kick')
 			->addArgument(
 				'tube',
@@ -26,8 +27,8 @@ class KickCommand extends AbstractQueueCommand {
 			throw new \RuntimeException('Not enough arguments.');
 		}
 
-		list($tubes, $error) = $this->matchTubeNames($input->getArgument('tube'), $output);
-		$queue = $this->getQueue();
+		list($tubes, $error) = $this->matchTubeNames($input->getArgument('tube'), $input, $output);
+		$queue = $this->getQueue($input);
 		foreach ($tubes as $tube) {
 			$kicked = $queue->kickTube($tube);
 			$output->writeln("Kicked <info>$kicked</info> jobs in <info>$tube</info>");
