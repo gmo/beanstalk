@@ -17,7 +17,6 @@ use Psr\Log\LoggerInterface;
 class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 
 	const JOB_RESERVATION_TIMEOUT = 5;
-	const CLS = 'GMO\Beanstalk\Runner\BaseRunner';
 
 	public function setup(QueueInterface $queue, WorkerInterface $worker) {
 		$this->queue = $queue;
@@ -158,6 +157,8 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 	public function setLogger(LoggerInterface $logger) {
 		$this->log = $logger;
 	}
+
+	public static function className() { return get_called_class(); }
 
 	protected function getNumberOfErrors(Job $job) {
 		return $this->queue->statsJob($job)->reserves();

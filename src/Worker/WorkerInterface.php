@@ -2,26 +2,27 @@
 namespace GMO\Beanstalk\Worker;
 
 use GMO\Beanstalk\Job;
+use GMO\Common\ClassNameResolverInterface;
 
-interface WorkerInterface {
+interface WorkerInterface extends ClassNameResolverInterface {
 
 	/**
 	 * Return worker name.
 	 * @return string
 	 */
-	public function getTubeName();
+	public static function getTubeName();
 
 	/**
 	 * Return the runner class
 	 * @return string class name
 	 */
-	public function getRunnerClass();
+	public static function getRunnerClass();
 
 	/**
 	 * Return number of workers to spawn.
 	 * @return int
 	 */
-	public function getNumberOfWorkers();
+	public static function getNumberOfWorkers();
 
 	/**
 	 * Returns a logger instance for worker

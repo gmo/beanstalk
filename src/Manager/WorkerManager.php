@@ -3,6 +3,7 @@ namespace GMO\Beanstalk\Manager;
 
 use GMO\Beanstalk\Processor;
 use GMO\Common\Collection;
+use GMO\Common\Collections\ArrayCollection;
 use GMO\Common\String;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -134,24 +135,27 @@ class WorkerManager implements LoggerAwareInterface {
 	}
 
 	/**
-	 * Get an array of workers that have the
-	 * AbstractWorker as their parent class
+	 * Get a collection of {@see WorkerInfo}'s that implement {@see WorkerInterface}
 	 * @param null|string|array $filter [optional] worker(s) filter
-	 * @return WorkerInfo[]
+	 * @return WorkerInfo[]|ArrayCollection
 	 */
 	public function getWorkers($filter = null) {
-		$files = glob($this->workerDir . "*.php");
 		/** @var WorkerInfo[] $workers */
-		$workers = array();
+		$workers = new ArrayCollection();
+		$files = glob($this->workerDir . "*.php");
 		foreach ($files as $file) {
 			$workerInfo = new WorkerInfo($this->getPhpClass($file));
+
+			if (!$workerInfo->getName()) { // File isn't a class
+				continue;
+			}
 
 			if (!$this->filterWorkers($workerInfo->getName(), $filter)) {
 				continue;
 			}
 
 			$cls = $workerInfo->getReflectionClass();
-			if ($cls->isInstantiable() && $cls->isSubclassOf('\GMO\Beanstalk\Worker\AbstractWorker')) {
+			if ($cls->isInstantiable() && $cls->isSubclassOf('\GMO\Beanstalk\Worker\WorkerInterface')) {
 				$workers[$workerInfo->getFullyQualifiedName()] = $workerInfo;
 			}
 		}

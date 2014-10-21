@@ -4,21 +4,21 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "5dcb56116938976fc4e7bca639c538fd",
+    "hash": "320367323e896340e64e60ebf1586019",
     "packages": [
         {
             "name": "gmo/common",
-            "version": "v1.20.0",
+            "version": "v1.22.0",
             "source": {
                 "type": "git",
                 "url": "git@bitbucket.org:gmodev/common-library.git",
-                "reference": "1e4bf5e37ec5e2605e099bddf23e37167563b50c"
+                "reference": "cca47abbc2aa4414f34bab118a2ae86dffed83ba"
             },
             "dist": {
                 "type": "zip",
-                "url": "http://composer.gmodev.com/dist/gmo-common-v1.20.0-089494.zip",
-                "reference": "1e4bf5e37ec5e2605e099bddf23e37167563b50c",
-                "shasum": "c0176fdf4893c3012999cec02c03994b227ef360"
+                "url": "http://composer.gmodev.com/dist/gmo-common-v1.22.0-e88c40.zip",
+                "reference": "cca47abbc2aa4414f34bab118a2ae86dffed83ba",
+                "shasum": "1de158a83f119fa6bc46d7eb0984d88c345ad9a3"
             },
             "require-dev": {
                 "monolog/monolog": "~1.6",
@@ -42,7 +42,7 @@
                 }
             },
             "description": "A library for common code",
-            "time": "2014-10-20 23:52:12"
+            "time": "2014-10-21 17:02:29"
         },
         {
             "name": "gmo/console",

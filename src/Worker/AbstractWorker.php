@@ -10,18 +10,18 @@ abstract class AbstractWorker implements WorkerInterface {
 	 * Return worker name. By default it is the class name.
 	 * @return string
 	 */
-	public function getTubeName() {
-		return String::className(get_called_class());
+	public static function getTubeName() {
+		return String::className(static::className());
 	}
 
 	/** @inheritdoc */
-	public function getRunnerClass() { return BaseRunner::CLS; }
+	public static function getRunnerClass() { return BaseRunner::className(); }
 
 	/**
 	 * Return number of workers to spawn. By default it is one.
 	 * @return int
 	 */
-	public function getNumberOfWorkers() { return 1; }
+	public static function getNumberOfWorkers() { return 1; }
 
 	/**
 	 * Return an array of parameters required for job to continue.
@@ -31,4 +31,6 @@ abstract class AbstractWorker implements WorkerInterface {
 	public function getRequiredParams() { return array(); }
 
 	public function setup() { }
+
+	public static function className() { return get_called_class(); }
 }

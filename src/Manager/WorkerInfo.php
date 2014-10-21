@@ -1,6 +1,7 @@
 <?php
 namespace GMO\Beanstalk\Manager;
 
+use GMO\Common\Collections\ArrayCollection;
 use GMO\Common\String;
 
 class WorkerInfo {
@@ -43,7 +44,7 @@ class WorkerInfo {
 		return $this->instance;
 	}
 
-	/** @return int[] */
+	/** @return int[]|ArrayCollection */
 	public function getPids() {
 		return $this->pids;
 	}
@@ -59,18 +60,18 @@ class WorkerInfo {
 	 * @param int $pid
 	 */
 	public function removePid($pid) {
-		if(($key = array_search($pid, $this->pids)) !== false) {
-			unset($this->pids[$key]);
-		}
+		$this->pids->removeElement($pid);
 	}
 
 	public function __construct($fullyQualifiedName) {
 		$this->fullyQualifiedName = $fullyQualifiedName;
+		$this->pids = new ArrayCollection();
 	}
 
 	private $fullyQualifiedName;
 	private $name;
 	private $refCls;
 	private $instance;
-	private $pids = array();
+	/** @var ArrayCollection */
+	private $pids;
 }

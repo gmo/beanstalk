@@ -12,7 +12,6 @@ use GMO\Beanstalk\Runner\BaseRunner;
 class RpcRunner extends BaseRunner {
 
 	const RPC_REPLY_TO_FIELD = 'rpcReplyTo';
-	const CLS = 'GMO\Beanstalk\Runner\RpcRunner';
 
 	public function preProcessJob(Job $job) {
 		parent::preProcessJob($job);
