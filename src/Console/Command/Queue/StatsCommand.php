@@ -63,7 +63,7 @@ class StatsCommand extends AbstractQueueCommand {
 	 */
 	private function renderStats(ArrayCollection $stats, $width = null) {
 		if ($stats->isEmpty()) {
-			return '';
+			return 'There are no current tubes';
 		}
 
 		$buffer = new BufferedOutput();

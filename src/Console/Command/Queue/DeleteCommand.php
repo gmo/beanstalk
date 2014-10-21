@@ -15,10 +15,10 @@ class DeleteCommand extends AbstractQueueCommand {
 				'tube',
 				InputArgument::IS_ARRAY,
 				'The name of the tube (does not have to be exact)')
-			->addOption('all', 'a', InputOption::VALUE_NONE, 'Delete all tubes')
-			->addOption('ready', 'r', InputOption::VALUE_NONE, 'Delete from ready queue')
-			->addOption('buried', 'b', InputOption::VALUE_NONE, 'Delete from buried queue')
-			->addOption('delayed', 'd', InputOption::VALUE_NONE, 'Delete from delayed queue')
+			->addOption('ready', 'r', InputOption::VALUE_NONE, 'Delete jobs in ready state')
+			->addOption('buried', 'b', InputOption::VALUE_NONE, 'Delete jobs in buried state')
+			->addOption('delayed', 'd', InputOption::VALUE_NONE, 'Delete jobs in delayed state')
+			->addOption('all', 'a', InputOption::VALUE_NONE, 'Delete jobs in ALL tubes')
 			->setDescription('Delete jobs');
 	}
 
@@ -33,8 +33,16 @@ class DeleteCommand extends AbstractQueueCommand {
 			throw new \RuntimeException('One or more tubes must be specified.');
 		}
 
-		list($tubes, $error) = $this->matchTubeNames($input->getArgument('tube'), $output);
 		$queue = $this->getQueue();
+
+		list($tubes, $error) = $this->matchTubeNames($input->getArgument('tube'), $output);
+		if ($input->getOption('all')) {
+			$tubes = $queue->listTubes();
+			if ($tubes->isEmpty()) {
+				$output->writeln('There are no current tubes');
+			}
+		}
+
 		foreach ($tubes as $tube) {
 			if ($input->getOption('ready')) {
 				$queue->deleteReadyJobs($tube);
