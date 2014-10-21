@@ -138,6 +138,10 @@ class WorkerManager implements LoggerAwareInterface {
 		return $stats;
 	}
 
+	public function getWorkerDir() {
+		return $this->workerDir;
+	}
+
 	/** @inheritdoc */
 	public function setLogger(LoggerInterface $logger) {
 		$this->log = $logger;

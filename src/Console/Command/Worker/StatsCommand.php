@@ -17,7 +17,12 @@ class StatsCommand extends AbstractWorkerCommand {
 	}
 
 	protected function executeManagerFunction(OutputInterface $output, WorkerManager $manager, $workers) {
-		$output->writeln($this->renderStats($manager->getWorkers($workers)));
+		$workers = $manager->getWorkers($workers);
+		if ($workers->isEmpty()) {
+			$output->writeln('There are no workers in: ' . $manager->getWorkerDir());
+			return;
+		}
+		$output->writeln($this->renderStats($workers));
 	}
 
 	/**
