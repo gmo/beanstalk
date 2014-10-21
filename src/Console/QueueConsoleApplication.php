@@ -16,6 +16,7 @@ class QueueConsoleApplication extends ConsoleApplication {
 			new Command\KickCommand(),
 			new Command\DeleteCommand(),
 			new Command\StatsCommand(),
+			new Command\ServerStatsCommand(),
 		));
 	}
 

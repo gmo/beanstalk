@@ -1,6 +1,8 @@
 <?php
 namespace GMO\Beanstalk\Queue\Response;
 
+use GMO\Common\String;
+
 class ServerStats extends AbstractStats {
 
 	//region Current Counts
@@ -86,6 +88,10 @@ class ServerStats extends AbstractStats {
 	 */
 	public function currentWaiting() {
 		return $this->get('current-waiting');
+	}
+
+	public function getCurrentStats() {
+		return $this->getGroup('current');
 	}
 
 	//endregion
@@ -250,6 +256,10 @@ class ServerStats extends AbstractStats {
 		return $this->get('cmd-pause-tube');
 	}
 
+	public function getCmdStats() {
+		return $this->getGroup('cmd');
+	}
+
 	//endregion
 
 	/**
@@ -343,6 +353,14 @@ class ServerStats extends AbstractStats {
 		return $this->get('uptime');
 	}
 
+	public function getOtherStats() {
+		return $this->diffKeys(
+			$this->getCurrentStats(),
+			$this->getCmdStats(),
+			$this->getBinLogStats()
+		);
+	}
+
 	//region Binlog
 
 	/**
@@ -386,5 +404,15 @@ class ServerStats extends AbstractStats {
 		return $this->get('binlog-recrods-migrated');
 	}
 
+	public function getBinLogStats() {
+		return $this->getGroup('binlog');
+	}
+
 	//endregion
+
+	public function getGroup($startsWith) {
+		return $this->filter(function($key) use ($startsWith) {
+			return String::startsWith($key, $startsWith);
+		});
+	}
 }

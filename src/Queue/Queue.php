@@ -150,7 +150,7 @@ class Queue implements QueueInterface {
 	}
 
 	/** @inheritdoc */
-	public function statsServer() {
+	public function serverStats() {
 		/** @var ArrayResponse $stats */
 		$stats = $this->pheanstalk->stats();
 		return ServerStats::create($stats);

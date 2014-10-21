@@ -24,5 +24,5 @@ interface QueueInterface extends TubeControlInterface, JobControlInterface, Logg
 	 * Returns the stats about the server
 	 * @return ServerStats
 	 */
-	public function statsServer();
+	public function serverStats();
 }
