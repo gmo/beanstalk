@@ -58,10 +58,10 @@ class StatsCommand extends AbstractQueueCommand {
 
 	/**
 	 * @param TubeStats[]|ArrayCollection $stats
-	 * @param bool                        $full
+	 * @param int|null                    $width
 	 * @return string
 	 */
-	private function renderStats(ArrayCollection $stats, $full = true) {
+	private function renderStats(ArrayCollection $stats, $width = null) {
 		if ($stats->isEmpty()) {
 			return '';
 		}
@@ -69,9 +69,9 @@ class StatsCommand extends AbstractQueueCommand {
 		$buffer = new BufferedOutput();
 		$buffer->setDecorated(true);
 
-		$width = $this->getConsoleWidth();
+		$width = $width ?: $this->getConsoleWidth();
 		$table = $width ? new AutoHidingTable($buffer, $width) : new Table($buffer);
-		$headers = array(
+		$table->setHeaders(array(
 			'Tube',
 			'Ready',
 			'Buried',
@@ -79,24 +79,19 @@ class StatsCommand extends AbstractQueueCommand {
 			'Delayed',
 			'Urgent',
 			'Total',
-		);
-		if ($full) {
-			$headers = array_merge($headers, array(
-				'',
-				'Using',
-				'Watching',
-				'Waiting',
-				'',
-				'Pause Elapsed',
-				'Pause Left',
-				'',
-				'Delete Count',
-				'Pause Count',
-			));
-		}
-		$table->setHeaders($headers);
+			'',
+			'Using',
+			'Watching',
+			'Waiting',
+			'',
+			'Pause Elapsed',
+			'Pause Left',
+			'',
+			'Delete Count',
+			'Pause Count',
+		));
 		foreach ($stats as $tubeStats) {
-			$row = array(
+			$table->addRow(array(
 				$tubeStats->name(),
 				$tubeStats->readyJobs(),
 				$tubeStats->buriedJobs(),
@@ -104,22 +99,17 @@ class StatsCommand extends AbstractQueueCommand {
 				$tubeStats->delayedJobs(),
 				$tubeStats->urgentJobs(),
 				$tubeStats->totalJobs(),
-			);
-			if ($full) {
-				$row = array_merge($row, array(
-					'',
-					$tubeStats->usingCount(),
-					$tubeStats->watchingCount(),
-					$tubeStats->waitingCount(),
-					'',
-					$tubeStats->pause(),
-					$tubeStats->pauseTimeLeft(),
-					'',
-					$tubeStats->cmdDeleteCount(),
-					$tubeStats->cmdPauseTubeCount(),
-				));
-			}
-			$table->addRow($row);
+				'',
+				$tubeStats->usingCount(),
+				$tubeStats->watchingCount(),
+				$tubeStats->waitingCount(),
+				'',
+				$tubeStats->pause(),
+				$tubeStats->pauseTimeLeft(),
+				'',
+				$tubeStats->cmdDeleteCount(),
+				$tubeStats->cmdPauseTubeCount(),
+			));
 		}
 		$table->render();
 
@@ -132,7 +122,7 @@ class StatsCommand extends AbstractQueueCommand {
 			new TubeStats(array('name' => 'SendApi')),
 			new TubeStats(array('name' => 'ReceiveApi')),
 		));
-		$stats = preg_replace("#\n#", "\n      ", $this->renderStats($exampleStats, false));
+		$stats = preg_replace("#\n#", "\n      ", $this->renderStats($exampleStats, 78));
 
 		return <<<EOF
 
