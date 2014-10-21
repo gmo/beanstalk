@@ -2,7 +2,6 @@
 namespace GMO\Beanstalk\Manager;
 
 use GMO\Beanstalk\Processor;
-use GMO\Common\Collection;
 use GMO\Common\Collections\ArrayCollection;
 use GMO\Common\String;
 use Psr\Log\LoggerAwareInterface;
@@ -11,55 +10,8 @@ use Psr\Log\NullLogger;
 
 /**
  * WorkerManager controls beanstalk workers.
- *
- * @example restart workers in code
- *          $manager = new WorkerManager( $workerDir, $logger, $host, $port );
- *          $manager->restartWorkers();
- *
- * @example workers.php file for command line usage
- *          $manager = new WorkerManager( $workerDir, $logger, $host, $port );
- *          $manager->runCommand($argv);
- *
- * @package GMO\Beanstalk
- *
- * @since   1.0.0
  */
 class WorkerManager implements LoggerAwareInterface {
-
-	/**
-	 * Use this method when running from command-line.
-	 * Calls a method based on args, or displays usage.
-	 * @param array $args command-line arguments
-	 */
-	public function runCommand($args) {
-		$filename = basename($args[0]);
-
-		function help($filename) {
-			echo "php $filename restart|start|stop|stats [worker ...]\n";
-			echo "\n";
-			exit(1);
-		}
-
-		$filter = array_slice($args, 2);
-
-		switch (Collection::get($args, 1)) {
-			case "restart":
-				$this->restartWorkers($filter);
-				break;
-			case "stop":
-				$this->stopWorkers($filter);
-				break;
-			case "start":
-				$this->startWorkers($filter);
-				break;
-			case "stats":
-				$this->log->info(print_r($this->getStats($filter), true));
-				break;
-			default:
-				help($filename);
-		}
-
-	}
 
 	/**
 	 * Restarts all beanstalk workers
