@@ -46,7 +46,7 @@ class Queue implements QueueInterface {
 	public function reserve($tube, $timeout = null) {
 		try {
 			$job = $this->pheanstalk->reserveFromTube($tube, $timeout);
-			return new Job($job->getId(), $job->getData());
+			return new Job($job->getId(), $job->getData(), $this);
 		} catch (SocketException $e) {
 			return false;
 		}

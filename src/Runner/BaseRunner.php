@@ -40,7 +40,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 
 		$this->setupWorker($this->worker);
 
-		$job = new Job(-1, null);
+		$job = new Job(-1, null, null);
 		do {
 			$job = $this->getJob($job);
 			if ($job->getId() === -1) {
@@ -136,14 +136,14 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 
 		$job = $this->queue->reserve($this->tubeName, static::JOB_RESERVATION_TIMEOUT);
 		if (!$job) {
-			return new Job(-1, null);
+			return new Job(-1, null, null);
 		}
 
 		$this->checkForTerminationSignal();
 
 		$this->queue->bury($job);
 
-		return new Job($job->getId(), $job->getData());
+		return new Job($job->getId(), $job->getData(), $this->queue);
 	}
 
 	public function shouldKeepRunning() {

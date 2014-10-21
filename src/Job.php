@@ -1,10 +1,19 @@
 <?php
 namespace GMO\Beanstalk;
 
+use GMO\Beanstalk\Queue\JobControlInterface;
+
 class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate {
 
-	private $parsedData = array();
-	private $result;
+	protected $parsedData = array();
+	protected $result;
+	/** @var JobControlInterface */
+	protected $queue;
+
+	public function __construct($id, $data, JobControlInterface $queue) {
+		$this->queue = $queue;
+		parent::__construct($id, $data);
+	}
 
 	public function setParsedData($data) {
 		$this->parsedData = $data;
@@ -25,6 +34,33 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate {
 		return $this->result;
 	}
 
+	//region Job Control Methods
+	public function release($delay = null, $priority = null) {
+		$this->queue->release($this, $priority, $delay);
+	}
+
+	public function bury() {
+		$this->queue->bury($this);
+	}
+
+	public function delete() {
+		$this->queue->delete($this);
+	}
+
+	public function kick() {
+		$this->queue->kickJob($this);
+	}
+
+	public function touch() {
+		$this->queue->touch($this);
+	}
+
+	public function stats() {
+		return $this->queue->statsJob($this);
+	}
+	//endregion
+
+	//region Array and Iterator Methods
 	/** @inheritdoc */
 	public function offsetExists($offset) {
 		return isset($this->parsedData[$offset]);
@@ -49,4 +85,5 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate {
 	public function getIterator() {
 		return new \ArrayIterator($this->parsedData);
 	}
+	//endregion
 }
