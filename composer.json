@@ -6,7 +6,7 @@
 		"pda/pheanstalk": "~3.0",
 		"gmo/common": "~1.22",
 		"nikic/php-parser": "~0.9",
-		"gmo/console": "~1.1"
+		"gmo/console": "~2.0"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "3.7.*",
