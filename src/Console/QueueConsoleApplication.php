@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 class QueueConsoleApplication extends ConsoleApplication {
 
 	public function __construct(\Pimple $container = null) {
-		parent::__construct('Queue', 'DEV', $container);
+		parent::__construct('Queue', null, $container);
 		$this->addCommands(array(
 			new Command\Queue\ListCommand(),
 			new Command\Queue\KickCommand(),
@@ -34,4 +34,8 @@ class QueueConsoleApplication extends ConsoleApplication {
 			new InputOption('dir',	    null, InputOption::VALUE_REQUIRED, 'Override worker directory'),
 		));
 	}
+
+	protected function getPackageName() { return 'gmo/beanstalk'; }
+
+	protected function getProjectDirectory() { return __DIR__ . '/../..'; }
 }
