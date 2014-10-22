@@ -3,10 +3,12 @@
 
 use GMO\Beanstalk\Queue\Queue;
 
-exec('"' . __DIR__ . '/findAutoloader"', $output);
-$autoloader = $output[0];
-/** @noinspection PhpIncludeInspection */
-require_once $autoloader;
+if (file_exists(__DIR__ . '/../vendor')) {
+	require_once __DIR__ . '/../vendor/autoload.php';
+} else {
+	/** @noinspection PhpIncludeInspection */
+	require_once __DIR__ . '/../../../../vendor/autoload.php';
+}
 
 list(
 	$cmd,

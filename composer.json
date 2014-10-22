@@ -25,6 +25,9 @@
 			"": "tests/"
 		}
 	},
+	"bin": [
+		"bin/queue"
+	],
 	"repositories": [
 		{ "type": "composer", "url": "composer.gmodev.com" }
 	],

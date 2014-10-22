@@ -1,0 +1,12 @@
+#!/usr/bin/env php
+<?php
+
+if (file_exists(__DIR__ . '/../vendor')) {
+	require_once __DIR__ . '/../vendor/autoload.php';
+} else {
+	/** @noinspection PhpIncludeInspection */
+	require_once __DIR__ . '/../../../../vendor/autoload.php';
+}
+
+$app = new \GMO\Beanstalk\Console\QueueConsoleApplication();
+$app->run();
