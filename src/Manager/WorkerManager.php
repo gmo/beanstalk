@@ -122,22 +122,6 @@ class WorkerManager implements LoggerAwareInterface {
 		return $workers;
 	}
 
-	/**
-	 * Returns an array containing: WorkerName => # Running / # Total
-	 * @param null|string|array $filter [optional] worker(s) filter
-	 * @return array
-	 */
-	public function getStats($filter = null) {
-		$stats = array();
-
-		$workers = $this->getWorkers($filter);
-		foreach ($workers as $worker) {
-			$stats[$worker->getName()] = $worker->getNumRunning() . "/" . $worker->getTotal();
-		}
-
-		return $stats;
-	}
-
 	public function getWorkerDir() {
 		return $this->workerDir;
 	}
@@ -216,7 +200,7 @@ class WorkerManager implements LoggerAwareInterface {
 		$port = 11300,
 		Processor $processor = null
 	) {
-		$this->workerDir = realpath($workerDir) . "/";
+		$this->workerDir = $workerDir ? realpath($workerDir) . "/" : null;
 		$this->processor = $processor ?: new Processor();
 		$this->setLogger($logger ?: new NullLogger());
 		$this->host = $host;

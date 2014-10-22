@@ -25,7 +25,11 @@ class AbstractWorkerCommand extends AbstractCommand {
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		parent::execute($input, $output);
-		$this->executeManagerFunction($output, $this->getManager($input), $input->getArgument('worker'));
+		$manager = $this->getManager($input);
+		if (!$manager->getWorkerDir()) {
+			throw new \RuntimeException('Worker directory needs to be passed in via --dir or set in the dependency container');
+		}
+		$this->executeManagerFunction($output, $manager, $input->getArgument('worker'));
 	}
 
 	protected function executeManagerFunction(OutputInterface $output, WorkerManager $manager, $workers) { }
