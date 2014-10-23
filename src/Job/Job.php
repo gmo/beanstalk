@@ -7,6 +7,7 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate {
 	protected $result;
 	/** @var JobControlInterface */
 	protected $queue;
+	protected $handled = false;
 
 	public function __construct($id, $data, JobControlInterface $queue) {
 		$this->queue = $queue;
@@ -32,16 +33,27 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate {
 		return $this->result;
 	}
 
+	/**
+	 * Returns whether the job has been handled (released, buried, deleted)
+	 * @return bool
+	 */
+	public function isHandled() {
+		return $this->handled;
+	}
+
 	//region Job Control Methods
 	public function release($delay = null, $priority = null) {
+		$this->handled = true;
 		$this->queue->release($this, $priority, $delay);
 	}
 
 	public function bury() {
+		$this->handled = true;
 		$this->queue->bury($this);
 	}
 
 	public function delete() {
+		$this->handled = true;
 		$this->queue->delete($this);
 	}
 

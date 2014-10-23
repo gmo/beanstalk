@@ -69,6 +69,11 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 			$numErrors = $this->getNumberOfErrors($job);
 			$this->log->warning($ex->getMessage());
 
+			if ($job->isHandled()) {
+				$this->log->warning('Worker should not throw an Exception if job has been handled');
+				return;
+			}
+
 			if ($ex instanceof JobAwareExceptionInterface &&
 				$ex->shouldDelete() &&
 				$numErrors >= $ex->deleteAfter()
@@ -113,6 +118,9 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 	}
 
 	public function postProcessJob(Job $job) {
+		if ($job->isHandled()) {
+			return;
+		}
 		$this->log->debug("Deleting the current job from: " . $this->tubeName);
 		$job->delete();
 	}
