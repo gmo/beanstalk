@@ -66,29 +66,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 			$this->worker->process($job);
 			$this->postProcessJob($job);
 		} catch (Exception $ex) {
-			$numErrors = $this->getNumberOfErrors($job);
-			$this->log->warning($ex->getMessage());
-
-			if ($job->isHandled()) {
-				$this->log->warning('Worker should not throw an Exception if job has been handled');
-				return;
-			}
-
-			if ($ex instanceof JobAwareExceptionInterface &&
-				$ex->shouldDelete() &&
-				$numErrors >= $ex->deleteAfter()
-			) {
-				$this->log->warning("Not retrying job...deleting.", array(
-					"params"    => $job->getData(),
-					"exception" => $ex
-				));
-				$job->delete();
-			} else {
-				$this->log->warning("Job failed $numErrors times.", array(
-					"params"    => $job->getData(),
-					"exception" => $ex
-				));
-			}
+			$this->handleError($job, $ex);
 		}
 	}
 
@@ -165,6 +143,34 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 	}
 
 	public static function className() { return get_called_class(); }
+
+	/**
+	 * Handled Exception thrown by worker
+	 * @param Job       $job
+	 * @param Exception $ex
+	 */
+	protected function handleError(Job $job, Exception $ex) {
+		$numErrors = $this->getNumberOfErrors($job);
+		$this->log->warning($ex->getMessage());
+
+		if ($job->isHandled()) {
+			$this->log->warning('Worker should not throw an Exception if job has been handled');
+			return;
+		}
+
+		if ($ex instanceof JobAwareExceptionInterface && $ex->shouldDelete() && $numErrors >= $ex->deleteAfter()) {
+			$this->log->warning("Not retrying job...deleting.", array(
+				"params"    => $job->getData(),
+				"exception" => $ex
+			));
+			$job->delete();
+		} else {
+			$this->log->warning("Job failed $numErrors times.", array(
+				"params"    => $job->getData(),
+				"exception" => $ex
+			));
+		}
+	}
 
 	protected function getNumberOfErrors(Job $job) {
 		return $job->stats()->reserves();
