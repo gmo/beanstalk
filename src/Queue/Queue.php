@@ -1,7 +1,8 @@
 <?php
 namespace GMO\Beanstalk\Queue;
 
-use GMO\Beanstalk\Job;
+use GMO\Beanstalk\Job\Job;
+use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Queue\Response\JobStats;
 use GMO\Beanstalk\Queue\Response\ServerStats;
 use GMO\Beanstalk\Queue\Response\TubeStats;
@@ -37,18 +38,21 @@ class Queue implements QueueInterface {
 		return $this->pheanstalk->putInTube(
 			$tube,
 			$data,
-			$priority ?: Pheanstalk::DEFAULT_PRIORITY,
-			$delay ?: Pheanstalk::DEFAULT_DELAY,
-			$ttr ?: Pheanstalk::DEFAULT_TTR
+			$priority ?: static::DEFAULT_PRIORITY,
+			$delay ?: static::DEFAULT_DELAY,
+			$ttr ?: static::DEFAULT_TTR
 		);
 	}
 
 	public function reserve($tube, $timeout = null) {
 		try {
 			$job = $this->pheanstalk->reserveFromTube($tube, $timeout);
+			if (!$job) {
+				return new NullJob();
+			}
 			return new Job($job->getId(), $job->getData(), $this);
 		} catch (SocketException $e) {
-			return false;
+			return new NullJob();
 		}
 	}
 

@@ -1,10 +1,15 @@
 <?php
 namespace GMO\Beanstalk\Queue;
 
-use GMO\Beanstalk\Job;
+use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Queue\Response\TubeStats;
+use Pheanstalk\PheanstalkInterface;
 
 interface TubeControlInterface {
+
+	const DEFAULT_PRIORITY = PheanstalkInterface::DEFAULT_PRIORITY;
+	const DEFAULT_DELAY = PheanstalkInterface::DEFAULT_DELAY;
+	const DEFAULT_TTR = PheanstalkInterface::DEFAULT_TTR;
 
 	/**
 	 * Pushes a job to the specified tube
@@ -21,7 +26,7 @@ interface TubeControlInterface {
 	 * Reserves a job from the specified tube or false if error or timeout
 	 * @param string   $tube
 	 * @param int|null $timeout
-	 * @return Job|false
+	 * @return Job
 	 */
 	public function reserve($tube, $timeout = null);
 

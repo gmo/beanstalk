@@ -1,7 +1,7 @@
 <?php
 namespace GMO\Beanstalk\Runner;
 
-use GMO\Beanstalk\Job;
+use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Worker\WorkerInterface;
 use GMO\Common\ClassNameResolverInterface;

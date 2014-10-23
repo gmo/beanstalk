@@ -1,13 +1,13 @@
 <?php
 namespace GMO\Beanstalk\Worker;
 
-use GMO\Beanstalk\Job;
+use GMO\Beanstalk\Job\Job;
 use GMO\Common\ClassNameResolverInterface;
 
 interface WorkerInterface extends ClassNameResolverInterface {
 
 	/**
-	 * Return worker name.
+	 * The tube name the worker should pull jobs from.
 	 * @return string
 	 */
 	public static function getTubeName();
@@ -23,6 +23,13 @@ interface WorkerInterface extends ClassNameResolverInterface {
 	 * @return int
 	 */
 	public static function getNumberOfWorkers();
+
+	/**
+	 * Return the number of seconds a job for
+	 * this worker should be allowed to run.
+	 * @return int seconds
+	 */
+	public static function getTimeToRun();
 
 	/**
 	 * Returns a logger instance for worker

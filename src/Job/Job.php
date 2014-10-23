@@ -1,7 +1,5 @@
 <?php
-namespace GMO\Beanstalk;
-
-use GMO\Beanstalk\Queue\JobControlInterface;
+namespace GMO\Beanstalk\Job;
 
 class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate {
 

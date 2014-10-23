@@ -1,7 +1,6 @@
 <?php
-namespace GMO\Beanstalk\Queue;
+namespace GMO\Beanstalk\Job;
 
-use GMO\Beanstalk\Job;
 use GMO\Beanstalk\Queue\Response\JobStats;
 
 interface JobControlInterface {

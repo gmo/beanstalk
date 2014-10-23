@@ -1,7 +1,7 @@
 <?php
 namespace Runner;
 
-use GMO\Beanstalk\Job;
+use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Runner\BaseRunner;
 
 /**

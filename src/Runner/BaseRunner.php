@@ -3,7 +3,8 @@ namespace GMO\Beanstalk\Runner;
 
 use Exception;
 use GMO\Beanstalk\Exception\JobAwareExceptionInterface;
-use GMO\Beanstalk\Job;
+use GMO\Beanstalk\Job\Job;
+use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Worker\WorkerInterface;
 use GMO\Common\Collections\ArrayCollection;
@@ -29,8 +30,8 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 	}
 
 	public function run() {
-		if (!$this->queue) {
-			throw new \LogicException('setup method needs to be called before run');
+		if (!$this->queue || !$this->worker) {
+			throw new \LogicException('Setup method needs to be called before run');
 		}
 
 		$this->log->info("Running worker: " . $this->tubeName);
@@ -39,10 +40,10 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 
 		$this->setupWorker($this->worker);
 
-		$job = new Job(-1, null, null);
+		$job = new NullJob();
 		do {
 			$job = $this->getJob($job);
-			if ($job->getId() === -1) {
+			if ($job instanceof NullJob) {
 				continue;
 			}
 			$this->processJob($job);
@@ -56,7 +57,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 
 		if (!$this->validateJob($job)) {
 			$this->log->error('Job missing required params is being deleted!');
-			$this->queue->delete($job);
+			$job->delete();
 			return;
 		}
 
@@ -76,7 +77,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 					"params"    => $job->getData(),
 					"exception" => $ex
 				));
-				$this->queue->delete($job);
+				$job->delete();
 			} else {
 				$this->log->warning("Job failed $numErrors times.", array(
 					"params"    => $job->getData(),
@@ -113,7 +114,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 
 	public function postProcessJob(Job $job) {
 		$this->log->debug("Deleting the current job from: " . $this->tubeName);
-		$this->queue->delete($job);
+		$job->delete();
 	}
 
 	protected function setupWorker(WorkerInterface $worker) {
@@ -129,20 +130,17 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 		$this->checkForTerminationSignal();
 
 		# Only log if last call was valid to prevent spamming the log
-		if ($previousJob->getId() !== -1) {
+		if (!$previousJob instanceof NullJob) {
 			$this->log->debug("Getting next job...");
 		}
 
 		$job = $this->queue->reserve($this->tubeName, static::JOB_RESERVATION_TIMEOUT);
-		if (!$job) {
-			return new Job(-1, null, null);
-		}
 
 		$this->checkForTerminationSignal();
 
-		$this->queue->bury($job);
+		$job->bury();
 
-		return new Job($job->getId(), $job->getData(), $this->queue);
+		return $job;
 	}
 
 	public function shouldKeepRunning() {
@@ -161,7 +159,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 	public static function className() { return get_called_class(); }
 
 	protected function getNumberOfErrors(Job $job) {
-		return $this->queue->statsJob($job)->reserves();
+		return $job->stats()->reserves();
 	}
 
 	protected function attachSignalHandler() {

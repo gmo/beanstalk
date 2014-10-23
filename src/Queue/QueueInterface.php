@@ -1,6 +1,7 @@
 <?php
 namespace GMO\Beanstalk\Queue;
 
+use GMO\Beanstalk\Job\JobControlInterface;
 use GMO\Beanstalk\Queue\Response\ServerStats;
 use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Common\Collections\ArrayCollection;
