@@ -29,10 +29,10 @@ class AbstractWorkerCommand extends AbstractCommand {
 		if (!$manager->getWorkerDir()) {
 			throw new \RuntimeException('Worker directory needs to be passed in via --dir or set in the dependency container');
 		}
-		$this->executeManagerFunction($output, $manager, $input->getArgument('worker'));
+		$this->executeManagerFunction($input, $output, $manager, $input->getArgument('worker'));
 	}
 
-	protected function executeManagerFunction(OutputInterface $output, WorkerManager $manager, $workers) { }
+	protected function executeManagerFunction(InputInterface $input, OutputInterface $output, WorkerManager $manager, $workers) { }
 
 	protected function getManager(InputInterface $input) {
 		$container = $this->getContainer();

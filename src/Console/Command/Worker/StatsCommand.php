@@ -6,6 +6,7 @@ use GMO\Beanstalk\Manager\WorkerManager;
 use GMO\Common\Collections\ArrayCollection;
 use GMO\Console\Helper\AutoHidingTable;
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -16,7 +17,7 @@ class StatsCommand extends AbstractWorkerCommand {
 		$this->setName('stats')->setDescription('Get stats about the workers');
 	}
 
-	protected function executeManagerFunction(OutputInterface $output, WorkerManager $manager, $workers) {
+	protected function executeManagerFunction(InputInterface $input, OutputInterface $output, WorkerManager $manager, $workers) {
 		$workers = $manager->getWorkers($workers);
 		if ($workers->isEmpty()) {
 			$output->writeln('There are no workers in: ' . $manager->getWorkerDir());

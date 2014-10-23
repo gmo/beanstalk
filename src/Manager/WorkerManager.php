@@ -27,39 +27,24 @@ class WorkerManager implements LoggerAwareInterface {
 	 * Spawns workers of each type up to the number of
 	 * workers specified in each worker class.
 	 * @param null|string|array $filter [optional] worker(s) filter
+	 * @param int $spawnNumber [optional] The number of workers to spawn.
+	 *
+	 *                         Default is to spawn workers up to the total specified by the worker
 	 */
-	public function startWorkers($filter = null) {
+	public function startWorkers($filter = null, $spawnNumber = null) {
 		$this->log->info("Starting workers...");
-		# get workers
 		$workers = $this->getWorkers($filter);
 
 		foreach ($workers as $worker) {
-			$workersToSpawn = $worker->getTotal() - $worker->getNumRunning();
+			$workersToSpawn = $spawnNumber ?: ($worker->getTotal() - $worker->getNumRunning());
 
 			if ($workersToSpawn > 0) {
 				$this->log->info("Starting $workersToSpawn workers: " . $worker->getName());
 			}
-			# spawn new workers
-			for ($i = 0; $i < $workersToSpawn; $i++) {
+			foreach (range(1, $workersToSpawn) as $i) {
 				$this->spawnWorker($worker);
 			}
 		}
-	}
-
-	/**
-	 * Spawn a new worker given the class name
-	 * @param string $worker class name
-	 */
-	public function startWorker($worker) {
-		if (!file_exists($this->workerDir . $worker . ".php")) {
-			$this->log->error("Worker: $worker doesn't exist");
-			return;
-		}
-
-		$worker = new WorkerInfo($this->getPhpClass($this->workerDir . $worker . '.php'));
-
-		$this->log->info("Starting worker: " . $worker->getName());
-		$this->spawnWorker($worker);
 	}
 
 	/**
