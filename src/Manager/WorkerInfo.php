@@ -2,21 +2,17 @@
 namespace GMO\Beanstalk\Manager;
 
 use GMO\Common\Collections\ArrayCollection;
-use GMO\Common\String;
 
 class WorkerInfo {
 
 	/** @return string Fully qualified class name */
 	public function getFullyQualifiedName() {
-		return $this->fullyQualifiedName;
+		return $this->refCls->getName();
 	}
 
 	/** @return string class name without namespace */
 	public function getName() {
-		if (!$this->name) {
-			$this->name = String::className($this->fullyQualifiedName);
-		}
-		return $this->name;
+		return $this->refCls->getShortName();
 	}
 
 	/** @return int number of workers currently running */
@@ -30,16 +26,13 @@ class WorkerInfo {
 	}
 
 	public function getReflectionClass() {
-		if (!$this->refCls) {
-			$this->refCls = new \ReflectionClass($this->fullyQualifiedName);
-		}
 		return $this->refCls;
 	}
 
 	/** @return \GMO\Beanstalk\Worker\WorkerInterface */
 	public function getInstance() {
 		if (!$this->instance) {
-			$this->instance = $this->getReflectionClass()->newInstance();
+			$this->instance = $this->refCls->newInstance();
 		}
 		return $this->instance;
 	}
@@ -63,13 +56,12 @@ class WorkerInfo {
 		$this->pids->removeElement($pid);
 	}
 
-	public function __construct($fullyQualifiedName) {
-		$this->fullyQualifiedName = $fullyQualifiedName;
+	public function __construct(\ReflectionClass $reflectionClass) {
+		$this->refCls = $reflectionClass;
 		$this->pids = new ArrayCollection();
 	}
 
-	private $fullyQualifiedName;
-	private $name;
+	/** @var \ReflectionClass */
 	private $refCls;
 	private $instance;
 	/** @var ArrayCollection */

@@ -1,7 +1,8 @@
 <?php
 namespace GMO\Beanstalk\Manager;
 
-use GMO\Beanstalk\Processor;
+use GMO\Beanstalk\Helper\ClassFinder;
+use GMO\Beanstalk\Helper\Processor;
 use GMO\Common\Collections\ArrayCollection;
 use GMO\Common\String;
 use Psr\Log\LoggerAwareInterface;
@@ -92,38 +93,35 @@ class WorkerManager implements LoggerAwareInterface {
 	 * @return WorkerInfo[]|ArrayCollection
 	 */
 	public function getWorkers($filter = null) {
-		/** @var WorkerInfo[] $workers */
-		$workers = new ArrayCollection();
-		$files = glob($this->workerDir . "*.php");
-		foreach ($files as $file) {
-			$workerInfo = new WorkerInfo($this->getPhpClass($file));
+		$self = $this;
+		return ArrayCollection::create(
+			ClassFinder::create($this->workerDir)
+			->isInstantiable()
+			->isSubclassOf('\GMO\Beanstalk\Worker\WorkerInterface')
+			->map(function(\ReflectionClass $class) {
+				return new WorkerInfo($class);
+			}))
+			->filter(function(WorkerInfo $worker) use ($self, $filter) {
+				return $self->filterWorkers($worker->getName(), $filter);
+			})
+			->map(function(WorkerInfo $worker) use ($self) {
+				$processes = $self->getProcessor()->grepForPids(sprintf('runner \"%s\"', $self->getWorkerDir()));
 
-			if (!$workerInfo->getName()) { // File isn't a class
-				continue;
-			}
-
-			if (!$this->filterWorkers($workerInfo->getName(), $filter)) {
-				continue;
-			}
-
-			$cls = $workerInfo->getReflectionClass();
-			if ($cls->isInstantiable() && $cls->isSubclassOf('\GMO\Beanstalk\Worker\WorkerInterface')) {
-				$workers[$workerInfo->getFullyQualifiedName()] = $workerInfo;
-			}
-		}
-
-		$processes = $this->processor->grepForPids(sprintf('runner \"%s\"', $this->workerDir));
-		foreach ($processes as $process) {
-			if (isset($workers[$process[0]])) {
-				$workers[$process[0]]->addPid($process[1]);
-			}
-		}
-
-		return $workers;
+				foreach ($processes as $process) {
+					if ($worker->getFullyQualifiedName() === $process[0]) {
+						$worker->addPid($process[1]);
+					}
+				}
+				return $worker;
+			});
 	}
 
 	public function getWorkerDir() {
 		return $this->workerDir;
+	}
+
+	public function getProcessor() {
+		return $this->processor;
 	}
 
 	/** @inheritdoc */
@@ -145,7 +143,7 @@ class WorkerManager implements LoggerAwareInterface {
 	 * @param null|string|array $filters worker(s) filter
 	 * @return bool
 	 */
-	protected function filterWorkers($workerName, $filters) {
+	public function filterWorkers($workerName, $filters) {
 		if (!$filters) {
 			return true;
 		}

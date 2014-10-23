@@ -1,5 +1,5 @@
 <?php
-namespace GMO\Beanstalk;
+namespace GMO\Beanstalk\Helper;
 
 class Processor {
 

@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f783ce602b8b6e294ec9a019935cada4",
+    "hash": "58ddf223b16a96861031ecc9732d035b",
     "packages": [
         {
             "name": "gmo/common",
@@ -46,17 +46,17 @@
         },
         {
             "name": "gmo/console",
-            "version": "v2.1.0",
+            "version": "v2.1.1",
             "source": {
                 "type": "git",
                 "url": "git@bitbucket.org:gmodev/console-library.git",
-                "reference": "ba5466873ded9fe3646514b5f5d7cb69fb54a9f2"
+                "reference": "728d1bfc1192088eab677aac1d6f222f4aacbb7d"
             },
             "dist": {
                 "type": "zip",
-                "url": "http://composer.gmodev.com/dist/gmo-console-v2.1.0-97fb13.zip",
-                "reference": "ba5466873ded9fe3646514b5f5d7cb69fb54a9f2",
-                "shasum": "f4529570ad7e51090acb639494f570a63128acc4"
+                "url": "http://composer.gmodev.com/dist/gmo-console-v2.1.1-7525fb.zip",
+                "reference": "728d1bfc1192088eab677aac1d6f222f4aacbb7d",
+                "shasum": "7857524963cd7180b1d6691f1b91b5fcbafcd3cd"
             },
             "require": {
                 "gmo/common": "~1.22",
@@ -70,7 +70,7 @@
                 }
             },
             "description": "A library that eases the creation of beautiful and testable command line interfaces",
-            "time": "2014-10-22 14:05:04"
+            "time": "2014-10-22 15:42:09"
         },
         {
             "name": "gmo/dependency-injection",
@@ -333,6 +333,53 @@
             "description": "Symfony Console Component",
             "homepage": "http://symfony.com",
             "time": "2014-09-25 09:53:56"
+        },
+        {
+            "name": "symfony/finder",
+            "version": "v2.5.5",
+            "target-dir": "Symfony/Component/Finder",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/Finder.git",
+                "reference": "d5033742b9a6206ef6d06e813870bca18e9205df"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/Finder/zipball/d5033742b9a6206ef6d06e813870bca18e9205df",
+                "reference": "d5033742b9a6206ef6d06e813870bca18e9205df",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.5-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\Finder\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                },
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "Symfony Finder Component",
+            "homepage": "http://symfony.com",
+            "time": "2014-09-27 08:35:39"
         }
     ],
     "packages-dev": [
