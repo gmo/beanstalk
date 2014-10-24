@@ -42,6 +42,10 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate {
 	}
 
 	//region Job Control Methods
+	/**
+	 * @param int $delay    Seconds to wait before job becomes ready
+	 * @param int $priority From 0 (most urgent) to 4294967295 (least urgent)
+	 */
 	public function release($delay = null, $priority = null) {
 		$this->handled = true;
 		$this->queue->release($this, $priority, $delay);

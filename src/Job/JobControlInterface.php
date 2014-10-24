@@ -7,8 +7,8 @@ interface JobControlInterface {
 
 	/**
 	 * @param Job $job
-	 * @param int $priority
-	 * @param int $delay
+	 * @param int $priority From 0 (most urgent) to 4294967295 (least urgent)
+	 * @param int $delay    Seconds to wait before job becomes ready
 	 */
 	public function release(Job $job, $priority = null, $delay = null);
 
