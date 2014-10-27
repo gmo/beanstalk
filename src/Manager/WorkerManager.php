@@ -78,8 +78,12 @@ class WorkerManager implements LoggerAwareInterface {
 	 * @return WorkerInfo[]|ArrayCollection
 	 */
 	public function getWorkers($filter = null) {
+		if ($this->workers) {
+			return $this->workers;
+		}
+
 		$self = $this;
-		return ArrayCollection::create(
+		return $this->workers = ArrayCollection::create(
 			ClassFinder::create($this->workerDir)
 			->isInstantiable()
 			->isSubclassOf('\GMO\Beanstalk\Worker\WorkerInterface')
@@ -192,6 +196,8 @@ class WorkerManager implements LoggerAwareInterface {
 
 	/** @var string Directory containing workers */
 	protected $workerDir;
+	/** @var WorkerInfo[]|ArrayCollection */
+	protected $workers;
 	/** @var Processor */
 	protected $processor;
 	/** @var LoggerInterface */
