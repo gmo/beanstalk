@@ -43,11 +43,9 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 		$job = new NullJob();
 		do {
 			$job = $this->getJob($job);
-			if ($job instanceof NullJob) {
-				continue;
+			if (!$job instanceof NullJob) {
+				$this->processJob($job);
 			}
-			$this->processJob($job);
-
 		} while ($this->shouldKeepRunning());
 		$this->log->info('Worker stopped');
 	}

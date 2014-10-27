@@ -41,7 +41,7 @@ class WorkerManager implements LoggerAwareInterface {
 			if ($workersToSpawn > 0) {
 				$this->log->info("Starting $workersToSpawn workers: " . $worker->getName());
 			}
-			foreach (range(1, $workersToSpawn) as $i) {
+			for($i = 0; $i < $workersToSpawn; $i++) {
 				$this->spawnWorker($worker);
 			}
 		}
