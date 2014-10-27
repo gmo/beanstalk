@@ -60,7 +60,7 @@ class WorkerManager implements LoggerAwareInterface {
 			$this->log->info("Stopping workers: " . $worker->getName());
 			foreach ($worker->getPids() as $pid) {
 				$this->log->debug(sprintf("Terminating: [%s] %s", $pid, $worker->getName()));
-				posix_kill($pid, SIGTERM);
+				$this->processor->terminateProcess($pid);
 			}
 		}
 		foreach ($workers as $worker) {
@@ -128,6 +128,10 @@ class WorkerManager implements LoggerAwareInterface {
 		$this->log = $logger;
 	}
 
+	public function setProcessor($processor) {
+		$this->processor = $processor;
+	}
+
 	protected function spawnWorker(WorkerInfo $worker) {
 		//TODO: Use actual logger not redirection
 		$cmd =
@@ -141,17 +145,10 @@ class WorkerManager implements LoggerAwareInterface {
 	 * @param LoggerInterface $logger
 	 * @param string          $host      Beanstalkd host
 	 * @param int             $port      Beanstalkd port
-	 * @param Processor       $processor
 	 */
-	public function __construct(
-		$workerDir,
-		LoggerInterface $logger = null,
-		$host = 'localhost',
-		$port = 11300,
-		Processor $processor = null
-	) {
+	public function __construct($workerDir, LoggerInterface $logger = null, $host = 'localhost', $port = 11300) {
 		$this->workerDir = $workerDir ? realpath($workerDir) . "/" : null;
-		$this->processor = $processor ?: new Processor();
+		$this->processor = new Processor();
 		$this->setLogger($logger ?: new NullLogger());
 		$this->host = $host;
 		$this->port = $port;

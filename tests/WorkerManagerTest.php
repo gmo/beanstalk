@@ -1,176 +1,137 @@
 <?php
 
-use Psr\Log\NullLogger;
+use GMO\Beanstalk\Helper\Processor;
+use GMO\Beanstalk\Manager\WorkerManager;
+use GMO\Beanstalk\Worker\WorkerInterface;
+use GMO\Common\Collections\ArrayCollection;
+use GMO\Common\String;
 
-class When_restarting_workers extends ContextSpecification {
+class WorkerManagerTest extends \PHPUnit_Framework_TestCase {
 
-	protected static function given() {
-		$log = new NullLogger();
-		self::$workerManager = new UnitTestWorkerManagerRestart(WORKER_DIR, $log, HOST, PORT);
-	}
-
-	protected static function when() {
-		self::$workerManager->restartWorkers();
-	}
-
-	public function test_workers_should_be_stopped() {
-		$this->assertTrue( self::$workerManager->stopCalled );
-	}
-
-	public function test_workers_should_be_started() {
-		$this->assertTrue( self::$workerManager->startCalled );
-	}
-
-	/**
-	 * @var UnitTestWorkerManagerRestart
-	 */
-	private static $workerManager;
-}
-
-class Given_there_are_workers_running_when_stop_workers_is_called extends ContextSpecification {
-
-	protected static function given() {
-		$log = new NullLogger();
-		self::$workerManager = new UnitTestWorkerManager(WORKER_DIR, $log, HOST, PORT);
-	}
-
-	protected static function when() {
-		self::$workerManager->stopWorkers();
-	}
-
-	public function test_all_workers_are_stopped() {
-		$correctCommands = array(
-			"kill 14692",
-			"kill 14693",
-			"kill 14690"
+	public function testWorkerListAndCounts() {
+		$actual = array();
+		foreach ($this->wm->getWorkers() as $worker) {
+			$actual[$worker->getName()] = array($worker->getNumRunning(), $worker->getTotal());
+		}
+		$expected = array(
+			'NullWorker'                            => array(2, 3),
+			'UnitTestRpcWorker'                     => array(1, 1),
+			'UnitTestWorker'                        => array(0, 0),
+			'UnitTestWorkerProcessGenericException' => array(0, 0),
+			'UnitTestWorkerProcessJobError'         => array(0, 0),
+			'UnitTestWorkerSetupFailure'            => array(0, 0),
 		);
-		foreach ( $correctCommands as $cmd ) {
-			$this->assertContains( $cmd, self::$workerManager->calledCommands );
+		$this->assertSame($expected, $actual);
+	}
+
+	public function testWorkersImplementInterface() {
+		foreach ($this->wm->getWorkers() as $worker) {
+			$this->assertTrue($worker->getInstance() instanceof WorkerInterface);
 		}
 	}
 
-	/**
-	 * @var UnitTestWorkerManager
-	 */
-	private static $workerManager;
-}
-
-class Given_workers_are_currently_running extends ContextSpecification {
-
-	protected static function given() {
-		$log = new NullLogger();
-		self::$workerManager = new UnitTestWorkerManager(WORKER_DIR, $log, HOST, PORT);
+	public function testWorkersAreInstantiable() {
+		foreach ($this->wm->getWorkers() as $worker) {
+			$this->assertTrue($worker->getReflectionClass()->isInstantiable());
+		}
 	}
 
-	protected static function when() {
-		self::$currentlyRunningWorkers = self::$workerManager->getRunningWorkers();
-	}
-
-	public function test_list_workers_correctly() {
-		$correctWorkers = array(
-			"NullWorker"     => 1,
-			"UnitTestWorker" => 2
+	public function testStopWorkers() {
+		$this->wm->stopWorkers();
+		$expectedPids = array(
+			22923,
+			22921,
+			22925,
 		);
-		$this->assertEquals( $correctWorkers, self::$currentlyRunningWorkers );
+		$this->assertSame($expectedPids, $this->processor->terminatedProcesses->toArray());
+		$this->assertSame($expectedPids, $this->processor->waitedForProcesses->toArray());
 	}
 
-	/**
-	 * @var UnitTestWorkerManager
-	 */
-	private static $workerManager;
-	private static $currentlyRunningWorkers;
+	public function testStartWorkers() {
+		$this->wm->startWorkers();
+		$this->assertCount(1, $this->processor->executeCalls);
+		$this->assertContains('NullWorker', $this->processor->executeCalls->first());
+	}
+
+	protected function setUp() {
+		$dir = realpath('workers') . '/';
+		$this->wm = new WorkerManager($dir);
+		$this->processor = new TestProcessor($dir);
+		$this->wm->setProcessor($this->processor);
+	}
+
+	/** @var WorkerManager */
+	private $wm;
+	/** @var TestProcessor */
+	private $processor;
 }
 
-class Given_a_directory_get_number_of_workers extends ContextSpecification {
+class TestProcessor extends Processor {
 
-	protected static function given() {
-		$log = new NullLogger();
-		self::$workerManager = new UnitTestWorkerManager(WORKER_DIR, $log, HOST, PORT);
+	public function waitForProcess($pid, $interval = 200) {
+		$this->waitedForProcesses->add($pid);
 	}
 
-	protected static function when() {
-		self::$workers = self::$workerManager->getWorkers();
+	public function isProcessRunning($pid) {
+		return $this->getProcesses()->exists(function($key, $value) use ($pid) {
+			return $value[1] == $pid;
+		});
 	}
 
-	public function test_numbers_are_zero() {
-		$correctWorkers = array(
-			"NullWorker"                                     => 3,
-			"UnitTestWorker"                                 => 1,
-			"UnitTestWorkerProcessGenericException"          => 0,
-			"UnitTestWorkerProcessJobAwareException"         => 0,
-			"UnitTestWorkerProcessJobAwareExceptionNoDelete" => 0,
-			"UnitTestWorkerSetupFailure"                     => 0
-		);
-		foreach ( $correctWorkers as $workerName => $workerCount ) {
-			/** @var \GMO\Beanstalk\AbstractWorker $worker */
-			$worker = self::$workers[$workerName];
-			$this->assertEquals(
-			     $workerCount,
-			     $worker->getNumberOfWorkers()
-			);
+	public function terminateProcess($pid) {
+		$this->terminatedProcesses->add($pid);
+	}
+
+	public function grepForPids($grep) {
+		$grep = str_replace('\"', '"', $grep);
+		return $this->getProcessLines()
+			->filter(function($line) use ($grep) {
+				return String::contains($line, $grep, false);
+			})
+			->map(array($this, 'parseLines'))
+			->map(function($line) {
+				return array($line[13], $line[1]);
+			});
+	}
+
+	public function execute($command, array &$output = null, &$return_var = null) {
+		$this->executeCalls->add($command);
+	}
+
+	private function getProcessLines() {
+		$workerDir = $this->workerDir;
+		return ArrayCollection::create(file('process_list.txt'))
+			->map(function($line) use ($workerDir) {
+				return str_replace('{WORKER_DIR}', $workerDir, $line);
+			});
+	}
+
+	public function parseLines($line) {
+		if (preg_match_all('/"[^"]+"|\S+/', $line, $matches)) {
+			return $matches[0];
 		}
+		return $line;
 	}
 
-	/**
-	 * @var UnitTestWorkerManager
-	 */
-	private static $workerManager;
-	private static $workers;
-}
-
-class Given_a_directory_get_workers extends ContextSpecification {
-
-	protected static function given() {
-		$log = new NullLogger();
-		self::$workerManager = new UnitTestWorkerManager(WORKER_DIR, $log, HOST, PORT);
+	private function getProcesses() {
+		return $this->getProcessLines()
+			->map(function($line) {
+				if (preg_match_all('/"[^"]+"|\S+/', $line, $matches)) {
+					return $matches[0];
+				}
+				return $line;
+			});
 	}
 
-	protected static function when() {
-		self::$workers = self::$workerManager->getWorkers();
+	public function __construct($workerDir) {
+		$this->workerDir = realpath($workerDir) . '/';
+		$this->executeCalls = new ArrayCollection();
+		$this->terminatedProcesses = new ArrayCollection();
+		$this->waitedForProcesses = new ArrayCollection();
 	}
 
-	public function test_abstract_worker_not_included() {
-		$this->assertArrayNotHasKey( "AbstractWorker", self::$workers );
-	}
-
-	public function test_workers_are_subclasses_of_abstract_worker() {
-		foreach ( self::$workers as $worker ) {
-			$this->assertInstanceOf( "\\GMO\\Beanstalk\\AbstractWorker", $worker );
-		}
-	}
-
-	public function test_workers_are_instantiable() {
-		foreach ( self::$workers as $worker ) {
-			$cls = new ReflectionClass($worker);
-			$this->assertTrue($cls->isInstantiable());
-		}
-	}
-
-	/**
-	 * @var UnitTestWorkerManager
-	 */
-	private static $workerManager;
-	private static $workers;
-}
-
-class Given_a_directory_start_workers extends ContextSpecification {
-
-	protected static function given() {
-		$log = new NullLogger();
-		self::$workerManager = new UnitTestWorkerManager(WORKER_DIR, $log, HOST, PORT);
-	}
-
-	protected static function when() {
-		self::$workerManager->startWorkers();
-	}
-
-	public function test_start_only_needed_count() {
-		$expected = array( "NullWorker" => 2, "UnitTestRpcWorker" => 1 );
-		$this->assertEquals( $expected, self::$workerManager->calledWorkers );
-	}
-
-	/**
-	 * @var UnitTestWorkerManager
-	 */
-	private static $workerManager;
+	private $workerDir;
+	public $executeCalls;
+	public $terminatedProcesses;
+	public $waitedForProcesses;
 }

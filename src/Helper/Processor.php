@@ -13,6 +13,10 @@ class Processor {
 		}
 	}
 
+	public function terminateProcess($pid) {
+		posix_kill($pid, SIGTERM);
+	}
+
 	/**
 	 * Checks if pid is running
 	 * @param $pid
