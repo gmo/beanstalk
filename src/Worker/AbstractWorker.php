@@ -26,7 +26,7 @@ abstract class AbstractWorker implements WorkerInterface {
 		return String::className(static::className());
 	}
 
-	public static function getRunnerClass() { return BaseRunner::className(); }
+	public static function getRunner() { return new BaseRunner(); }
 
 	public static function getNumberOfWorkers() { return 1; }
 

@@ -27,6 +27,8 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 		$log = $worker->getLogger();
 		$this->setLogger($log);
 		$queue->setLogger($log);
+
+		$this->attachSignalHandler();
 	}
 
 	public function run() {
@@ -35,8 +37,6 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 		}
 
 		$this->log->info("Running worker: " . $this->tubeName);
-
-		$this->attachSignalHandler();
 
 		$this->setupWorker($this->worker);
 
@@ -94,7 +94,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 		$job->delete();
 	}
 
-	protected function setupWorker(WorkerInterface $worker) {
+	public function setupWorker(WorkerInterface $worker) {
 		try {
 			$worker->setup();
 		} catch (Exception $e) {
@@ -103,7 +103,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 		}
 	}
 
-	protected function getJob(Job $previousJob) {
+	public function getJob(Job $previousJob) {
 		$this->checkForTerminationSignal();
 
 		# Only log if last call was valid to prevent spamming the log

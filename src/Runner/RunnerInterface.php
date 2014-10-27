@@ -12,6 +12,14 @@ interface RunnerInterface extends ClassNameResolverInterface {
 
 	public function run();
 
+	public function setupWorker(WorkerInterface $worker);
+
+	/**
+	 * @param Job $previousJob
+	 * @return Job
+	 */
+	public function getJob(Job $previousJob);
+
 	public function preProcessJob(Job $job);
 
 	/**

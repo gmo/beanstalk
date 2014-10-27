@@ -5,12 +5,11 @@ use GMO\Beanstalk\Exception\RpcInvalidResponseException;
 use GMO\Beanstalk\Exception\RpcTimeoutException;
 use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Queue\TubeControlInterface;
-use Runner\RpcRunner;
+use GMO\Beanstalk\Runner\RpcRunner;
 
 abstract class RpcWorker extends AbstractWorker {
 
-	/** @inheritdoc */
-	public static function getRunnerClass() { return RpcRunner::className(); }
+	public static function getRunner() { return new RpcRunner(); }
 
 	public static function getTimeToRun() { return 30; }
 
