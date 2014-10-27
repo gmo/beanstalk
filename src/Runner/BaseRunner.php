@@ -2,8 +2,9 @@
 namespace GMO\Beanstalk\Runner;
 
 use Exception;
-use GMO\Beanstalk\Exception\JobAwareExceptionInterface;
 use GMO\Beanstalk\Job\Job;
+use GMO\Beanstalk\Job\JobError\Action\JobActionInterface;
+use GMO\Beanstalk\Job\JobError\JobErrorInterface;
 use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Worker\WorkerInterface;
@@ -124,8 +125,6 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 
 		$this->checkForTerminationSignal();
 
-		$job->bury();
-
 		return $job;
 	}
 
@@ -150,7 +149,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 	 * @param Exception $ex
 	 */
 	protected function handleError(Job $job, Exception $ex) {
-		$numErrors = $this->getNumberOfErrors($job);
+		$numRetries = $this->getNumberOfRetries($job);
 		$this->log->warning($ex->getMessage());
 
 		if ($job->isHandled()) {
@@ -158,22 +157,50 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 			return;
 		}
 
-		if ($ex instanceof JobAwareExceptionInterface && $ex->shouldDelete() && $numErrors >= $ex->deleteAfter()) {
-			$this->log->warning("Not retrying job...deleting.", array(
-				"params"    => $job->getData(),
-				"exception" => $ex
-			));
-			$job->delete();
+		if (!$ex instanceof JobErrorInterface) {
+			$this->buryJob($job, $ex, $numRetries);
+		}
+
+		if ($numRetries < $ex->getMaxRetries()) {
+			$this->delayJob($job, $ex, $numRetries);
+		} elseif ($ex->getActionToTake() === JobActionInterface::DELETE) {
+			$this->deleteJob($job, $ex, $numRetries);
 		} else {
-			$this->log->warning("Job failed $numErrors times.", array(
-				"params"    => $job->getData(),
-				"exception" => $ex
-			));
+			$this->buryJob($job, $ex, $numRetries);
 		}
 	}
 
-	protected function getNumberOfErrors(Job $job) {
-		return $job->stats()->reserves();
+	protected function buryJob(Job $job, $exception, $numErrors) {
+		$this->log->warning("Burying failed job", array(
+			"numErrors" => $numErrors,
+			"params"    => $job->getData(),
+			"exception" => $exception
+		));
+		$job->bury();
+	}
+
+	protected function deleteJob(Job $job, $exception, $numErrors) {
+		$this->log->notice("Deleting failed job", array(
+			"numErrors" => $numErrors,
+			"params"    => $job->getData(),
+			"exception" => $exception
+		));
+		$job->delete();
+	}
+
+	protected function delayJob(Job $job, JobErrorInterface $exception, $numErrors) {
+		$delay = $exception->getDelay($numErrors);
+		$this->log->notice("Delaying failed job", array(
+			"numErrors" => $numErrors,
+			"delay" 	=> $delay,
+			"params"    => $job->getData(),
+			"exception" => $exception
+		));
+		$job->release($delay);
+	}
+
+	protected function getNumberOfRetries(Job $job) {
+		return $job->stats()->releases();
 	}
 
 	protected function attachSignalHandler() {

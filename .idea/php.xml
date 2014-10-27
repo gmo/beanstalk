@@ -10,7 +10,6 @@
       <skipped_path path="/usr/local/bin/composer" />
     </skipped_paths>
   </component>
-  <component name="PhpProjectSharedConfiguration" php_language_level="5.3.0" />
   <component name="PhpUnit">
     <phpunit_settings>
       <PhpUnitSettings custom_loader_path="$PROJECT_DIR$/vendor/autoload.php" phpunit_phar_path="" />

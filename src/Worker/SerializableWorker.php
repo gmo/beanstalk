@@ -1,7 +1,8 @@
 <?php
 namespace GMO\Beanstalk\Worker;
 
-use GMO\Beanstalk\Exception\NotSerializableJobException;
+use GMO\Beanstalk\Exception\Job\NotSerializableJobException;
+use GMO\Beanstalk\Job\Job;
 use GMO\Common\ISerializable;
 
 /**
@@ -27,7 +28,7 @@ abstract class SerializableWorker extends AbstractWorker {
 
 	/**
 	 * Unserialize array into ISerializable object and call processSerializableObject()
-	 * @param \GMO\Beanstalk\Job $job
+	 * @param Job $job
 	 * @throws NotSerializableJobException
 	 * @return void
 	 */
