@@ -1,25 +1,14 @@
 <?php
 namespace GMO\Beanstalk\Test;
 
-use GMO\Beanstalk\Queue\Queue;
-
-/**
- * Class QueueTestCase
- * @package GMO\Beanstalk\Test
- * @since 1.7.0
- */
 abstract class QueueTestCase extends \PHPUnit_Framework_TestCase {
 
-	/** @var Queue */
+	/** @var ArrayQueue */
 	protected static $queue;
 	protected static $clearTubesBeforeEveryTest = true;
 
-	protected static function getHost() { return "127.0.0.1"; }
-	protected static function getPort() { return 11300; }
-	protected static function getLogger() { return null; }
-
 	protected static function createQueueClass() {
-		return new Queue(static::getHost(), static::getPort(), static::getLogger());
+		return new ArrayQueue();
 	}
 
 	public static function setUpBeforeClass() {
@@ -52,36 +41,27 @@ abstract class QueueTestCase extends \PHPUnit_Framework_TestCase {
 		static::$queue->deleteBuriedJobs($tube);
 	}
 
-	protected static function getJobs($tube, $decode = true) {
-		$jobs = static::$queue->readyJobsFromTube($tube);
-		if ($decode) {
-			$jobs = array_map(function($job) { return json_decode($job, true); }, $jobs);
-		}
-		return $jobs;
-	}
-
-	protected static function getFirstJob($tube, $decode = true) {
-		$jobs = static::getJobs($tube, $decode);
-		return $jobs[0];
+	protected static function getJobs($tube) {
+		return static::$queue->getTube($tube)->ready();
 	}
 
 	protected static function assertTubeContains($value, $tube, $message = '', $ignoreCase = false) {
-		$jobs = static::getJobs($tube, is_array($value));
+		$jobs = static::getJobs($tube);
 		static::assertContains($value, $jobs, $message, $ignoreCase);
 	}
 
 	protected static function assertTubeNotContains($value, $tube, $message = '', $ignoreCase = false) {
-		$jobs = static::getJobs($tube, is_array($value));
+		$jobs = static::getJobs($tube);
 		static::assertNotContains($value, $jobs, $message, $ignoreCase);
 	}
 
 	protected static function assertTubeEquals($expected, $tube, $message = '', $ignoreCase = false, $delta = 0, $maxDepth = 10, $canonicalize = false) {
-		$jobs = static::getJobs($tube, is_array($expected[0]));
+		$jobs = static::getJobs($tube);
 		static::assertEquals($expected, $jobs, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
 	}
 
 	protected static function assertTubeCount($expectedCount, $tube, $message = '') {
-		static::assertCount($expectedCount, static::$queue->readyJobsFromTube($tube), $message);
+		static::assertCount($expectedCount, static::$queue->getTube($tube)->ready()->count(), $message);
 	}
 
 	protected static function assertTubeEmpty($tube, $message = '') {
@@ -89,7 +69,7 @@ abstract class QueueTestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	protected static function assertFirstJobParameter($expectedValue, $tube, $key, $message = '') {
-		$job = static::getFirstJob($tube);
+		$job = static::getJobs($tube)->first();
 		static::assertEquals($expectedValue, $job[$key], $message);
 	}
 }
