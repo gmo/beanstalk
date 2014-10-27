@@ -1,9 +1,15 @@
 <?php
 namespace GMO\Beanstalk\Job;
 
+use GMO\Common\Collections\ArrayCollection;
+
 class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate {
 
-	protected $parsedData = array();
+	/**
+	 * Pheanstalk\Job::data is ignored because it's private and we allow write access
+	 * @var ArrayCollection|string
+	 */
+	protected $jobData = array();
 	protected $result;
 	/** @var JobControlInterface */
 	protected $queue;
@@ -11,18 +17,19 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate {
 
 	public function __construct($id, $data, JobControlInterface $queue) {
 		$this->queue = $queue;
-		parent::__construct($id, $data);
+		$this->jobData = is_array($data) ? new ArrayCollection($data) : $data;
+		parent::__construct($id, $this->jobData);
 	}
 
-	public function setParsedData($data) {
-		$this->parsedData = $data;
+	public function setData($data) {
+		$this->jobData = $data;
 	}
 
 	/**
 	 * @return string|mixed|\GMO\Common\Collections\ArrayCollection
 	 */
 	public function getData() {
-		return $this->parsedData ?: parent::getData();
+		return $this->jobData;
 	}
 
 	public function setResult($result) {
@@ -77,27 +84,27 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate {
 	//region Array and Iterator Methods
 	/** @inheritdoc */
 	public function offsetExists($offset) {
-		return isset($this->parsedData[$offset]);
+		return isset($this->jobData[$offset]);
 	}
 
 	/** @inheritdoc */
 	public function offsetGet($offset) {
-		return $this->parsedData[$offset];
+		return $this->jobData[$offset];
 	}
 
 	/** @inheritdoc */
 	public function offsetSet($offset, $value) {
-		$this->parsedData[$offset] = $value;
+		$this->jobData[$offset] = $value;
 	}
 
 	/** @inheritdoc */
 	public function offsetUnset($offset) {
-		unset($this->parsedData[$offset]);
+		unset($this->jobData[$offset]);
 	}
 
 	/** @inheritdoc */
 	public function getIterator() {
-		return new \ArrayIterator($this->parsedData);
+		return new \ArrayIterator($this->jobData);
 	}
 	//endregion
 }

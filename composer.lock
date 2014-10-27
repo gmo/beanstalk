@@ -8,17 +8,17 @@
     "packages": [
         {
             "name": "gmo/common",
-            "version": "v1.22.0",
+            "version": "v1.22.3",
             "source": {
                 "type": "git",
                 "url": "git@bitbucket.org:gmodev/common-library.git",
-                "reference": "cca47abbc2aa4414f34bab118a2ae86dffed83ba"
+                "reference": "c616ebc65bddbc22ff01c4c3492c455953e93c26"
             },
             "dist": {
                 "type": "zip",
-                "url": "http://composer.gmodev.com/dist/gmo-common-v1.22.0-e88c40.zip",
-                "reference": "cca47abbc2aa4414f34bab118a2ae86dffed83ba",
-                "shasum": "1de158a83f119fa6bc46d7eb0984d88c345ad9a3"
+                "url": "http://composer.gmodev.com/dist/gmo-common-v1.22.3-3a5bcb.zip",
+                "reference": "c616ebc65bddbc22ff01c4c3492c455953e93c26",
+                "shasum": "d3d9d1f7127861335819cfbdeaec0c617176bb9d"
             },
             "require-dev": {
                 "monolog/monolog": "~1.6",
@@ -42,7 +42,7 @@
                 }
             },
             "description": "A library for common code",
-            "time": "2014-10-21 17:02:29"
+            "time": "2014-10-27 17:26:37"
         },
         {
             "name": "gmo/console",

@@ -11,7 +11,7 @@ class NullJob extends Job {
 		return -1;
 	}
 
-	public function setParsedData($data) { }
+	public function setData($data) { }
 
 	public function getData() {
 		return null;

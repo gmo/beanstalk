@@ -8,7 +8,6 @@ use GMO\Beanstalk\Job\JobError\JobErrorInterface;
 use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Worker\WorkerInterface;
-use GMO\Common\Collections\ArrayCollection;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
@@ -71,24 +70,15 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 		}
 	}
 
-	public function preProcessJob(Job $job) {
-		$params = json_decode($job->getData(), true);
-		if (!$params) {
-			return;
-		}
-		foreach ($params as $key => $value) {
-			if (is_string($value)) {
-				$value = trim($value);
-			}
-			$params[$key] = $value;
-		}
-		$job->setParsedData(new ArrayCollection($params));
-	}
+	public function preProcessJob(Job $job) { }
 
 	public function validateJob(Job $job) {
 		$params = $job->getData();
+		if (is_scalar($params)) {
+			return true;
+		}
 		foreach ($this->worker->getRequiredParams() as $reqParam) {
-			if (!array_key_exists($reqParam, $params)) {
+			if (!$params->containsKey($reqParam)) {
 				$this->log->error("Job is missing required param: \"$reqParam\"", array( "params" => $params ));
 				return false;
 			}

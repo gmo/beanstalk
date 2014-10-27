@@ -7,7 +7,9 @@ use GMO\Beanstalk\Queue\Response\JobStats;
 use GMO\Beanstalk\Queue\Response\ServerStats;
 use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Common\Collections\ArrayCollection;
+use GMO\Common\Exception\NotSerializableException;
 use GMO\Common\ISerializable;
+use GMO\Common\SerializeHelper;
 use Pheanstalk\Exception\ServerException;
 use Pheanstalk\Exception\SocketException;
 use Pheanstalk\Pheanstalk;
@@ -31,6 +33,9 @@ class Queue implements QueueInterface {
 		} elseif ($data instanceof \Traversable) {
 			$data = iterator_to_array($data, true);
 		}
+		if (is_scalar($data)) {
+			$data = array('data' => $data);
+		}
 		if (is_array($data)) {
 			$data = json_encode($data);
 		}
@@ -48,12 +53,13 @@ class Queue implements QueueInterface {
 		try {
 			$job = $this->pheanstalk->reserveFromTube($tube, $timeout);
 			if ($stopWatching) {
-				$this->pheanstalk->ignore($tube);
+				$this->pheanstalk->watchOnly(PheanstalkInterface::DEFAULT_TUBE);
 			}
 			if (!$job) {
 				return new NullJob();
 			}
-			return new Job($job->getId(), $job->getData(), $this);
+
+			return new Job($job->getId(), $this->parseJobData($job->getData()), $this);
 		} catch (SocketException $e) {
 			return new NullJob();
 		}
@@ -177,6 +183,23 @@ class Queue implements QueueInterface {
 	public function __construct($host = 'localhost', $port = 11300, LoggerInterface $logger = null) {
 		$this->pheanstalk = new Pheanstalk($host, $port);
 		$this->setLogger($logger ?: new NullLogger());
+	}
+
+	protected function parseJobData($data) {
+		$params = new ArrayCollection(json_decode($data, true));
+		if ($params->count() === 1 && $params->containsKey('data')) {
+			return $params['data'];
+		}
+		foreach ($params as $key => $value) {
+			if (is_string($value)) {
+				$params[$key] = trim($value);
+			} elseif (is_array($value) && array_key_exists('class', $value)) {
+				try {
+					$params[$key] = SerializeHelper::createClassFromArray($value['class'], $value);
+				} catch (NotSerializableException $e) { }
+			}
+		}
+		return $params;
 	}
 
 	/** @var Pheanstalk */
