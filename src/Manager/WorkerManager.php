@@ -78,39 +78,49 @@ class WorkerManager implements LoggerAwareInterface {
 	 * @return WorkerInfo[]|ArrayCollection
 	 */
 	public function getWorkers($filter = null) {
-		if ($this->workers) {
-			return $this->workers;
-		}
 
-		$self = $this;
-		return $this->workers = ArrayCollection::create(
-			ClassFinder::create($this->workerDir)
-			->isInstantiable()
-			->isSubclassOf('\GMO\Beanstalk\Worker\WorkerInterface')
-			->map(function(\ReflectionClass $class) {
-				return new WorkerInfo($class);
-			}))
-			->filter(function(WorkerInfo $worker) use ($self, $filter) {
-				return $self->filterWorkers($worker->getName(), $filter);
-			})
-			->map(function(WorkerInfo $worker) use ($self) {
-				$processes = $self->getProcessor()->grepForPids(sprintf('runner \"%s\"', $self->getWorkerDir()));
+		$processes = $this->processor->grepForPids(sprintf('runner \"%s\"', $this->getWorkerDir()));
 
+		return $this->getWorkerInfoList()
+			->map(function(WorkerInfo $worker) use ($processes) {
 				foreach ($processes as $process) {
 					if ($worker->getFullyQualifiedName() === $process[0]) {
 						$worker->addPid($process[1]);
 					}
 				}
 				return $worker;
+			})
+			->filter(function(WorkerInfo $worker) use ($filter) {
+				if (!$filter) {
+					return true;
+				}
+				if (!is_array($filter)) {
+					$filter = array($filter);
+				}
+				foreach ($filter as $f) {
+					if (String::contains($worker->getName(), $f, false)) {
+						return true;
+					}
+				}
+				return false;
 			});
+	}
+
+	protected function getWorkerInfoList() {
+		if ($this->workerInfoList) {
+			return $this->workerInfoList;
+		}
+		return $this->workerInfoList = ArrayCollection::create(
+			ClassFinder::create($this->workerDir)
+				->isInstantiable()
+				->isSubclassOf('\GMO\Beanstalk\Worker\WorkerInterface')
+				->map(function(\ReflectionClass $class) {
+					return new WorkerInfo($class);
+				}));
 	}
 
 	public function getWorkerDir() {
 		return $this->workerDir;
-	}
-
-	public function getProcessor() {
-		return $this->processor;
 	}
 
 	/** @inheritdoc */
@@ -124,53 +134,6 @@ class WorkerManager implements LoggerAwareInterface {
 			sprintf('%s "\"%s\"" "%s" %s %d >> /var/log/gmo/beanstalkd/%s.log 2>&1 &', './runner', $this->workerDir,
 				$worker->getFullyQualifiedName(), $this->host, $this->port, $worker->getName());
 		$this->processor->executeFromDir($cmd, __DIR__ . '/../../bin');
-	}
-
-	/**
-	 * Fuzzy matching for worker name against one or multiple filters
-	 * @param string            $workerName
-	 * @param null|string|array $filters worker(s) filter
-	 * @return bool
-	 */
-	public function filterWorkers($workerName, $filters) {
-		if (!$filters) {
-			return true;
-		}
-		if (!is_array($filters)) {
-			$filters = array( $filters );
-		}
-		foreach ($filters as $filter) {
-			if (String::contains($workerName, $filter, false)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Get first class name from file
-	 * @param string $file
-	 * @return string|false fully qualified class name
-	 */
-	private static function getPhpClass($file) {
-		$parser = new \PHPParser_Parser(new \PHPParser_Lexer());
-		$phpCode = file_get_contents($file);
-		try {
-			$stmts = $parser->parse($phpCode);
-		} catch (\PHPParser_Error $e) {
-			return false;
-		}
-		foreach ($stmts as $stmt) {
-			if ($stmt instanceof \PHPParser_Node_Stmt_Namespace) {
-				$namespace = implode("\\", $stmt->name->parts);
-				foreach($stmt->stmts as $subStmt) {
-					if ($subStmt instanceof \PHPParser_Node_Stmt_Class) {
-						return $namespace . "\\" . $subStmt->name;
-					}
-				}
-			}
-		}
-		return false;
 	}
 
 	/**
@@ -197,7 +160,7 @@ class WorkerManager implements LoggerAwareInterface {
 	/** @var string Directory containing workers */
 	protected $workerDir;
 	/** @var WorkerInfo[]|ArrayCollection */
-	protected $workers;
+	protected $workerInfoList;
 	/** @var Processor */
 	protected $processor;
 	/** @var LoggerInterface */
