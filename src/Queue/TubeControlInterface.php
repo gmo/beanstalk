@@ -26,9 +26,10 @@ interface TubeControlInterface {
 	 * Reserves a job from the specified tube or false if error or timeout
 	 * @param string   $tube
 	 * @param int|null $timeout
+	 * @param bool     $stopWatching Stop watching the tube after reserving the job
 	 * @return Job
 	 */
-	public function reserve($tube, $timeout = null);
+	public function reserve($tube, $timeout = null, $stopWatching = false);
 
 	/**
 	 * Kicks all jobs in a given tube

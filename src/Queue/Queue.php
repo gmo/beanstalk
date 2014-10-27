@@ -44,9 +44,12 @@ class Queue implements QueueInterface {
 		);
 	}
 
-	public function reserve($tube, $timeout = null) {
+	public function reserve($tube, $timeout = null, $stopWatching = false) {
 		try {
 			$job = $this->pheanstalk->reserveFromTube($tube, $timeout);
+			if ($stopWatching) {
+				$this->pheanstalk->ignore($tube);
+			}
 			if (!$job) {
 				return new NullJob();
 			}

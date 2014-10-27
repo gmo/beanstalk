@@ -127,7 +127,7 @@ class ArrayQueue implements QueueInterface {
 		return $job->getId();
 	}
 
-	public function reserve($tube, $timeout = null) {
+	public function reserve($tube, $timeout = null, $stopWatching = false) {
 		$tube = $this->getTube($tube);
 
 		if ($tube->isPaused()) {
