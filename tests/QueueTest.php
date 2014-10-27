@@ -11,8 +11,8 @@ class QueueTest extends QueueTestCase {
 		static::$queue->push("test2", "test2data");
 		static::$queue->push("test3", "test3data");
 
-		$this->assertTubeEquals(array('"test1data"'), 'test1');
-		$this->assertTubeEquals(array('"test2data"'), 'test2');
-		$this->assertTubeEquals(array('"test3data"'), 'test3');
+		$this->assertTubeEquals(array('test1data'), 'test1');
+		$this->assertTubeEquals(array('test2data'), 'test2');
+		$this->assertTubeEquals(array('test3data'), 'test3');
 	}
 }

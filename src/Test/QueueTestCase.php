@@ -1,6 +1,9 @@
 <?php
 namespace GMO\Beanstalk\Test;
 
+use GMO\Beanstalk\Job\Job;
+use GMO\Common\Collections\ArrayCollection;
+
 abstract class QueueTestCase extends \PHPUnit_Framework_TestCase {
 
 	/** @var ArrayQueue */
@@ -56,12 +59,16 @@ abstract class QueueTestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	protected static function assertTubeEquals($expected, $tube, $message = '', $ignoreCase = false, $delta = 0, $maxDepth = 10, $canonicalize = false) {
-		$jobs = static::getJobs($tube);
+		$jobs = static::getJobs($tube)
+			->map(function(Job $job) {
+				return $job->getData();
+			});
+		$expected = new ArrayCollection($expected);
 		static::assertEquals($expected, $jobs, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
 	}
 
 	protected static function assertTubeCount($expectedCount, $tube, $message = '') {
-		static::assertCount($expectedCount, static::$queue->getTube($tube)->ready()->count(), $message);
+		static::assertCount($expectedCount, static::$queue->getTube($tube)->ready(), $message);
 	}
 
 	protected static function assertTubeEmpty($tube, $message = '') {
