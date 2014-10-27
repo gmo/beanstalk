@@ -2,8 +2,6 @@
 
 use Psr\Log\NullLogger;
 
-require_once __DIR__ . "/tester_autoload.php";
-
 class When_restarting_workers extends ContextSpecification {
 
 	protected static function given() {

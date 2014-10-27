@@ -2,8 +2,6 @@
 
 use GMO\Beanstalk\Test\QueueTestCase;
 
-require_once __DIR__ . "/tester_autoload.php";
-
 class QueueTest extends QueueTestCase {
 
 	function test_watch_only_tube_given() {
