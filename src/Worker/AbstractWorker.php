@@ -35,7 +35,7 @@ abstract class AbstractWorker implements WorkerInterface {
 
 	public static function getErrorHandlers() { return new ArrayCollection(); }
 
-	public function getRequiredParams() { return array(); }
+	public static function getRequiredParams() { return new ArrayCollection(); }
 
 	public function setup() { }
 

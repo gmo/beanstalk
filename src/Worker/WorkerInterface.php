@@ -42,15 +42,15 @@ interface WorkerInterface extends ClassNameResolverInterface {
 
 	/**
 	 * Return an array of parameters required for job to continue.
-	 * @return array
+	 * @return array|ArrayCollection
 	 */
-	public function getRequiredParams();
+	public static function getRequiredParams();
 
 	/**
 	 * Returns a logger instance for worker
 	 * @return \Psr\Log\LoggerInterface
 	 */
-	public function getLogger();
+	public static function getLogger();
 
 	/**
 	 * Setup worker to run. Called only one time.

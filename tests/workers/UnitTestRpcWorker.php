@@ -11,7 +11,7 @@ class UnitTestRpcWorker extends RpcWorker {
 		return new RunOnceRunnerDecorator(parent::getRunner());
 	}
 
-	public function getLogger() {
+	public static function getLogger() {
 		return new NullLogger();
 	}
 
