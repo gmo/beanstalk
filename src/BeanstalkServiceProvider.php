@@ -3,7 +3,6 @@ namespace GMO\Beanstalk;
 
 use GMO\Beanstalk\Manager\WorkerManager;
 use GMO\Beanstalk\Queue\Queue;
-use GMO\Beanstalk\Queue\RpcQueue;
 use GMO\DependencyInjection\ServiceProviderInterface;
 use Pimple;
 use Psr\Log\NullLogger;
@@ -18,7 +17,7 @@ class BeanstalkServiceProvider implements ServiceProviderInterface {
 	/** @inheritdoc */
 	public function register(Pimple $container) {
 
-		$container['beanstalk.host'] = '127.0.0.1';
+		$container['beanstalk.host'] = 'localhost';
 		$container['beanstalk.port'] = 11300;
 
 		$container['worker_manager.directory'] = null;
@@ -29,10 +28,6 @@ class BeanstalkServiceProvider implements ServiceProviderInterface {
 
 		$container['queue'] = $container->share(function($app) {
 			return new Queue($app['beanstalk.host'], $app['beanstalk.port'], $app['queue.logger']);
-		});
-
-		$container['queue.rpc'] = $container->share(function($app) {
-			return new RpcQueue($app['beanstalk.host'], $app['beanstalk.port'], $app['queue.logger']);
 		});
 
 		$container['worker_manager'] = $container->share(function($app) {
