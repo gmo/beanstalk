@@ -55,4 +55,8 @@ interface WorkerInterface extends ClassNameResolverInterface {
 	 */
 	public function process($job);
 
+	/**
+	 * Called when the worker is stopped
+	 */
+	public function onStop();
 }

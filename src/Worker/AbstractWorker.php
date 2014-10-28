@@ -36,5 +36,7 @@ abstract class AbstractWorker implements WorkerInterface {
 
 	public function setup() { }
 
+	public function onStop() { }
+
 	public static function className() { return get_called_class(); }
 }
