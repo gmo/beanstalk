@@ -4,6 +4,7 @@ namespace GMO\Beanstalk\Runner;
 use Exception;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\JobError\Action\JobActionInterface;
+use GMO\Beanstalk\Job\JobError\HasJobErrorInterface;
 use GMO\Beanstalk\Job\JobError\JobErrorInterface;
 use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Queue\QueueInterface;
@@ -153,16 +154,21 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 			return;
 		}
 
-		if (!$ex instanceof JobErrorInterface) {
+		if ($ex instanceof HasJobErrorInterface) {
+			$jobError = $ex->getJobError();
+		} elseif ($ex instanceof JobErrorInterface) {
+			$jobError = $ex;
+		} else {
 			$this->buryJob($job, $ex, $numRetries);
+			return;
 		}
 
-		if ($ex->shouldPauseTube()) {
-			$this->pauseTube($ex->getDelay($numRetries));
+		if ($jobError->shouldPauseTube()) {
+			$this->pauseTube($jobError->getDelay($numRetries));
 		}
-		if ($numRetries < $ex->getMaxRetries()) {
-			$this->delayJob($job, $ex, $numRetries);
-		} elseif ($ex->getActionToTake() === JobActionInterface::DELETE) {
+		if ($numRetries < $jobError->getMaxRetries()) {
+			$this->delayJob($job, $jobError, $ex, $numRetries);
+		} elseif ($jobError->getActionToTake() === JobActionInterface::DELETE) {
 			$this->deleteJob($job, $ex, $numRetries);
 		} else {
 			$this->buryJob($job, $ex, $numRetries);
@@ -195,8 +201,8 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 		$job->delete();
 	}
 
-	protected function delayJob(Job $job, JobErrorInterface $exception, $numErrors) {
-		$delay = !$exception->shouldPauseTube() ? $exception->getDelay($numErrors) : 0;
+	protected function delayJob(Job $job, JobErrorInterface $jobError, $exception, $numErrors) {
+		$delay = !$jobError->shouldPauseTube() ? $jobError->getDelay($numErrors) : 0;
 		$this->log->notice("Delaying failed job", array(
 			"numErrors" => $numErrors,
 			"delay" 	=> $delay,
