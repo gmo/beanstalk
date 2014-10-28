@@ -100,7 +100,7 @@ class TestProcessor extends Processor {
 
 	private function getProcessLines() {
 		$workerDir = $this->workerDir;
-		return ArrayCollection::create(file('process_list.txt'))
+		return ArrayCollection::create(file(__DIR__ . '/process_list.txt'))
 			->map(function($line) use ($workerDir) {
 				return str_replace('{WORKER_DIR}', $workerDir, $line);
 			});
