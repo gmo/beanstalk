@@ -1,30 +1,11 @@
 <?php
 namespace workers;
 
-use GMO\Beanstalk\AbstractWorker;
-use Psr\Log\NullLogger;
-use UnitTestWorkerManager;
+class UnitTestWorkerProcessGenericException extends AbstractTestWorker {
 
-class UnitTestWorkerProcessGenericException extends AbstractWorker {
-	public static function getNumberOfWorkers() { return 0; }
+	public function getRequiredParams() { return array( "param1", "param2" ); }
 
-	protected function getLogger() {
-		return new NullLogger();
-	}
-
-	public function getNumberOfErrorsForCurrentJob() {
-		$id = $this->currentJob->getId();
-		return $this->jobErrors[$id];
-	}
-
-	protected function getRequiredParams() { return array( "param1", "param2" ); }
-
-	protected function process( $params ) {
+	public function process($job) {
 		throw new \Exception("The process fails");
 	}
-
-	public $processResult = null;
-
 }
-
-UnitTestWorkerManager::runWorker();

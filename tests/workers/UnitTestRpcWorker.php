@@ -1,25 +1,21 @@
 <?php
 namespace workers;
 
-use GMO\Beanstalk\AbstractRpcWorker;
+use GMO\Beanstalk\Runner\RunOnceRunnerDecorator;
+use GMO\Beanstalk\Worker\RpcWorker;
 use Psr\Log\NullLogger;
-use UnitTestWorkerManager;
 
-require_once __DIR__ . "/../tester_autoload.php";
+class UnitTestRpcWorker extends RpcWorker {
 
-class UnitTestRpcWorker extends AbstractRpcWorker {
-	protected function getLogger() {
+	public static function getRunner() {
+		return new RunOnceRunnerDecorator(parent::getRunner());
+	}
+
+	public function getLogger() {
 		return new NullLogger();
 	}
 
-	protected function setup() {
-		$this->setToRunOnce();
-	}
-	
-
-	protected function process( $params ) {
-		return intval($params['a']) * intval($params['b']);
+	public function process($job) {
+		$job->setResult(intval($job['a']) * intval($job['b']));
 	}
 }
-
-UnitTestWorkerManager::runWorker();

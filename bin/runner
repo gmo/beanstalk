@@ -1,0 +1,25 @@
+#!/usr/bin/env php
+<?php
+
+use GMO\Beanstalk\Queue\Queue;
+
+if (file_exists(__DIR__ . '/../vendor')) {
+	require_once __DIR__ . '/../vendor/autoload.php';
+} else {
+	/** @noinspection PhpIncludeInspection */
+	require_once __DIR__ . '/../../../../vendor/autoload.php';
+}
+
+list(
+	$cmd,
+	$workerDir,
+	$workerName,
+	$host,
+	$port,
+) = $argv;
+
+/** @var GMO\Beanstalk\Worker\WorkerInterface $worker */
+$worker = new $workerName();
+$runner = $worker->getRunner();
+$runner->setup(new Queue($host, $port), $worker);
+$runner->run();
