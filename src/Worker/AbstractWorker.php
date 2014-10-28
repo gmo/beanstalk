@@ -3,6 +3,7 @@ namespace GMO\Beanstalk\Worker;
 
 use GMO\Beanstalk\Queue\TubeControlInterface;
 use GMO\Beanstalk\Runner\BaseRunner;
+use GMO\Common\Collections\ArrayCollection;
 use GMO\Common\String;
 
 /**
@@ -31,6 +32,8 @@ abstract class AbstractWorker implements WorkerInterface {
 	public static function getNumberOfWorkers() { return 1; }
 
 	public static function getTimeToRun() { return TubeControlInterface::DEFAULT_TTR; }
+
+	public static function getErrorHandlers() { return new ArrayCollection(); }
 
 	public function getRequiredParams() { return array(); }
 

@@ -2,8 +2,10 @@
 namespace GMO\Beanstalk\Worker;
 
 use GMO\Beanstalk\Job\Job;
+use GMO\Beanstalk\Job\JobError\JobErrorHandlerInterface;
 use GMO\Beanstalk\Runner\RunnerInterface;
 use GMO\Common\ClassNameResolverInterface;
+use GMO\Common\Collections\ArrayCollection;
 
 interface WorkerInterface extends ClassNameResolverInterface {
 
@@ -33,6 +35,18 @@ interface WorkerInterface extends ClassNameResolverInterface {
 	public static function getTimeToRun();
 
 	/**
+	 * Return a list of job error handlers
+	 * @return JobErrorHandlerInterface[]|ArrayCollection
+	 */
+	public static function getErrorHandlers();
+
+	/**
+	 * Return an array of parameters required for job to continue.
+	 * @return array
+	 */
+	public function getRequiredParams();
+
+	/**
 	 * Returns a logger instance for worker
 	 * @return \Psr\Log\LoggerInterface
 	 */
@@ -42,12 +56,6 @@ interface WorkerInterface extends ClassNameResolverInterface {
 	 * Setup worker to run. Called only one time.
 	 */
 	public function setup();
-
-	/**
-	 * Return an array of parameters required for job to continue.
-	 * @return array
-	 */
-	public function getRequiredParams();
 
 	/**
 	 * Process each job

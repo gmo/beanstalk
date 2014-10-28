@@ -5,10 +5,13 @@ use Exception;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\JobError\Action\JobActionInterface;
 use GMO\Beanstalk\Job\JobError\HasJobErrorInterface;
+use GMO\Beanstalk\Job\JobError\JobError;
+use GMO\Beanstalk\Job\JobError\JobErrorHandlerInterface;
 use GMO\Beanstalk\Job\JobError\JobErrorInterface;
 use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Worker\WorkerInterface;
+use GMO\Common\Collections\ArrayCollection;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
@@ -24,6 +27,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 		$this->queue = $queue;
 		$this->worker = $worker;
 		$this->tubeName = $worker->getTubeName();
+		$this->errorHandlers = $worker->getErrorHandlers();
 
 		$log = $worker->getLogger();
 		$this->setLogger($log);
@@ -154,14 +158,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 			return;
 		}
 
-		if ($ex instanceof HasJobErrorInterface) {
-			$jobError = $ex->getJobError();
-		} elseif ($ex instanceof JobErrorInterface) {
-			$jobError = $ex;
-		} else {
-			$this->buryJob($job, $ex, $numRetries);
-			return;
-		}
+		$jobError = $this->determineJobError($ex);
 
 		if ($jobError->shouldPauseTube()) {
 			$this->pauseTube($jobError->getDelay($numRetries));
@@ -224,19 +221,46 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 		pcntl_signal_dispatch();
 	}
 
+	/**
+	 * Determine job error from error handlers or exception
+	 * @param Exception $ex
+	 * @return JobErrorInterface
+	 */
+	protected function determineJobError(Exception $ex) {
+
+		foreach ($this->errorHandlers as $handler) {
+			if ($jobError = $handler->handle($ex)) {
+				return $jobError;
+			}
+		}
+
+		if ($ex instanceof HasJobErrorInterface) {
+			return $ex->getJobError();
+		}
+
+		if ($ex instanceof JobErrorInterface) {
+			return $ex;
+		}
+
+		return new JobError();
+	}
+
 	/** @var WorkerInterface */
 	protected $worker;
 
 	/** @var bool Boolean for running loop */
 	protected $keepRunning = true;
 
-	/** @var string */
-	protected $tubeName;
-
 	/** @var QueueInterface */
 	protected $queue;
 
 	/** @var \Psr\Log\LoggerInterface Worker logger */
 	protected $log;
+
+	/** @var string Tube name cached for performance */
+	protected $tubeName;
+
+	/** @var JobErrorHandlerInterface[]|ArrayCollection Error handlers cached for performance */
+	protected $errorHandlers;
 
 }
