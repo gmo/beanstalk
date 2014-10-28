@@ -23,7 +23,7 @@ interface JobControlInterface {
 	 * Deletes a job
 	 * @param Job $job
 	 */
-	public function delete(Job $job);
+	public function delete($job);
 
 	/**
 	 * If the given job exists and is in a buried or delayed state,

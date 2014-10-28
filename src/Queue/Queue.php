@@ -123,7 +123,7 @@ class Queue implements QueueInterface {
 		$this->pheanstalk->bury($job, $priority);
 	}
 
-	public function delete(Job $job) {
+	public function delete($job) {
 		try {
 			$this->pheanstalk->delete($job);
 		} catch (ServerException $e) {

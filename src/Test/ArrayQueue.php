@@ -53,7 +53,7 @@ class ArrayQueue implements QueueInterface {
 		$tube->buried()->add($job);
 	}
 
-	public function delete(Job $job) {
+	public function delete($job) {
 		$stats = $this->jobStats[$job->getId()];
 
 		$tube = $this->getTube($stats->tube());
