@@ -66,7 +66,13 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 			$this->worker->process($job);
 			$this->postProcessJob($job);
 		} catch (Exception $ex) {
-			$this->handleError($job, $ex);
+			try {
+				$this->handleError($job, $ex);
+			} catch (Exception $e) {
+				$this->log->warning('Queue command failed', array(
+					'exception' => $e,
+				));
+			}
 		}
 	}
 
