@@ -190,6 +190,15 @@ class Queue implements QueueInterface {
 		if ($params->count() === 1 && $params->containsKey('data')) {
 			return $params['data'];
 		}
+
+		if ($params->containsKey('class')) {
+			try {
+				return SerializeHelper::createClassFromArray($params['class'], $params->toArray());
+			} catch (NotSerializableException $e) {
+				return $params;
+			}
+		}
+
 		foreach ($params as $key => $value) {
 			if (is_string($value)) {
 				$params[$key] = trim($value);
