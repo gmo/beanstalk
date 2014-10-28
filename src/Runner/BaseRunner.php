@@ -151,6 +151,9 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 			$this->buryJob($job, $ex, $numRetries);
 		}
 
+		if ($ex->shouldPauseTube()) {
+			$this->pauseTube($ex->getDelay($numRetries));
+		}
 		if ($numRetries < $ex->getMaxRetries()) {
 			$this->delayJob($job, $ex, $numRetries);
 		} elseif ($ex->getActionToTake() === JobActionInterface::DELETE) {
@@ -158,6 +161,14 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 		} else {
 			$this->buryJob($job, $ex, $numRetries);
 		}
+	}
+
+	protected function pauseTube($delay) {
+		$this->log->notice('Pausing tube', array(
+			'tube' => $this->tubeName,
+			'delay' => $delay,
+		));
+		$this->queue->pause($this->tubeName, $delay);
 	}
 
 	protected function buryJob(Job $job, $exception, $numErrors) {
@@ -179,7 +190,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 	}
 
 	protected function delayJob(Job $job, JobErrorInterface $exception, $numErrors) {
-		$delay = $exception->getDelay($numErrors);
+		$delay = !$exception->shouldPauseTube() ? $exception->getDelay($numErrors) : 0;
 		$this->log->notice("Delaying failed job", array(
 			"numErrors" => $numErrors,
 			"delay" 	=> $delay,

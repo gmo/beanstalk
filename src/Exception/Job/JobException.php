@@ -7,8 +7,8 @@ use GMO\Beanstalk\Job\JobError\Action\JobActionInterface;
 use GMO\Beanstalk\Job\JobError\Delay\JobDelayInterface;
 use GMO\Beanstalk\Job\JobError\Delay\NoJobDelay;
 use GMO\Beanstalk\Job\JobError\JobErrorInterface;
-use GMO\Beanstalk\Job\JobError\Retry\NoJobRetry;
 use GMO\Beanstalk\Job\JobError\Retry\JobRetryInterface;
+use GMO\Beanstalk\Job\JobError\Retry\NoJobRetry;
 
 /**
  * Exceptions can be wrapped in this class or extend this class
@@ -18,6 +18,10 @@ class JobException extends QueueException implements JobErrorInterface {
 
 	public function getDelay($numRetries) {
 		return $this->delay->getDelay($numRetries);
+	}
+
+	public function shouldPauseTube() {
+		return $this->delay->shouldPauseTube();
 	}
 
 	public function getMaxRetries() {

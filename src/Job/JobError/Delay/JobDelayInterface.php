@@ -9,4 +9,10 @@ interface JobDelayInterface {
 	 * @return int
 	 */
 	public function getDelay($numRetries);
+
+	/**
+	 * Returns whether to pause the tube or just the job
+	 * @return bool
+	 */
+	public function shouldPauseTube();
 }

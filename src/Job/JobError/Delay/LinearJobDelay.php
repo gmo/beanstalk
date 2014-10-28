@@ -7,12 +7,19 @@ class LinearJobDelay implements JobDelayInterface {
 		return $this->delay;
 	}
 
+	public function shouldPauseTube() {
+		return $this->pause;
+	}
+
 	/**
-	 * @param int $delay
+	 * @param int  $delay
+	 * @param bool $pauseTube
 	 */
-	public function __construct($delay) {
+	public function __construct($delay, $pauseTube = false) {
 		$this->delay = intval($delay);
+		$this->pause = $pauseTube;
 	}
 
 	protected $delay;
+	protected $pause;
 }
