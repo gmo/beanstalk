@@ -17,25 +17,29 @@ class BeanstalkServiceProvider implements ServiceProviderInterface {
 	/** @inheritdoc */
 	public function register(Pimple $container) {
 
-		$container['beanstalk.host'] = 'localhost';
-		$container['beanstalk.port'] = 11300;
+		$container[BeanstalkKeys::HOST] = 'localhost';
+		$container[BeanstalkKeys::PORT] = 11300;
 
-		$container['worker_manager.directory'] = null;
-		$container['queue.logger'] =
-		$container['worker_manager.logger'] = function() {
+		$container[BeanstalkKeys::WORKER_DIRECTORY] = null;
+		$container[BeanstalkKeys::QUEUE_LOGGER] =
+		$container[BeanstalkKeys::WORKER_MANAGER_LOGGER] = function() {
 			return new NullLogger();
 		};
 
-		$container['queue'] = $container->share(function($app) {
-			return new Queue($app['beanstalk.host'], $app['beanstalk.port'], $app['queue.logger']);
+		$container[BeanstalkKeys::QUEUE] = $container->share(function($app) {
+			return new Queue(
+				$app[BeanstalkKeys::HOST],
+				$app[BeanstalkKeys::PORT],
+				$app[BeanstalkKeys::QUEUE_LOGGER]
+			);
 		});
 
-		$container['worker_manager'] = $container->share(function($app) {
+		$container[BeanstalkKeys::WORKER_MANAGER] = $container->share(function($app) {
 			return new WorkerManager(
-				$app['worker_manager.directory'],
-				$app['worker_manager.logger'],
-				$app['beanstalk.host'],
-				$app['beanstalk.port']
+				$app[BeanstalkKeys::WORKER_DIRECTORY],
+				$app[BeanstalkKeys::WORKER_MANAGER_LOGGER],
+				$app[BeanstalkKeys::HOST],
+				$app[BeanstalkKeys::PORT]
 			);
 		});
 	}
