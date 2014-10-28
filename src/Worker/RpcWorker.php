@@ -14,7 +14,7 @@ abstract class RpcWorker extends AbstractWorker {
 	public static function getTimeToRun() { return 30; }
 
 	public static function runRpc(TubeControlInterface $queue, $data, $priority = null) {
-		$replyToTube = static::getTubeName() . '-' . static::makeRpcUid();
+		$replyToTube = static::makeReplyTube();
 		static::push($queue, array(
 			RpcRunner::RPC_REPLY_TO_FIELD => $replyToTube,
 			'data' => $data
@@ -31,6 +31,10 @@ abstract class RpcWorker extends AbstractWorker {
 			throw new RpcInvalidResponseException('Result not sent');
 		}
 		return $result;
+	}
+
+	private static function makeReplyTube() {
+		return substr(static::getTubeName() . '-' . static::makeRpcUid(), 0, 190);
 	}
 
 	private static function makeRpcUid() {
