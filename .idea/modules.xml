@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/beanstalk-library.iml" filepath="$PROJECT_DIR$/.idea/beanstalk-library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Beanstalk Library.iml" filepath="$PROJECT_DIR$/.idea/Beanstalk Library.iml" />
     </modules>
   </component>
 </project>
-
