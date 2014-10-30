@@ -9,7 +9,6 @@ use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Common\Collections\ArrayCollection;
 use GMO\Common\Exception\NotSerializableException;
 use GMO\Common\ISerializable;
-use GMO\Common\SerializeHelper;
 use Pheanstalk\Exception\ServerException;
 use Pheanstalk\Exception\SocketException;
 use Pheanstalk\Pheanstalk;
@@ -193,7 +192,9 @@ class Queue implements QueueInterface {
 
 		if ($params->containsKey('class')) {
 			try {
-				return SerializeHelper::createClassFromArray($params['class'], $params->toArray());
+				/** @var ISerializable $cls */
+				$cls = $params['class'];
+				return $cls::fromArray($params->toArray());
 			} catch (NotSerializableException $e) {
 				return $params;
 			}
@@ -204,7 +205,9 @@ class Queue implements QueueInterface {
 				$params[$key] = trim($value);
 			} elseif (is_array($value) && array_key_exists('class', $value)) {
 				try {
-					$params[$key] = SerializeHelper::createClassFromArray($value['class'], $value);
+					/** @var ISerializable $cls */
+					$cls = $value['class'];
+					$params[$key] = $cls::fromArray($value);
 				} catch (NotSerializableException $e) { }
 			}
 		}
