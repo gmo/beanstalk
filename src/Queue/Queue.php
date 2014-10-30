@@ -27,21 +27,9 @@ class Queue implements QueueInterface {
 	//region Tube Control
 
 	public function push($tube, $data, $priority = null, $delay = null, $ttr = null) {
-		if ($data instanceof ISerializable) {
-			$data = $data->toJson();
-		} elseif ($data instanceof \Traversable) {
-			$data = iterator_to_array($data, true);
-		}
-		if (is_scalar($data)) {
-			$data = array('data' => $data);
-		}
-		if (is_array($data)) {
-			$data = json_encode($data);
-		}
-
 		return $this->pheanstalk->putInTube(
 			$tube,
-			$data,
+			$this->serializeJobData($data),
 			$priority ?: static::DEFAULT_PRIORITY,
 			$delay ?: static::DEFAULT_DELAY,
 			$ttr ?: static::DEFAULT_TTR
@@ -58,7 +46,7 @@ class Queue implements QueueInterface {
 				return new NullJob();
 			}
 
-			return new Job($job->getId(), $this->parseJobData($job->getData()), $this);
+			return new Job($job->getId(), $this->unserializeJobData($job->getData()), $this);
 		} catch (SocketException $e) {
 			return new NullJob();
 		}
@@ -184,7 +172,28 @@ class Queue implements QueueInterface {
 		$this->setLogger($logger ?: new NullLogger());
 	}
 
-	protected function parseJobData($data) {
+	protected function serializeJobData($data) {
+		if ($data instanceof ISerializable) {
+			return $data->toJson();
+		}
+		if ($data instanceof \Traversable) {
+			$data = iterator_to_array($data, true);
+		}
+		if (is_scalar($data)) {
+			$data = array( 'data' => $data );
+		}
+		if (is_array($data)) {
+			foreach ($data as $key => &$value) {
+				if ($value instanceof ISerializable) {
+					$value = $value->toArray();
+				}
+			}
+			$data = json_encode($data);
+		}
+		return $data;
+	}
+
+	protected function unserializeJobData($data) {
 		$params = new ArrayCollection(json_decode($data, true));
 		if ($params->count() === 1 && $params->containsKey('data')) {
 			return $params['data'];
