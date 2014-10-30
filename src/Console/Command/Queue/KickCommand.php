@@ -27,8 +27,13 @@ class KickCommand extends AbstractQueueCommand {
 			throw new \RuntimeException('Not enough arguments.');
 		}
 
-		list($tubes, $error) = $this->matchTubeNames($input->getArgument('tube'), $input, $output);
 		$queue = $this->getQueue($input);
+		if ($input->getOption('all')) {
+			$error = false;
+			$tubes = $queue->listTubes();
+		} else {
+			list($tubes, $error) = $this->matchTubeNames($input->getArgument('tube'), $input, $output);
+		}
 		foreach ($tubes as $tube) {
 			$kicked = $queue->kickTube($tube);
 			$output->writeln("Kicked <info>$kicked</info> jobs in <info>$tube</info>");
