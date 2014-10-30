@@ -53,12 +53,14 @@ class Queue implements QueueInterface {
 	}
 
 	public function kickTube($tube) {
+		$this->pheanstalk->useTube($tube);
 		$kicked = 0;
 		$stats = $this->statsTube($tube);
 		if ($stats->buriedJobs() > 0) {
 			$kicked += $this->pheanstalk->kick($stats->buriedJobs());
 		}
 		$kicked += $this->pheanstalk->kick($stats->delayedJobs());
+		$this->pheanstalk->ignore($tube);
 		return $kicked;
 	}
 
