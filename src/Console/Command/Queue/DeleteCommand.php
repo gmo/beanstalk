@@ -50,11 +50,11 @@ class DeleteCommand extends AbstractQueueCommand {
 				$output->writeln("Deleted <info>ready</info> jobs in <info>$tube</info>");
 			}
 			if ($input->getOption('buried')) {
-				$queue->deleteReadyJobs($tube);
+				$queue->deleteBuriedJobs($tube);
 				$output->writeln("Deleted <info>buried</info> jobs in <info>$tube</info>");
 			}
 			if ($input->getOption('delayed')) {
-				$queue->deleteReadyJobs($tube);
+				$queue->deleteDelayedJobs($tube);
 				$output->writeln("Deleted <info>delayed</info> jobs in <info>$tube</info>");
 			}
 		}
