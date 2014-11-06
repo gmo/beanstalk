@@ -116,7 +116,8 @@ class WorkerManager implements LoggerAwareInterface {
 				->isSubclassOf('\GMO\Beanstalk\Worker\WorkerInterface')
 				->map(function(\ReflectionClass $class) {
 					return new WorkerInfo($class);
-				}));
+				}))
+			->sortKeys();
 	}
 
 	public function getWorkerDir() {
