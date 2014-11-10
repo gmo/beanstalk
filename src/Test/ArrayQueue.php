@@ -189,6 +189,24 @@ class ArrayQueue implements QueueInterface {
 		return $kicked;
 	}
 
+	public function peekJob($jobId) {
+		$tubeName = $this->jobStats[$jobId]->tube();
+		$tube = $this->getTube($tubeName);
+		return $this->getJobFromTubeWithId($tube, $jobId);
+	}
+
+	public function peekReady($tube) {
+		$this->getTube($tube)->ready()->first();
+	}
+
+	public function peekBuried($tube) {
+		$this->getTube($tube)->buried()->first();
+	}
+
+	public function peekDelayed($tube) {
+		$this->getTube($tube)->delayed()->first();
+	}
+
 	public function deleteReadyJobs($tube, $num = -1) {
 		$tube = $this->getTube($tube);
 
@@ -265,6 +283,34 @@ class ArrayQueue implements QueueInterface {
 		if (!$tube->isPaused() && $tube->isEmpty()) {
 			$this->tubes->removeElement($tube);
 		}
+	}
+
+	protected function getJobFromTubeWithId(ArrayTube $tube, $jobId) {
+		$filter = function(ArrayJob $job) use ($jobId) {
+			return $job->getId() === $jobId;
+		};
+
+		$job = $tube->ready()->filter($filter)->first();
+		if ($job) {
+			return $job;
+		}
+
+		$job = $tube->reserved()->filter($filter)->first();
+		if ($job) {
+			return $job;
+		}
+
+		$job = $tube->buried()->filter($filter)->first();
+		if ($job) {
+			return $job;
+		}
+
+		$job = $tube->delayed()->filter($filter)->first();
+		if ($job) {
+			return $job;
+		}
+
+		return null;
 	}
 
 	/** @var ArrayCollection|ArrayTube[] */
