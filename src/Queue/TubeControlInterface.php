@@ -38,6 +38,27 @@ interface TubeControlInterface {
 	public function kickTube($tube);
 
 	/**
+	 * Inspect the next ready job in the specified tube
+	 * @param string $tube
+	 * @return Job
+	 */
+	public function peekReady($tube);
+
+	/**
+	 * Inspect the next buried job in the specified tube
+	 * @param string $tube
+	 * @return Job
+	 */
+	public function peekBuried($tube);
+
+	/**
+	 * Inspect the next delayed job in the specified tube
+	 * @param string $tube
+	 * @return Job
+	 */
+	public function peekDelayed($tube);
+
+	/**
 	 * Deletes all ready jobs in a given tube
 	 * @param string $tube
 	 * @param int    $num Number of jobs to delete, -1 is all

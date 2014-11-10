@@ -46,7 +46,7 @@ class Queue implements QueueInterface {
 				return new NullJob();
 			}
 
-			return new Job($job->getId(), $this->unserializeJobData($job->getData()), $this);
+			return $this->createJob($job);
 		} catch (SocketException $e) {
 			return new NullJob();
 		}
@@ -64,12 +64,25 @@ class Queue implements QueueInterface {
 		return $kicked;
 	}
 
+	public function peekJob($jobId) {
+		$job = $this->pheanstalk->peek($jobId);
+		return $this->createJob($job);
 	}
 
+	public function peekReady($tube) {
+		$job = $this->pheanstalk->peekReady($tube);
+		return $this->createJob($job);
 	}
 
+	public function peekBuried($tube) {
+		$job = $this->pheanstalk->peekBuried($tube);
+		return $this->createJob($job);
 	}
 
+	public function peekDelayed($tube) {
+		$job = $this->pheanstalk->peekDelayed($tube);
+		return $this->createJob($job);
+	}
 
 	public function deleteReadyJobs($tube, $num = -1) {
 		return $this->deleteJobs("peekReady", $tube, $num);
@@ -183,6 +196,11 @@ class Queue implements QueueInterface {
 	public function __construct($host = 'localhost', $port = 11300, LoggerInterface $logger = null) {
 		$this->pheanstalk = new Pheanstalk($host, $port);
 		$this->setLogger($logger ?: new NullLogger());
+	}
+
+	protected function createJob(\Pheanstalk\Job $job) {
+		$data = $this->unserializeJobData($job->getData());
+		return new Job($job->getId(), $data, $this);
 	}
 
 	protected function serializeJobData($data) {

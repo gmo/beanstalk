@@ -26,4 +26,11 @@ interface QueueInterface extends TubeControlInterface, JobControlInterface, Logg
 	 * @return ServerStats
 	 */
 	public function serverStats();
+
+	/**
+	 * Inspect a job in the system by ID
+	 * @param int $jobId
+	 * @return \GMO\Beanstalk\Job\Job
+	 */
+	public function peekJob($jobId);
 }
