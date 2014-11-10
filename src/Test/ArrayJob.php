@@ -41,6 +41,10 @@ class ArrayJob extends Job {
 		$this->priority = intval($priority);
 	}
 
+	public function resetHandled() {
+		$this->handled = false;
+	}
+
 	public function __construct($id, $data, JobControlInterface $queue) {
 		parent::__construct($id, $data, $queue);
 		$this->delayTime = new DateTime();

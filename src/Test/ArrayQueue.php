@@ -141,7 +141,7 @@ class ArrayQueue implements QueueInterface {
 			return new NullJob();
 		}
 
-		/** @var Job|null $job */
+		/** @var ArrayJob|null $job */
 		$job = $tube->ready()->removeFirst();
 		if (!$job) {
 			return new NullJob();
@@ -151,6 +151,8 @@ class ArrayQueue implements QueueInterface {
 		$stats->set('state', 'reserved');
 		$stats->set('reserves', $stats->reserves() + 1);
 		$tube->reserved()->add($job);
+
+		$job->resetHandled();
 
 		return $job;
 	}
@@ -245,7 +247,7 @@ class ArrayQueue implements QueueInterface {
 		foreach ($jobsToDelete as $job) {
 			$this->delete($job);
 		}
-		
+
 		$this->removeEmptyTube($tube);
 	}
 
