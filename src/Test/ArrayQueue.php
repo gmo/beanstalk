@@ -189,24 +189,45 @@ class ArrayQueue implements QueueInterface {
 		return $kicked;
 	}
 
-	public function deleteReadyJobs($tube) {
+	public function deleteReadyJobs($tube, $num = -1) {
 		$tube = $this->getTube($tube);
-		$tube->incrementDeleteCount($tube->ready()->count());
-		$tube->ready()->clear();
+
+		$readyCount = $tube->ready()->count();
+		$numToDelete = $num > 0 ? min($num, $readyCount) : $readyCount;
+		/** @var ArrayJob[] $jobsToDelete */
+		$jobsToDelete = $tube->ready()->slice(0, $numToDelete);
+		foreach ($jobsToDelete as $job) {
+			$this->delete($job);
+		}
+
 		$this->removeEmptyTube($tube);
 	}
 
-	public function deleteBuriedJobs($tube) {
+	public function deleteBuriedJobs($tube, $num = -1) {
 		$tube = $this->getTube($tube);
-		$tube->incrementDeleteCount($tube->buried()->count());
-		$tube->buried()->clear();
+
+		$buriedCount = $tube->buried()->count();
+		$numToDelete = $num > 0 ? min($num, $buriedCount) : $buriedCount;
+		/** @var ArrayJob[] $jobsToDelete */
+		$jobsToDelete = $tube->buried()->slice(0, $numToDelete);
+		foreach ($jobsToDelete as $job) {
+			$this->delete($job);
+		}
+
 		$this->removeEmptyTube($tube);
 	}
 
-	public function deleteDelayedJobs($tube) {
+	public function deleteDelayedJobs($tube, $num = -1) {
 		$tube = $this->getTube($tube);
-		$tube->incrementDeleteCount($tube->delayed()->count());
-		$tube->delayed()->clear();
+
+		$delayedCount = $tube->delayed()->count();
+		$numToDelete = $num > 0 ? min($num, $delayedCount) : $delayedCount;
+		/** @var ArrayJob[] $jobsToDelete */
+		$jobsToDelete = $tube->delayed()->slice(0, $numToDelete);
+		foreach ($jobsToDelete as $job) {
+			$this->delete($job);
+		}
+		
 		$this->removeEmptyTube($tube);
 	}
 
