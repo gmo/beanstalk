@@ -8,26 +8,30 @@
     "packages": [
         {
             "name": "gmo/common",
-            "version": "v1.22.3",
+            "version": "v1.23.0",
             "source": {
                 "type": "git",
                 "url": "git@bitbucket.org:gmodev/common-library.git",
-                "reference": "c616ebc65bddbc22ff01c4c3492c455953e93c26"
+                "reference": "9820676052a30658c625ee6c65ebdb9452f7316f"
             },
             "dist": {
                 "type": "zip",
-                "url": "http://composer.gmodev.com/dist/gmo-common-v1.22.3-3a5bcb.zip",
-                "reference": "c616ebc65bddbc22ff01c4c3492c455953e93c26",
-                "shasum": "d3d9d1f7127861335819cfbdeaec0c617176bb9d"
+                "url": "http://composer.gmodev.com/dist/gmo-common-v1.23.0-3fb8c7.zip",
+                "reference": "9820676052a30658c625ee6c65ebdb9452f7316f",
+                "shasum": "d3e2825f043346553da6213768dbdb678da71ed3"
             },
             "require-dev": {
                 "monolog/monolog": "~1.6",
                 "phpunit/phpunit": "3.7.*",
-                "psr/log": "1.0.0"
+                "psr/log": "1.0.0",
+                "silex/silex": "~1.0",
+                "twig/twig": "~1.8"
             },
             "suggest": {
                 "monolog/monolog": "Provides serializable formatter",
-                "psr/log": "Provides a basic console logger for PSR-3 interface"
+                "psr/log": "Provides a basic console logger for PSR-3 interface",
+                "silex/silex": "Provides twig responses",
+                "twig/twig": "Provides twig responses"
             },
             "type": "library",
             "autoload": {
@@ -42,7 +46,7 @@
                 }
             },
             "description": "A library for common code",
-            "time": "2014-10-27 17:26:37"
+            "time": "2014-10-29 19:20:06"
         },
         {
             "name": "gmo/console",
@@ -281,17 +285,17 @@
         },
         {
             "name": "symfony/console",
-            "version": "v2.5.5",
+            "version": "v2.5.6",
             "target-dir": "Symfony/Component/Console",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Console.git",
-                "reference": "ca053eaa031c93afb68a71e4eb1f4168dfd4a661"
+                "reference": "6f177fca24200a5b97aef5ce7a5c98124a0f0db0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Console/zipball/ca053eaa031c93afb68a71e4eb1f4168dfd4a661",
-                "reference": "ca053eaa031c93afb68a71e4eb1f4168dfd4a661",
+                "url": "https://api.github.com/repos/symfony/Console/zipball/6f177fca24200a5b97aef5ce7a5c98124a0f0db0",
+                "reference": "6f177fca24200a5b97aef5ce7a5c98124a0f0db0",
                 "shasum": ""
             },
             "require": {
@@ -332,21 +336,21 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "http://symfony.com",
-            "time": "2014-09-25 09:53:56"
+            "time": "2014-10-05 13:57:04"
         },
         {
             "name": "symfony/finder",
-            "version": "v2.5.5",
+            "version": "v2.5.6",
             "target-dir": "Symfony/Component/Finder",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Finder.git",
-                "reference": "d5033742b9a6206ef6d06e813870bca18e9205df"
+                "reference": "cf66df4e783e6aade319b273c9bcf9e42aa9b10f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Finder/zipball/d5033742b9a6206ef6d06e813870bca18e9205df",
-                "reference": "d5033742b9a6206ef6d06e813870bca18e9205df",
+                "url": "https://api.github.com/repos/symfony/Finder/zipball/cf66df4e783e6aade319b273c9bcf9e42aa9b10f",
+                "reference": "cf66df4e783e6aade319b273c9bcf9e42aa9b10f",
                 "shasum": ""
             },
             "require": {
@@ -379,7 +383,7 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "http://symfony.com",
-            "time": "2014-09-27 08:35:39"
+            "time": "2014-10-01 05:50:18"
         }
     ],
     "packages-dev": [
@@ -751,17 +755,17 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v2.5.5",
+            "version": "v2.5.6",
             "target-dir": "Symfony/Component/Yaml",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Yaml.git",
-                "reference": "b1dbc53593b98c2d694ebf383660ac9134d30b96"
+                "reference": "2d9f527449cabfa8543dd7fa3a466d6ae83d6726"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Yaml/zipball/b1dbc53593b98c2d694ebf383660ac9134d30b96",
-                "reference": "b1dbc53593b98c2d694ebf383660ac9134d30b96",
+                "url": "https://api.github.com/repos/symfony/Yaml/zipball/2d9f527449cabfa8543dd7fa3a466d6ae83d6726",
+                "reference": "2d9f527449cabfa8543dd7fa3a466d6ae83d6726",
                 "shasum": ""
             },
             "require": {
@@ -794,7 +798,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
-            "time": "2014-09-22 09:14:18"
+            "time": "2014-10-01 05:50:18"
         }
     ],
     "aliases": [],

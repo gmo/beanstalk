@@ -4,6 +4,7 @@ namespace GMO\Beanstalk\Console\Command\Queue;
 use GMO\Beanstalk\BeanstalkKeys;
 use GMO\Beanstalk\Console\Command\AbstractCommand;
 use GMO\Beanstalk\Queue\QueueInterface;
+use GMO\Common\Collections\ArrayCollection;
 use GMO\Common\String;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -26,7 +27,7 @@ class AbstractQueueCommand extends AbstractCommand {
 	}
 
 	protected function matchTubeNames($tubesSearch, InputInterface $input, OutputInterface $output) {
-		$matchedTubes = array();
+		$matchedTubes = new ArrayCollection();
 		$queue = $this->getQueue($input);
 		$error = false;
 		foreach ($tubesSearch as $tubeSearch) {
@@ -39,7 +40,7 @@ class AbstractQueueCommand extends AbstractCommand {
 				$output->writeln("<warn>No tubes matched to: $tubeSearch</warn>");
 				$error = true;
 			}
-			$matchedTubes = array_merge($matchedTubes, $matched->toArray());
+			$matchedTubes->merge($matched);
 		}
 		return array($matchedTubes, $error);
 	}

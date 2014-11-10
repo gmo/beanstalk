@@ -30,6 +30,38 @@ class AbstractCommand extends ContainerAwareCommand {
 			->registerService(new BeanstalkServiceProvider());
 	}
 
+	/**
+	 * @inheritdoc
+	 * @return $this
+	 */
+	public function setName($name) {
+		return parent::setName($name);
+	}
+
+	/**
+	 * @inheritdoc
+	 * @return $this
+	 */
+	public function setDescription($description) {
+		return parent::setDescription($description);
+	}
+
+	/**
+	 * @inheritdoc
+	 * @return $this
+	 */
+	public function addArgument($name, $mode = null, $description = '', $default = null) {
+		return parent::addArgument($name, $mode, $description, $default);
+	}
+
+	/**
+	 * @inheritdoc
+	 * @return $this
+	 */
+	public function addOption($name, $shortcut = null, $mode = null, $description = '', $default = null) {
+		return parent::addOption($name, $shortcut, $mode, $description, $default);
+	}
+
 	/** @var LoggerInterface */
 	protected $logger;
 }
