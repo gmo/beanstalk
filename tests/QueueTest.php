@@ -1,16 +1,87 @@
 <?php
 
+use GMO\Beanstalk\Queue\Queue;
+use GMO\Beanstalk\Test\ArrayQueue;
 use GMO\Beanstalk\Test\QueueTestCase;
 
 class QueueTest extends QueueTestCase {
 
-	function test_watch_only_tube_given() {
-		static::$queue->push("test1", "test1data");
-		static::$queue->push("test2", "test2data");
-		static::$queue->push("test3", "test3data");
+	public function testKickAllBuriedAndDelayed() {
+		$this->pushBuriedAndDelayedJobs();
 
-		$this->assertTubeEquals(array('test1data'), 'test1');
-		$this->assertTubeEquals(array('test2data'), 'test2');
-		$this->assertTubeEquals(array('test3data'), 'test3');
+		$numKicked = static::$queue->kickTube('test1');
+		$this->assertSame(4, $numKicked);
+
+		$stats = static::$queue->statsTube('test1');
+		$this->assertSame(4, $stats->readyJobs());
+		$this->assertSame(0, $stats->buriedJobs());
+		$this->assertSame(0, $stats->delayedJobs());
 	}
+
+	public function testKickSomeBuriedWithSpecifiedNumber() {
+		$this->pushBuriedAndDelayedJobs();
+
+		$numKicked = static::$queue->kickTube('test1', 1);
+		$this->assertSame(1, $numKicked);
+
+		$stats = static::$queue->statsTube('test1');
+		$this->assertSame(1, $stats->readyJobs());
+		$this->assertSame(1, $stats->buriedJobs());
+		$this->assertSame(2, $stats->delayedJobs());
+	}
+
+	public function testKickAllBuriedWithSpecifiedNumber() {
+		$this->pushBuriedAndDelayedJobs();
+
+		$numKicked = static::$queue->kickTube('test1', 2);
+		$this->assertSame(2, $numKicked);
+
+		$stats = static::$queue->statsTube('test1');
+		$this->assertSame(2, $stats->readyJobs());
+		$this->assertSame(0, $stats->buriedJobs());
+		$this->assertSame(2, $stats->delayedJobs());
+	}
+
+	public function testKickAllBuriedAndSomeDelayedWithSpecifiedNumber() {
+		$this->pushBuriedAndDelayedJobs();
+
+		$numKicked = static::$queue->kickTube('test1', 3);
+		$this->assertSame(3, $numKicked);
+
+		$stats = static::$queue->statsTube('test1');
+		$this->assertSame(3, $stats->readyJobs());
+		$this->assertSame(0, $stats->buriedJobs());
+		$this->assertSame(1, $stats->delayedJobs());
+	}
+
+	public function testKickAllBuriedAndAllDelayedWithSpecifiedNumber() {
+		$this->pushBuriedAndDelayedJobs();
+
+		$numKicked = static::$queue->kickTube('test1', 4);
+		$this->assertSame(4, $numKicked);
+
+		$stats = static::$queue->statsTube('test1');
+		$this->assertSame(4, $stats->readyJobs());
+		$this->assertSame(0, $stats->buriedJobs());
+		$this->assertSame(0, $stats->delayedJobs());
+	}
+
+	protected function pushBuriedAndDelayedJobs() {
+		static::$queue->push('test1', 'test');
+		static::$queue->reserve('test1')->bury();
+		static::$queue->push('test1', 'test');
+		static::$queue->reserve('test1')->bury();
+		static::$queue->push('test1', 'test');
+		static::$queue->reserve('test1')->release(3600);
+		static::$queue->push('test1', 'test');
+		static::$queue->reserve('test1')->release(3600);
+	}
+
+	protected static function createQueueClass() {
+//		return new Queue();
+		return new ArrayQueue();
+	}
+
+	/** @var Queue */
+	protected static $queue;
 }

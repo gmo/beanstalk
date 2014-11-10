@@ -68,11 +68,18 @@ class ArrayQueue implements QueueInterface {
 		$stats = $this->jobStats[$job->getId()];
 
 		$tube = $this->getTube($stats->tube());
-		$tube->buried()->removeElement($job);
+		if ($job instanceof ArrayJob && $job->isDelayed()) {
+			$tube->delayed()->removeElement($job);
+		} else {
+			$tube->buried()->removeElement($job);
+		}
 
 		$stats->set('state', 'ready');
 		$stats->set('kicks', $stats->kicks() + 1);
 		$tube->ready()->add($job);
+		if ($job instanceof ArrayJob) {
+			$job->setDelay(0);
+		}
 	}
 
 	public function statsJob($job) {
@@ -148,16 +155,36 @@ class ArrayQueue implements QueueInterface {
 		return $job;
 	}
 
-	public function kickTube($tube) {
+	public function kickTube($tube, $num = -1) {
 		$tube = $this->getTube($tube);
 
-		$kicked = $tube->buried()->count();
-		$tube->ready()->merge($tube->buried());
-		$tube->buried()->clear();
+		$kicked = 0;
+		if (($buriedCount = $tube->buried()->count()) > 0) {
+			$numToKick = $num > 0 ? min($num, $buriedCount) : $buriedCount;
+			$kicked += $numToKick;
+			$num -= $numToKick;
 
-		$kicked += $tube->delayed()->count();
-		$tube->ready()->merge($tube->delayed());
-		$tube->delayed()->clear();
+			/** @var ArrayJob[] $jobsToKick */
+			$jobsToKick = $tube->buried()->slice(0, $numToKick);
+			foreach ($jobsToKick as $job) {
+				$this->kickJob($job);
+			}
+
+			if ($num === 0) {
+				return $kicked;
+			}
+		}
+		$numToKick = $tube->delayed()->count();
+		if ($num > 0) {
+			$numToKick = min($numToKick, $num);
+		}
+		$kicked += $numToKick;
+
+		/** @var ArrayJob[] $jobsToKick */
+		$jobsToKick = $tube->delayed()->slice(0, $numToKick);
+		foreach ($jobsToKick as $job) {
+			$this->kickJob($job);
+		}
 
 		return $kicked;
 	}
