@@ -40,20 +40,26 @@ interface TubeControlInterface {
 	/**
 	 * Deletes all ready jobs in a given tube
 	 * @param string $tube
+	 * @param int    $num Number of jobs to delete, -1 is all
+	 * @return int number of jobs deleted
 	 */
-	public function deleteReadyJobs($tube);
+	public function deleteReadyJobs($tube, $num = -1);
 
 	/**
 	 * Deletes all buried jobs in a given tube
 	 * @param string $tube
+	 * @param int    $num Number of jobs to delete, -1 is all
+	 * @return int number of jobs deleted
 	 */
-	public function deleteBuriedJobs($tube);
+	public function deleteBuriedJobs($tube, $num = -1);
 
 	/**
 	 * Deletes all delayed jobs in a given tube
 	 * @param string $tube
+	 * @param int    $num Number of jobs to delete, -1 is all
+	 * @return int number of jobs deleted
 	 */
-	public function deleteDelayedJobs($tube);
+	public function deleteDelayedJobs($tube, $num = -1);
 
 	/**
 	 * Temporarily prevent jobs being reserved from the given tube

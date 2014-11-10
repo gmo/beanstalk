@@ -64,25 +64,36 @@ class Queue implements QueueInterface {
 		return $kicked;
 	}
 
-	public function deleteReadyJobs($tube) {
-		$this->deleteJobs("peekReady", $tube);
 	}
 
-	public function deleteBuriedJobs($tube) {
-		$this->deleteJobs("peekBuried", $tube);
 	}
 
-	public function deleteDelayedJobs($tube) {
-		$this->deleteJobs("peekDelayed", $tube);
 	}
 
-	private function deleteJobs($state, $tube) {
+
+	public function deleteReadyJobs($tube, $num = -1) {
+		return $this->deleteJobs("peekReady", $tube, $num);
+	}
+
+	public function deleteBuriedJobs($tube, $num = -1) {
+		return $this->deleteJobs("peekBuried", $tube, $num);
+	}
+
+	public function deleteDelayedJobs($tube, $num = -1) {
+		return $this->deleteJobs("peekDelayed", $tube, $num);
+	}
+
+	private function deleteJobs($state, $tube, $numberToDelete) {
+		$numberDeleted = 0;
 		try {
-			while ($job = $this->pheanstalk->$state($tube)) {
+			while ($numberToDelete !== 0 && $job = $this->pheanstalk->$state($tube)) {
 				$this->delete($job);
+				$numberDeleted++;
+				$numberToDelete--;
 			}
 		} catch (ServerException $e) {
 		}
+		return $numberDeleted;
 	}
 
 	public function pause($tube, $delay) {
