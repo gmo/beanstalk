@@ -151,7 +151,9 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 	 */
 	protected function handleError(Job $job, Exception $ex) {
 		$numRetries = $this->getNumberOfRetries($job);
-		$this->log->warning($ex->getMessage());
+		$this->log->warning($ex->getMessage(), array(
+			'exception' => $ex,
+		));
 
 		if ($job->isHandled()) {
 			$this->log->warning('Worker should not throw an Exception if job has been handled');
