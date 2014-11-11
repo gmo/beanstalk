@@ -4,6 +4,7 @@ namespace GMO\Beanstalk\Console\Command\Queue;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Queue;
 use GMO\Beanstalk\Queue\QueueInterface;
+use GMO\Common\Collections\ArrayCollection;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -34,7 +35,7 @@ class PeekCommand extends ChangeStateCommand {
 		if ($id) {
 			$job = $this->getQueue($input)->peekJob(intval($id));
 			$output->writeln("Peeking at job <info>#{$job->getId()}</info>");
-			$output->writeln(print_r($job->getData(), true));
+			$output->writeln($this->renderJobData($job));
 		}
 
 		if ($input->getOption('stats')) {
@@ -62,7 +63,16 @@ class PeekCommand extends ChangeStateCommand {
 
 	protected function outputJob(OutputInterface $output, Job $job, $tube, $state) {
 		$output->writeln("Peeking at the $state job <info>#{$job->getId()}</info> in <info>$tube</info> tube");
-		$output->writeln(print_r($job->getData(), true));
+		$output->writeln($this->renderJobData($job));
+	}
+
+	protected function renderJobData(Job $job) {
+		$data = $job->getData();
+		if ($data instanceof ArrayCollection) {
+			$data = $data->toArray();
+		}
+
+		return print_r($data, true);
 	}
 
 	protected function renderStats(OutputInterface $output, array $ids) {
