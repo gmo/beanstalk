@@ -18,6 +18,7 @@ class QueueConsoleApplication extends ConsoleApplication {
 			new Command\Queue\PeekCommand(),
 			new Command\Queue\StatsCommand(),
 			new Command\Queue\ServerStatsCommand(),
+			new Command\Queue\JobStatsCommand(),
 			new Command\Worker\StartCommand(),
 			new Command\Worker\StopCommand(),
 			new Command\Worker\RestartCommand(),
