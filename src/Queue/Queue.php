@@ -1,6 +1,8 @@
 <?php
 namespace GMO\Beanstalk\Queue;
 
+use GMO\Beanstalk\Exception\JobPushException;
+use GMO\Beanstalk\Exception\JobTooBigException;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Queue\Response\JobStats;
@@ -9,11 +11,7 @@ use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Common\Collections\ArrayCollection;
 use GMO\Common\Exception\NotSerializableException;
 use GMO\Common\ISerializable;
-use Pheanstalk\Exception\ServerException;
-use Pheanstalk\Exception\SocketException;
-use Pheanstalk\Pheanstalk;
-use Pheanstalk\PheanstalkInterface;
-use Pheanstalk\Response\ArrayResponse;
+use Pheanstalk;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -27,27 +25,34 @@ class Queue implements QueueInterface {
 	//region Tube Control
 
 	public function push($tube, $data, $priority = null, $delay = null, $ttr = null) {
-		return $this->pheanstalk->putInTube(
-			$tube,
-			$this->serializeJobData($data),
-			$priority ?: static::DEFAULT_PRIORITY,
-			$delay ?: static::DEFAULT_DELAY,
-			$ttr ?: static::DEFAULT_TTR
-		);
+		try {
+			return $this->pheanstalk->putInTube(
+				$tube,
+				$this->serializeJobData($data),
+				$priority ?: static::DEFAULT_PRIORITY,
+				$delay ?: static::DEFAULT_DELAY,
+				$ttr ?: static::DEFAULT_TTR
+			);
+		} catch (Pheanstalk\Exception $e) {
+			if ($e->getMessage() === Pheanstalk\Response::RESPONSE_JOB_TOO_BIG) {
+				throw new JobTooBigException($tube, $data, $e);
+			}
+			throw new JobPushException($tube, $data, $e);
+		}
 	}
 
 	public function reserve($tube, $timeout = null, $stopWatching = false) {
 		try {
 			$job = $this->pheanstalk->reserveFromTube($tube, $timeout);
 			if ($stopWatching) {
-				$this->pheanstalk->watchOnly(PheanstalkInterface::DEFAULT_TUBE);
+				$this->pheanstalk->watchOnly(Pheanstalk\PheanstalkInterface::DEFAULT_TUBE);
 			}
 			if (!$job) {
 				return new NullJob();
 			}
 
 			return $this->createJob($job);
-		} catch (SocketException $e) {
+		} catch (Pheanstalk\Exception\SocketException $e) {
 			return new NullJob();
 		}
 	}
@@ -111,7 +116,7 @@ class Queue implements QueueInterface {
 				$numberDeleted++;
 				$numberToDelete--;
 			}
-		} catch (ServerException $e) {
+		} catch (Pheanstalk\Exception\ServerException $e) {
 		}
 		return $numberDeleted;
 	}
@@ -122,7 +127,7 @@ class Queue implements QueueInterface {
 
 	/** @inheritdoc */
 	public function statsTube($tube) {
-		/** @var ArrayResponse $response */
+		/** @var Pheanstalk\Response\ArrayResponse $response */
 		$response = $this->pheanstalk->statsTube($tube);
 		$stats = TubeStats::create($response);
 		return $stats;
@@ -133,20 +138,20 @@ class Queue implements QueueInterface {
 	//region Job Control
 
 	public function release(Job $job, $priority = null, $delay = null) {
-		$priority = $priority ?: Pheanstalk::DEFAULT_PRIORITY;
-		$delay = $delay ?: Pheanstalk::DEFAULT_DELAY;
+		$priority = $priority ?: Pheanstalk\Pheanstalk::DEFAULT_PRIORITY;
+		$delay = $delay ?: Pheanstalk\Pheanstalk::DEFAULT_DELAY;
 		$this->pheanstalk->release($job, $priority, $delay);
 	}
 
 	public function bury(Job $job, $priority = null) {
-		$priority = $priority ?: Pheanstalk::DEFAULT_PRIORITY;
+		$priority = $priority ?: Pheanstalk\Pheanstalk::DEFAULT_PRIORITY;
 		$this->pheanstalk->bury($job, $priority);
 	}
 
 	public function delete($job) {
 		try {
 			$this->pheanstalk->delete($job);
-		} catch (ServerException $e) {
+		} catch (Pheanstalk\Exception\ServerException $e) {
 			$this->log->notice("Error deleting job", array( "exception" => $e ));
 		}
 	}
@@ -156,7 +161,7 @@ class Queue implements QueueInterface {
 	}
 
 	public function statsJob($job) {
-		/** @var ArrayResponse $stats */
+		/** @var Pheanstalk\Response\ArrayResponse $stats */
 		$stats = $this->pheanstalk->statsJob($job);
 		return JobStats::create($stats);
 	}
@@ -169,7 +174,7 @@ class Queue implements QueueInterface {
 
 	public function listTubes() {
 		$tubes = ArrayCollection::create($this->pheanstalk->listTubes());
-		$tubes->removeElement(PheanstalkInterface::DEFAULT_TUBE);
+		$tubes->removeElement(Pheanstalk\PheanstalkInterface::DEFAULT_TUBE);
 		return $tubes;
 	}
 
@@ -184,7 +189,7 @@ class Queue implements QueueInterface {
 
 	/** @inheritdoc */
 	public function serverStats() {
-		/** @var ArrayResponse $stats */
+		/** @var Pheanstalk\Response\ArrayResponse $stats */
 		$stats = $this->pheanstalk->stats();
 		return ServerStats::create($stats);
 	}
@@ -201,11 +206,11 @@ class Queue implements QueueInterface {
 	 * @param LoggerInterface $logger [Optional] Default: NullLogger
 	 */
 	public function __construct($host = 'localhost', $port = 11300, LoggerInterface $logger = null) {
-		$this->pheanstalk = new Pheanstalk($host, $port);
+		$this->pheanstalk = new Pheanstalk\Pheanstalk($host, $port);
 		$this->setLogger($logger ?: new NullLogger());
 	}
 
-	protected function createJob(\Pheanstalk\Job $job) {
+	protected function createJob(Pheanstalk\Job $job) {
 		$data = $this->unserializeJobData($job->getData());
 		return new Job($job->getId(), $data, $this);
 	}
@@ -261,7 +266,7 @@ class Queue implements QueueInterface {
 		return $params;
 	}
 
-	/** @var Pheanstalk */
+	/** @var Pheanstalk\Pheanstalk */
 	protected $pheanstalk;
 	/** @var LoggerInterface */
 	protected $log;
