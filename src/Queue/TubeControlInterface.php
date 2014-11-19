@@ -38,7 +38,7 @@ interface TubeControlInterface {
 	 * Kicks all jobs in a given tube.
 	 * Buried jobs will be kicked before delayed jobs
 	 * @param string $tube
- 	 * @param int    $num Number of jobs to delete, -1 is all
+ 	 * @param int    $num Number of jobs to kick, -1 is all
 	 * @return int number of jobs deleted
 	 */
 	public function kickTube($tube, $num = -1);
