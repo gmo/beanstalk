@@ -7,7 +7,10 @@ use Pheanstalk\PheanstalkInterface;
 
 interface TubeControlInterface {
 
-	const DEFAULT_PRIORITY = PheanstalkInterface::DEFAULT_PRIORITY;
+	const HIGH_PRIORITY = 512;
+	const DEFAULT_PRIORITY = 1024;
+	const LOW_PRIORITY = 1536;
+
 	const DEFAULT_DELAY = PheanstalkInterface::DEFAULT_DELAY;
 	const DEFAULT_TTR = PheanstalkInterface::DEFAULT_TTR;
 

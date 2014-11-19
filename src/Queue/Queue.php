@@ -3,6 +3,7 @@ namespace GMO\Beanstalk\Queue;
 
 use GMO\Beanstalk\Exception\JobPushException;
 use GMO\Beanstalk\Exception\JobTooBigException;
+use GMO\Beanstalk\Exception\RangeException;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Queue\Response\JobStats;
@@ -25,11 +26,15 @@ class Queue implements QueueInterface {
 	//region Tube Control
 
 	public function push($tube, $data, $priority = null, $delay = null, $ttr = null) {
+		$priority = $priority ?: static::DEFAULT_PRIORITY;
+		if ($priority < 0 || $priority > 4294967295) {
+			throw new RangeException("Priority must be between 0 and 4294967295. Given: $priority");
+		}
 		try {
 			return $this->pheanstalk->putInTube(
 				$tube,
 				$this->serializeJobData($data),
-				$priority ?: static::DEFAULT_PRIORITY,
+				$priority,
 				$delay ?: static::DEFAULT_DELAY,
 				$ttr ?: static::DEFAULT_TTR
 			);

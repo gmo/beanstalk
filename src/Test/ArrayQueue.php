@@ -1,6 +1,7 @@
 <?php
 namespace GMO\Beanstalk\Test;
 
+use GMO\Beanstalk\Exception\RangeException;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Queue\QueueInterface;
@@ -113,6 +114,12 @@ class ArrayQueue implements QueueInterface {
 	}
 
 	public function push($tube, $data, $priority = null, $delay = null, $ttr = null) {
+		$priority = $priority ?: static::DEFAULT_PRIORITY;
+		if ($priority < 0 || $priority > 4294967295) {
+			throw new RangeException("Priority must be between 0 and 4294967295. Given: $priority");
+		}
+		$delay = $delay ?: static::DEFAULT_DELAY;
+
 		$job = new ArrayJob($this->jobCounter++, $data, $this);
 		$job->setDelay($delay);
 		$job->setPriority($priority);
