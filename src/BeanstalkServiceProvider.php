@@ -3,6 +3,7 @@ namespace GMO\Beanstalk;
 
 use GMO\Beanstalk\Manager\WorkerManager;
 use GMO\Beanstalk\Queue\Queue;
+use GMO\Beanstalk\Queue\WebJobProducer;
 use GMO\DependencyInjection\ServiceProviderInterface;
 use Pimple;
 use Psr\Log\NullLogger;
@@ -28,6 +29,14 @@ class BeanstalkServiceProvider implements ServiceProviderInterface {
 
 		$container[BeanstalkKeys::QUEUE] = $container->share(function($app) {
 			return new Queue(
+				$app[BeanstalkKeys::HOST],
+				$app[BeanstalkKeys::PORT],
+				$app[BeanstalkKeys::QUEUE_LOGGER]
+			);
+		});
+
+		$container[BeanstalkKeys::WEB_JOB_PRODUCER] = $container->share(function($app) {
+			return new WebJobProducer(
 				$app[BeanstalkKeys::HOST],
 				$app[BeanstalkKeys::PORT],
 				$app[BeanstalkKeys::QUEUE_LOGGER]

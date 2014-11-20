@@ -211,8 +211,8 @@ class Queue implements QueueInterface {
 	 * @param LoggerInterface $logger [Optional] Default: NullLogger
 	 */
 	public function __construct($host = 'localhost', $port = 11300, LoggerInterface $logger = null) {
-		$this->pheanstalk = new Pheanstalk\Pheanstalk($host, $port);
 		$this->setLogger($logger ?: new NullLogger());
+		$this->pheanstalk = new Pheanstalk\Pheanstalk($host, $port);
 	}
 
 	protected function createJob(Pheanstalk\Job $job) {
