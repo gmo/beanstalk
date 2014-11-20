@@ -61,7 +61,7 @@ interface WorkerInterface extends ClassNameResolverInterface {
 	 * Process each job
 	 * @param Job $job
 	 */
-	public function process($job);
+	public function process(Job $job);
 
 	/**
 	 * Called when the worker is stopped

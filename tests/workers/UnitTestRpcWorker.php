@@ -1,6 +1,7 @@
 <?php
 namespace workers;
 
+use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Runner\RunOnceRunnerDecorator;
 use GMO\Beanstalk\Worker\RpcWorker;
 use Psr\Log\NullLogger;
@@ -15,7 +16,7 @@ class UnitTestRpcWorker extends RpcWorker {
 		return new NullLogger();
 	}
 
-	public function process($job) {
+	public function process(Job $job) {
 		$job->setResult(intval($job['a']) * intval($job['b']));
 	}
 }

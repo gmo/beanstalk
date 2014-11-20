@@ -1,6 +1,8 @@
 <?php
 namespace workers;
 
+use GMO\Beanstalk\Job\Job;
+
 class UnitTestWorkerSetupFailure extends AbstractTestWorker {
 
 	public static function tubeName() { return "UnitTestWorker"; }
@@ -9,5 +11,5 @@ class UnitTestWorkerSetupFailure extends AbstractTestWorker {
 		throw new \Exception("Setup function failed!");
 	}
 
-	public function process($job) { }
+	public function process(Job $job) { }
 }
