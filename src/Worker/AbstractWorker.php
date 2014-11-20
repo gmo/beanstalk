@@ -19,7 +19,7 @@ abstract class AbstractWorker implements WorkerInterface {
 	 * @param int|null $delay    Seconds to wait before job becomes ready
 	 * @return int The new job ID
 	 */
-	public static function push(JobProducerInterface $queue, $data, $priority = null, $delay = null) {
+	public static function pushData(JobProducerInterface $queue, $data, $priority = null, $delay = null) {
 		return $queue->push(static::getTubeName(), $data, $priority, $delay, static::getTimeToRun());
 	}
 
