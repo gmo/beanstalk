@@ -109,7 +109,7 @@ class ArrayQueue implements QueueInterface {
 		return $stats;
 	}
 
-	public function serverStats() {
+	public function statsServer() {
 		return new ServerStats();
 	}
 
