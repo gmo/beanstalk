@@ -6,6 +6,7 @@ use GMO\Beanstalk\Exception\JobTooBigException;
 use GMO\Beanstalk\Exception\RangeException;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\NullJob;
+use GMO\Beanstalk\Job\UnserializableJob;
 use GMO\Beanstalk\Queue\Response\JobStats;
 use GMO\Beanstalk\Queue\Response\ServerStats;
 use GMO\Beanstalk\Queue\Response\TubeStats;
@@ -216,8 +217,12 @@ class Queue implements QueueInterface {
 	}
 
 	protected function createJob(Pheanstalk\Job $job) {
-		$data = $this->unserializeJobData($job->getData());
-		return new Job($job->getId(), $data, $this);
+		try {
+			$data = $this->unserializeJobData($job->getData());
+			return new Job($job->getId(), $data, $this);
+		} catch (NotSerializableException $e) {
+			return new UnserializableJob($job->getId(), $job->getData(), $this, $e);
+		}
 	}
 
 	protected function serializeJobData($data) {
@@ -248,24 +253,24 @@ class Queue implements QueueInterface {
 		}
 
 		if ($params->containsKey('class')) {
-			try {
-				/** @var ISerializable $cls */
-				$cls = $params['class'];
-				return $cls::fromArray($params->toArray());
-			} catch (NotSerializableException $e) {
-				return $params;
+			/** @var ISerializable|string $cls */
+			$cls = $params['class'];
+			if (!class_exists($cls)) {
+				throw new NotSerializableException($cls . ' does not exist');
 			}
+			return $cls::fromArray($params->toArray());
 		}
 
 		foreach ($params as $key => $value) {
 			if (is_string($value)) {
 				$params[$key] = trim($value);
 			} elseif (is_array($value) && array_key_exists('class', $value)) {
-				try {
-					/** @var ISerializable $cls */
-					$cls = $value['class'];
-					$params[$key] = $cls::fromArray($value);
-				} catch (NotSerializableException $e) { }
+				/** @var ISerializable|string $cls */
+				$cls = $value['class'];
+				if (!class_exists($cls)) {
+					throw new NotSerializableException($cls . ' does not exist');
+				}
+				$params[$key] = $cls::fromArray($value);
 			}
 		}
 		return $params;

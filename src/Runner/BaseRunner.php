@@ -9,6 +9,7 @@ use GMO\Beanstalk\Job\JobError\JobError;
 use GMO\Beanstalk\Job\JobError\JobErrorHandlerInterface;
 use GMO\Beanstalk\Job\JobError\JobErrorInterface;
 use GMO\Beanstalk\Job\NullJob;
+use GMO\Beanstalk\Job\UnserializableJob;
 use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Worker\WorkerInterface;
 use GMO\Common\Collections\ArrayCollection;
@@ -59,6 +60,9 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 
 	public function processJob(Job $job) {
 		$this->preProcessJob($job);
+		if ($job->isHandled()) {
+			return;
+		}
 
 		if (!$this->validateJob($job)) {
 			$this->log->error('Job missing required params is being deleted!');
@@ -81,7 +85,14 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 		}
 	}
 
-	public function preProcessJob(Job $job) { }
+	public function preProcessJob(Job $job) {
+		if ($job instanceof UnserializableJob) {
+			$this->log->error('Burying unserializable job', array(
+				'job' => $job,
+			));
+			$job->bury();
+		}
+	}
 
 	public function validateJob(Job $job) {
 		$params = $job->getData();
