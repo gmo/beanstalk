@@ -8,17 +8,20 @@
     "packages": [
         {
             "name": "gmo/common",
-            "version": "v1.23.0",
+            "version": "v1.24.5",
             "source": {
                 "type": "git",
                 "url": "git@bitbucket.org:gmodev/common-library.git",
-                "reference": "9820676052a30658c625ee6c65ebdb9452f7316f"
+                "reference": "54da694794034c2a363a1fada680ac4afa9f73cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "http://composer.gmodev.com/dist/gmo-common-v1.23.0-3fb8c7.zip",
-                "reference": "9820676052a30658c625ee6c65ebdb9452f7316f",
-                "shasum": "d3e2825f043346553da6213768dbdb678da71ed3"
+                "url": "http://composer.gmodev.com/dist/gmo-common-v1.24.5-4b4c17.zip",
+                "reference": "54da694794034c2a363a1fada680ac4afa9f73cf",
+                "shasum": "89b7e038cba3ca02e0244dcc44837033bee011a3"
+            },
+            "require": {
+                "symfony/yaml": "~2.5"
             },
             "require-dev": {
                 "monolog/monolog": "~1.6",
@@ -46,7 +49,7 @@
                 }
             },
             "description": "A library for common code",
-            "time": "2014-10-29 19:20:06"
+            "time": "2014-12-02 21:11:45"
         },
         {
             "name": "gmo/console",
@@ -149,16 +152,16 @@
         },
         {
             "name": "pda/pheanstalk",
-            "version": "v3.0.0",
+            "version": "v3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pda/pheanstalk.git",
-                "reference": "8c9568db39e78004455a327f02c347e2133d4ab5"
+                "reference": "2078587884faf43fc00976b152b2dde0b5e3830e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pda/pheanstalk/zipball/8c9568db39e78004455a327f02c347e2133d4ab5",
-                "reference": "8c9568db39e78004455a327f02c347e2133d4ab5",
+                "url": "https://api.github.com/repos/pda/pheanstalk/zipball/2078587884faf43fc00976b152b2dde0b5e3830e",
+                "reference": "2078587884faf43fc00976b152b2dde0b5e3830e",
                 "shasum": ""
             },
             "require": {
@@ -195,7 +198,7 @@
             "keywords": [
                 "beanstalkd"
             ],
-            "time": "2014-06-18 16:33:53"
+            "time": "2014-11-08 20:00:00"
         },
         {
             "name": "pimple/pimple",
@@ -382,6 +385,53 @@
                 }
             ],
             "description": "Symfony Finder Component",
+            "homepage": "http://symfony.com",
+            "time": "2014-10-01 05:50:18"
+        },
+        {
+            "name": "symfony/yaml",
+            "version": "v2.5.6",
+            "target-dir": "Symfony/Component/Yaml",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/Yaml.git",
+                "reference": "2d9f527449cabfa8543dd7fa3a466d6ae83d6726"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/Yaml/zipball/2d9f527449cabfa8543dd7fa3a466d6ae83d6726",
+                "reference": "2d9f527449cabfa8543dd7fa3a466d6ae83d6726",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.5-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\Yaml\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                },
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
             "time": "2014-10-01 05:50:18"
         }
@@ -752,53 +802,6 @@
                 "xunit"
             ],
             "time": "2013-01-13 10:24:48"
-        },
-        {
-            "name": "symfony/yaml",
-            "version": "v2.5.6",
-            "target-dir": "Symfony/Component/Yaml",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/Yaml.git",
-                "reference": "2d9f527449cabfa8543dd7fa3a466d6ae83d6726"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Yaml/zipball/2d9f527449cabfa8543dd7fa3a466d6ae83d6726",
-                "reference": "2d9f527449cabfa8543dd7fa3a466d6ae83d6726",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.5-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Symfony\\Component\\Yaml\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                },
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                }
-            ],
-            "description": "Symfony Yaml Component",
-            "homepage": "http://symfony.com",
-            "time": "2014-10-01 05:50:18"
         }
     ],
     "aliases": [],
