@@ -7,9 +7,9 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate {
 
 	/**
 	 * Pheanstalk\Job::data is ignored because it's private and we allow write access
-	 * @var ArrayCollection|string
+	 * @var ArrayCollection|mixed
 	 */
-	protected $jobData = array();
+	protected $jobData;
 	protected $result;
 	/** @var JobControlInterface */
 	protected $queue;
@@ -26,7 +26,7 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate {
 	}
 
 	/**
-	 * @return string|mixed|\GMO\Common\Collections\ArrayCollection
+	 * @return ArrayCollection|mixed
 	 */
 	public function getData() {
 		return $this->jobData;

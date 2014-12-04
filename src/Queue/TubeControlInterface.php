@@ -8,7 +8,7 @@ use GMO\Beanstalk\Queue\Response\TubeStats;
 interface TubeControlInterface extends JobProducerInterface {
 
 	/**
-	 * Reserves a job from the specified tube or false if error or timeout
+	 * Reserves a job from the specified tube
 	 * @param string   $tube
 	 * @param int|null $timeout
 	 * @param bool     $stopWatching Stop watching the tube after reserving the job
