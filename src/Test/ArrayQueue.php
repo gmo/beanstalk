@@ -58,7 +58,7 @@ class ArrayQueue implements QueueInterface {
 		$stats = $this->jobStats[$job->getId()];
 
 		$tube = $this->getTube($stats->tube());
-		$tube->reserved()->removeElement($job);
+		$tube->{$stats->state()}()->removeElement($job);
 
 		$this->jobStats->remove($job->getId());
 		$tube->incrementDeleteCount();
