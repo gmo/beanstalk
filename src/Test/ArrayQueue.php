@@ -22,6 +22,9 @@ use Psr\Log\LoggerInterface;
 class ArrayQueue implements QueueInterface {
 
 	public function release(Job $job, $priority = null, $delay = null) {
+		if ($this->isNullJob($job)) {
+			return;
+		}
 		/** @var ArrayJob $job */
 		$stats = $this->jobStats[$job->getId()];
 		$stats->set('releases', $stats->releases() + 1);
@@ -41,6 +44,9 @@ class ArrayQueue implements QueueInterface {
 	}
 
 	public function bury(Job $job, $priority = null) {
+		if ($this->isNullJob($job)) {
+			return;
+		}
 		/** @var ArrayJob $job */
 		$job->setPriority($priority);
 
@@ -55,6 +61,9 @@ class ArrayQueue implements QueueInterface {
 	}
 
 	public function delete($job) {
+		if ($this->isNullJob($job)) {
+			return;
+		}
 		$stats = $this->jobStats[$job->getId()];
 
 		$tube = $this->getTube($stats->tube());
@@ -66,6 +75,9 @@ class ArrayQueue implements QueueInterface {
 	}
 
 	public function kickJob($job) {
+		if ($this->isNullJob($job)) {
+			return;
+		}
 		$stats = $this->jobStats[$job->getId()];
 
 		$tube = $this->getTube($stats->tube());
@@ -321,6 +333,10 @@ class ArrayQueue implements QueueInterface {
 		}
 
 		return null;
+	}
+
+	protected function isNullJob(Job $job) {
+		return $job->getId() === -1;
 	}
 
 	/** @var ArrayCollection|ArrayTube[] */

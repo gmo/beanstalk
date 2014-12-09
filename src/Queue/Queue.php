@@ -154,17 +154,26 @@ class Queue implements QueueInterface {
 	//region Job Control
 
 	public function release(Job $job, $priority = null, $delay = null) {
+		if ($this->isNullJob($job)) {
+			return;
+		}
 		$priority = $priority ?: Pheanstalk\Pheanstalk::DEFAULT_PRIORITY;
 		$delay = $delay ?: Pheanstalk\Pheanstalk::DEFAULT_DELAY;
 		$this->pheanstalk->release($job, $priority, $delay);
 	}
 
 	public function bury(Job $job, $priority = null) {
+		if ($this->isNullJob($job)) {
+			return;
+		}
 		$priority = $priority ?: Pheanstalk\Pheanstalk::DEFAULT_PRIORITY;
 		$this->pheanstalk->bury($job, $priority);
 	}
 
 	public function delete($job) {
+		if ($this->isNullJob($job)) {
+			return;
+		}
 		try {
 			$this->pheanstalk->delete($job);
 		} catch (Pheanstalk\Exception\ServerException $e) {
@@ -173,6 +182,9 @@ class Queue implements QueueInterface {
 	}
 
 	public function kickJob($job) {
+		if ($this->isNullJob($job)) {
+			return;
+		}
 		$this->pheanstalk->kickJob($job);
 	}
 
@@ -188,6 +200,9 @@ class Queue implements QueueInterface {
 	}
 
 	public function touch(Job $job) {
+		if ($this->isNullJob($job)) {
+			return;
+		}
 		$this->pheanstalk->touch($job);
 	}
 
@@ -290,6 +305,10 @@ class Queue implements QueueInterface {
 			}
 		}
 		return $params;
+	}
+
+	protected function isNullJob(Job $job) {
+		return $job instanceof NullJob || $job->getId() === -1;
 	}
 
 	/** @var Pheanstalk\Pheanstalk */
