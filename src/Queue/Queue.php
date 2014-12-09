@@ -83,31 +83,29 @@ class Queue implements QueueInterface {
 	}
 
 	public function peekJob($jobId) {
-		$job = $this->pheanstalk->peek($jobId);
+		try {
+			$job = $this->pheanstalk->peek($jobId);
+		} catch (Pheanstalk\Exception\ServerException $e) {
+			return new NullJob();
+		}
 		return $this->createJob($job);
 	}
 
 	public function peekReady($tube) {
-		try {
-			$job = $this->pheanstalk->peekReady($tube);
-		} catch (Pheanstalk\Exception\ServerException $e) {
-			return new NullJob();
-		}
-		return $this->createJob($job);
+		return $this->peek($tube, 'Ready');
 	}
 
 	public function peekBuried($tube) {
-		try {
-			$job = $this->pheanstalk->peekBuried($tube);
-		} catch (Pheanstalk\Exception\ServerException $e) {
-			return new NullJob();
-		}
-		return $this->createJob($job);
+		return $this->peek($tube, 'Buried');
 	}
 
 	public function peekDelayed($tube) {
+		return $this->peek($tube, 'Delayed');
+	}
+
+	private function peek($tube, $state) {
 		try {
-			$job = $this->pheanstalk->peekDelayed($tube);
+			$job = $this->pheanstalk->{"peek$state"}($tube);
 		} catch (Pheanstalk\Exception\ServerException $e) {
 			return new NullJob();
 		}
