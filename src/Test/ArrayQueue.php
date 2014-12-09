@@ -83,6 +83,7 @@ class ArrayQueue implements QueueInterface {
 		}
 	}
 
+	/** @inheritdoc */
 	public function statsJob($job) {
 		$id = $job instanceof Job ? $job->getId() : $job;
 		$stats = $this->jobStats[$id];

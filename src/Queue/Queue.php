@@ -88,17 +88,29 @@ class Queue implements QueueInterface {
 	}
 
 	public function peekReady($tube) {
-		$job = $this->pheanstalk->peekReady($tube);
+		try {
+			$job = $this->pheanstalk->peekReady($tube);
+		} catch (Pheanstalk\Exception\ServerException $e) {
+			return new NullJob();
+		}
 		return $this->createJob($job);
 	}
 
 	public function peekBuried($tube) {
-		$job = $this->pheanstalk->peekBuried($tube);
+		try {
+			$job = $this->pheanstalk->peekBuried($tube);
+		} catch (Pheanstalk\Exception\ServerException $e) {
+			return new NullJob();
+		}
 		return $this->createJob($job);
 	}
 
 	public function peekDelayed($tube) {
-		$job = $this->pheanstalk->peekDelayed($tube);
+		try {
+			$job = $this->pheanstalk->peekDelayed($tube);
+		} catch (Pheanstalk\Exception\ServerException $e) {
+			return new NullJob();
+		}
 		return $this->createJob($job);
 	}
 
@@ -166,9 +178,14 @@ class Queue implements QueueInterface {
 		$this->pheanstalk->kickJob($job);
 	}
 
+	/** @inheritdoc */
 	public function statsJob($job) {
-		/** @var Pheanstalk\Response\ArrayResponse $stats */
-		$stats = $this->pheanstalk->statsJob($job);
+		try {
+			/** @var Pheanstalk\Response\ArrayResponse $stats */
+			$stats = $this->pheanstalk->statsJob($job);
+		} catch (Pheanstalk\Exception\ServerException $e) {
+			$stats = array('id' => -1);
+		}
 		return JobStats::create($stats);
 	}
 
@@ -179,7 +196,8 @@ class Queue implements QueueInterface {
 	//endregion
 
 	public function listTubes() {
-		$tubes = ArrayCollection::create($this->pheanstalk->listTubes());
+		$tubes = ArrayCollection::create($this->pheanstalk->listTubes())
+			->sortValues();
 		$tubes->removeElement(Pheanstalk\PheanstalkInterface::DEFAULT_TUBE);
 		return $tubes;
 	}

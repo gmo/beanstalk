@@ -2,6 +2,7 @@
 namespace GMO\Beanstalk\Console\Command\Queue;
 
 use GMO\Beanstalk\Job\Job;
+use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Queue;
 use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Common\Collections\ArrayCollection;
@@ -46,22 +47,24 @@ class PeekCommand extends ChangeStateCommand {
 	protected function forEachTube(QueueInterface $queue, $tube, InputInterface $input, OutputInterface $output) {
 		if ($input->getOption('ready')) {
 			$job = $queue->peekReady($tube);
-			$this->ids[] = $job->getId();
 			$this->outputJob($output, $job, $tube, 'ready');
 		}
 		if ($input->getOption('buried')) {
 			$job = $queue->peekBuried($tube);
-			$this->ids[] = $job->getId();
 			$this->outputJob($output, $job, $tube, 'buried');
 		}
 		if ($input->getOption('delayed')) {
 			$job = $queue->peekDelayed($tube);
-			$this->ids[] = $job->getId();
 			$this->outputJob($output, $job, $tube, 'delayed');
 		}
 	}
 
 	protected function outputJob(OutputInterface $output, Job $job, $tube, $state) {
+		if ($job instanceof NullJob) {
+			$output->writeln("There are no $state jobs in <info>$tube</info> tube");
+			return;
+		}
+		$this->ids[] = $job->getId();
 		$output->writeln("Peeking at the $state job <info>#{$job->getId()}</info> in <info>$tube</info> tube");
 		$output->writeln($this->renderJobData($job));
 	}

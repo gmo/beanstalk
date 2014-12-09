@@ -28,9 +28,16 @@ class JobStatsCommand extends AbstractQueueCommand {
 		$queue = $this->getQueue($input);
 		$stats = new ArrayCollection();
 		foreach ($input->getArgument('id') as $id) {
-			$stats->add($queue->statsJob($id));
+			$jobStats = $queue->statsJob($id);
+			if ($jobStats->id() !== -1) {
+				$stats->add($jobStats);
+			} else {
+				$output->writeln("Job <info>#$id</info> does not exist");
+			}
 		}
-		$output->writeln($this->renderStats($stats));
+		if (!$stats->isEmpty()) {
+			$output->writeln($this->renderStats($stats));
+		}
 	}
 
 	/**

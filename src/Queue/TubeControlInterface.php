@@ -3,6 +3,7 @@ namespace GMO\Beanstalk\Queue;
 
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\JobProducerInterface;
+use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Queue\Response\TubeStats;
 
 interface TubeControlInterface extends JobProducerInterface {
@@ -28,21 +29,21 @@ interface TubeControlInterface extends JobProducerInterface {
 	/**
 	 * Inspect the next ready job in the specified tube
 	 * @param string $tube
-	 * @return Job
+	 * @return Job|NullJob
 	 */
 	public function peekReady($tube);
 
 	/**
 	 * Inspect the next buried job in the specified tube
 	 * @param string $tube
-	 * @return Job
+	 * @return Job|NullJob
 	 */
 	public function peekBuried($tube);
 
 	/**
 	 * Inspect the next delayed job in the specified tube
 	 * @param string $tube
-	 * @return Job
+	 * @return Job|NullJob
 	 */
 	public function peekDelayed($tube);
 
