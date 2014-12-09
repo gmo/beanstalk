@@ -218,15 +218,15 @@ class ArrayQueue implements QueueInterface {
 	}
 
 	public function peekReady($tube) {
-		$this->getTube($tube)->ready()->first();
+		return $this->getTube($tube)->ready()->first() ?: new NullJob();
 	}
 
 	public function peekBuried($tube) {
-		$this->getTube($tube)->buried()->first();
+		return $this->getTube($tube)->buried()->first() ?: new NullJob();
 	}
 
 	public function peekDelayed($tube) {
-		$this->getTube($tube)->delayed()->first();
+		return $this->getTube($tube)->delayed()->first() ?: new NullJob();
 	}
 
 	public function deleteReadyJobs($tube, $num = -1) {
@@ -332,7 +332,7 @@ class ArrayQueue implements QueueInterface {
 			return $job;
 		}
 
-		return null;
+		return new NullJob();
 	}
 
 	protected function isNullJob(Job $job) {
