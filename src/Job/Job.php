@@ -104,7 +104,16 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate {
 
 	/** @inheritdoc */
 	public function getIterator() {
-		return new \ArrayIterator($this->jobData);
+		if ($this->jobData instanceof ArrayCollection) {
+			return $this->jobData->getIterator();
+		} elseif (is_array($this->jobData)) {
+			return new \ArrayIterator($this->jobData);
+		} else {
+			return new \ArrayIterator(array(
+				'id' => $this->getId(),
+				'data' => $this->jobData,
+			));
+		}
 	}
 	//endregion
 }
