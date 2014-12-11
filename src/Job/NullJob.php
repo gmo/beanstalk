@@ -5,7 +5,9 @@ use GMO\Beanstalk\Queue\Response\TubeStats;
 
 class NullJob extends Job {
 
-	public function __construct() { }
+	public function __construct() {
+		$this->handled = true;
+	}
 
 	public function getId() {
 		return -1;
