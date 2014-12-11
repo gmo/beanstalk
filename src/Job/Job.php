@@ -110,7 +110,6 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate {
 			return new \ArrayIterator($this->jobData);
 		} else {
 			return new \ArrayIterator(array(
-				'id' => $this->getId(),
 				'data' => $this->jobData,
 			));
 		}

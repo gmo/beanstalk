@@ -88,7 +88,8 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 	public function preProcessJob(Job $job) {
 		if ($job instanceof UnserializableJob) {
 			$this->log->error('Burying unserializable job', array(
-				'job' => $job,
+				'id' => $job->getId(),
+				'data' => $job->getData(),
 			));
 			$job->bury();
 		}
@@ -101,7 +102,11 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 		}
 		foreach ($this->worker->getRequiredParams() as $reqParam) {
 			if (!$params->containsKey($reqParam)) {
-				$this->log->error("Job is missing required param: \"$reqParam\"", array( "params" => $params ));
+				$this->log->error('Job is missing required parameter', array(
+					"missing" => $reqParam,
+					"id" => $job->getId(),
+					"data" => $job->getData(),
+				));
 				return false;
 			}
 		}
@@ -196,7 +201,8 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 	protected function buryJob(Job $job, $exception, $numErrors) {
 		$this->log->warning("Burying failed job", array(
 			"numErrors" => $numErrors,
-			"params"    => $job->getData(),
+			"id"        => $job->getId(),
+			"data"      => $job->getData(),
 			"exception" => $exception
 		));
 		$job->bury();
@@ -205,7 +211,8 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 	protected function deleteJob(Job $job, $exception, $numErrors) {
 		$this->log->notice("Deleting failed job", array(
 			"numErrors" => $numErrors,
-			"params"    => $job->getData(),
+			"id"        => $job->getId(),
+			"data"      => $job->getData(),
 			"exception" => $exception
 		));
 		$job->delete();
@@ -216,7 +223,8 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 		$this->log->notice("Delaying failed job", array(
 			"numErrors" => $numErrors,
 			"delay" 	=> $delay,
-			"params"    => $job->getData(),
+			"id"        => $job->getId(),
+			"data"      => $job->getData(),
 			"exception" => $exception
 		));
 		$job->release($delay);
