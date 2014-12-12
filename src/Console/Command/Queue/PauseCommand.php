@@ -19,7 +19,7 @@ class PauseCommand extends ChangeStateCommand {
 	}
 
 	protected function forEachTube(QueueInterface $queue, $tube, InputInterface $input, OutputInterface $output) {
-		$delay = intval($input->getOption('delay'));
+		$delay = intval($input->getArgument('delay'));
 		$queue->pause($tube, $delay);
 	}
 }
