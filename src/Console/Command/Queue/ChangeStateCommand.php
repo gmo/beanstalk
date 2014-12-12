@@ -48,7 +48,7 @@ abstract class ChangeStateCommand extends AbstractQueueCommand {
 	protected function addTubeArgument() {
 		$this->validateTube();
 		return $this
-			->addArgument('tube', InputArgument::IS_ARRAY, 'The name of the tube (does not have to be exact)')
+			->addArgument('tube', InputArgument::IS_ARRAY, 'The name of the tube(s) (does not have to be exact)')
 			->addOption('all', 'a', InputOption::VALUE_NONE, ucfirst($this->getName()) . ' jobs in ALL tubes');
 	}
 

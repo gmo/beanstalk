@@ -16,7 +16,7 @@ class ServerStatsCommand extends AbstractQueueCommand {
 			->addOption('list', 	'l', InputOption::VALUE_NONE, 'List all the stat names')
 			->addOption('stat', 's',
 				InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
-				'Output the value of the specified stat (one per line)')
+				'Output the value of the specified stat <comment>(one per line if multiple)</comment>')
 			->addOption('current', 	'c', InputOption::VALUE_NONE, 'List current count stats')
 			->addOption('cmd', 	   null, InputOption::VALUE_NONE, 'List command count stats')
 			->addOption('other', 	'o', InputOption::VALUE_NONE, 'List other stats and values')
@@ -42,7 +42,7 @@ class ServerStatsCommand extends AbstractQueueCommand {
 					$output->writeln("<error>Stat: \"$statName\" does not exist</error>");
 					continue;
 				}
-				$output->writeln($stats->get($statName, 0));
+				$output->write($stats->get($statName, 0), count($input->getOption('stat')) > 1);
 			}
 			return;
 		}
