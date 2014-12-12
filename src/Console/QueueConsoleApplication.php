@@ -17,6 +17,7 @@ class QueueConsoleApplication extends ConsoleApplication {
 			new Command\Queue\DeleteCommand(),
 			new Command\Queue\BuryCommand(),
 			new Command\Queue\PeekCommand(),
+			new Command\Queue\PauseCommand(),
 			new Command\Queue\StatsCommand(),
 			new Command\Queue\ServerStatsCommand(),
 			new Command\Queue\JobStatsCommand(),
