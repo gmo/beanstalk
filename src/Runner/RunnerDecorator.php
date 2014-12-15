@@ -20,7 +20,7 @@ abstract class RunnerDecorator extends BaseRunner {
 	}
 
 	public function preProcessJob(Job $job) {
-		$this->runner->preProcessJob($job);
+		return $this->runner->preProcessJob($job);
 	}
 
 	public function validateJob(Job $job) {

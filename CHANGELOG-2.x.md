@@ -7,7 +7,7 @@ To get the diff between two versions, go to
 https://bitbucket.org/gmodev/beanstalk-library/branches/compare/v2.0.0..v1.0.0
 
 * 2.3.x (2014-12-11)
-
+ * `RunnerInterface::preProcessJob` returns a `Job` instance
  * `RunnerDecorator` does not call wrapped runner's `processJob` method, since it breaks the wrapping.
  * Added pause command to console app
 

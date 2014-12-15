@@ -14,6 +14,10 @@ interface RunnerInterface extends ClassNameResolverInterface {
 
 	public function processJob(Job $job);
 
+	/**
+	 * @param Job $job
+	 * @return Job
+	 */
 	public function preProcessJob(Job $job);
 
 	/**

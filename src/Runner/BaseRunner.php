@@ -59,7 +59,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 	}
 
 	public function processJob(Job $job) {
-		$this->preProcessJob($job);
+		$job = $this->preProcessJob($job);
 		if ($job->isHandled()) {
 			return;
 		}
@@ -93,6 +93,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 			));
 			$job->bury();
 		}
+		return $job;
 	}
 
 	public function validateJob(Job $job) {
