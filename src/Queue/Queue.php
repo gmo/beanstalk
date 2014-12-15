@@ -113,26 +113,23 @@ class Queue implements QueueInterface {
 	}
 
 	public function deleteReadyJobs($tube, $num = -1) {
-		return $this->deleteJobs("peekReady", $tube, $num);
+		return $this->deleteJobs("Ready", $tube, $num);
 	}
 
 	public function deleteBuriedJobs($tube, $num = -1) {
-		return $this->deleteJobs("peekBuried", $tube, $num);
+		return $this->deleteJobs("Buried", $tube, $num);
 	}
 
 	public function deleteDelayedJobs($tube, $num = -1) {
-		return $this->deleteJobs("peekDelayed", $tube, $num);
+		return $this->deleteJobs("Delayed", $tube, $num);
 	}
 
 	private function deleteJobs($state, $tube, $numberToDelete) {
 		$numberDeleted = 0;
-		try {
-			while ($numberToDelete !== 0 && $job = $this->pheanstalk->$state($tube)) {
-				$this->delete($job);
-				$numberDeleted++;
-				$numberToDelete--;
-			}
-		} catch (Pheanstalk\Exception\ServerException $e) {
+		while ($numberToDelete !== 0 && $job = $this->{"peek$state"}($tube)) {
+			$this->delete($job);
+			$numberDeleted++;
+			$numberToDelete--;
 		}
 		return $numberDeleted;
 	}
