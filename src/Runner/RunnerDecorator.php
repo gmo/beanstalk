@@ -14,14 +14,6 @@ use GMO\Beanstalk\Worker\WorkerInterface;
  */
 abstract class RunnerDecorator extends BaseRunner {
 
-	public function setupWorker(WorkerInterface $worker) {
-		$this->runner->setupWorker($worker);
-	}
-
-	public function getJob(Job $previousJob) {
-		return $this->runner->getJob($previousJob);
-	}
-
 	public function setup(QueueInterface $queue, WorkerInterface $worker) {
 		parent::setup($queue, $worker);
 		$this->runner->setup($queue, $worker);
@@ -37,6 +29,14 @@ abstract class RunnerDecorator extends BaseRunner {
 
 	public function postProcessJob(Job $job) {
 		$this->runner->postProcessJob($job);
+	}
+
+	public function setupWorker(WorkerInterface $worker) {
+		$this->runner->setupWorker($worker);
+	}
+
+	public function getJob(Job $previousJob) {
+		return $this->runner->getJob($previousJob);
 	}
 
 	public function shouldKeepRunning() {

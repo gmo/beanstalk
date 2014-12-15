@@ -12,13 +12,7 @@ interface RunnerInterface extends ClassNameResolverInterface {
 
 	public function run();
 
-	public function setupWorker(WorkerInterface $worker);
-
-	/**
-	 * @param Job $previousJob
-	 * @return Job
-	 */
-	public function getJob(Job $previousJob);
+	public function processJob(Job $job);
 
 	public function preProcessJob(Job $job);
 
@@ -29,9 +23,15 @@ interface RunnerInterface extends ClassNameResolverInterface {
 	 */
 	public function validateJob(Job $job);
 
-	public function processJob(Job $job);
-
 	public function postProcessJob(Job $job);
+
+	public function setupWorker(WorkerInterface $worker);
+
+	/**
+	 * @param Job $previousJob
+	 * @return Job
+	 */
+	public function getJob(Job $previousJob);
 
 	/**
 	 * Should the runner keep processing jobs?
