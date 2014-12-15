@@ -6,7 +6,11 @@ use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Worker\WorkerInterface;
 
 /**
- * This class is the base for decorating runners
+ * This class is the base for decorating runners.
+ *
+ * NOTE: {@see RunnerDecorator::run run()} and {@see RunnerDecorator::processJob processJob()}
+ *    do not call the previous runner because they call the other methods,
+ *    which would not call the wrapped runner's method.
  */
 abstract class RunnerDecorator extends BaseRunner {
 
@@ -29,10 +33,6 @@ abstract class RunnerDecorator extends BaseRunner {
 
 	public function validateJob(Job $job) {
 		return $this->runner->validateJob($job);
-	}
-
-	public function processJob(Job $job) {
-		$this->runner->processJob($job);
 	}
 
 	public function postProcessJob(Job $job) {

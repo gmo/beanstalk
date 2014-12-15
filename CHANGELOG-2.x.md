@@ -6,8 +6,9 @@ This changelog references the relevant changes done in 2.x minor versions.
 To get the diff between two versions, go to 
 https://bitbucket.org/gmodev/beanstalk-library/branches/compare/v2.0.0..v1.0.0
 
-* 2.3.0 (2014-12-11)
+* 2.3.x (2014-12-11)
 
+ * `RunnerDecorator` does not call wrapped runner's `processJob` method, since it breaks the wrapping.
  * Added pause command to console app
 
 
