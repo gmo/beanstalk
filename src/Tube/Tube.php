@@ -97,6 +97,10 @@ class Tube {
 		return $this->name;
 	}
 
+	public function __toString() {
+		return $this->name();
+	}
+
 	public function __construct($name, TubeControlInterface $queue) {
 		$this->name = $name;
 		$this->queue = $queue;

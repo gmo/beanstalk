@@ -2,7 +2,7 @@
 namespace GMO\Beanstalk\Console\Command\Queue;
 
 use GMO\Beanstalk\Queue;
-use GMO\Beanstalk\Queue\QueueInterface;
+use GMO\Beanstalk\Tube\Tube;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -18,8 +18,8 @@ class PauseCommand extends ChangeStateCommand {
 		;
 	}
 
-	protected function forEachTube(QueueInterface $queue, $tube, InputInterface $input, OutputInterface $output) {
+	protected function forEachTube(Tube $tube, InputInterface $input, OutputInterface $output) {
 		$delay = intval($input->getArgument('delay'));
-		$queue->pause($tube, $delay);
+		$tube->pause($delay);
 	}
 }

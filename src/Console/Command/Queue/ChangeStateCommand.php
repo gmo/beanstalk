@@ -1,7 +1,7 @@
 <?php
 namespace GMO\Beanstalk\Console\Command\Queue;
 
-use GMO\Beanstalk\Queue\QueueInterface;
+use GMO\Beanstalk\Tube\Tube;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class ChangeStateCommand extends AbstractQueueCommand {
 
-	abstract protected function forEachTube(QueueInterface $queue, $tube, InputInterface $input, OutputInterface $output);
+	abstract protected function forEachTube(Tube $tube, InputInterface $input, OutputInterface $output);
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		parent::execute($input, $output);
@@ -36,7 +36,7 @@ abstract class ChangeStateCommand extends AbstractQueueCommand {
 			list($tubes, $error) = $this->matchTubeNames($input->getArgument('tube'), $input, $output);
 		}
 		foreach ($tubes as $tube) {
-			$this->forEachTube($queue, $tube, $input, $output);
+			$this->forEachTube(new Tube($tube, $queue), $input, $output);
 		}
 
 		if ($error) {
