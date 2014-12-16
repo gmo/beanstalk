@@ -1,5 +1,5 @@
 <?php
-namespace GMO\Beanstalk\Queue;
+namespace GMO\Beanstalk\Tube;
 
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\JobProducerInterface;

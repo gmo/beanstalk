@@ -4,8 +4,8 @@ namespace GMO\Beanstalk\Worker;
 use GMO\Beanstalk\Exception\RpcInvalidResponseException;
 use GMO\Beanstalk\Exception\RpcTimeoutException;
 use GMO\Beanstalk\Job\NullJob;
-use GMO\Beanstalk\Queue\TubeControlInterface;
 use GMO\Beanstalk\Runner\RpcRunner;
+use GMO\Beanstalk\Tube\TubeControlInterface;
 
 abstract class RpcWorker extends AbstractWorker {
 

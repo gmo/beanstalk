@@ -4,6 +4,7 @@ namespace GMO\Beanstalk\Queue;
 use GMO\Beanstalk\Job\JobControlInterface;
 use GMO\Beanstalk\Queue\Response\ServerStats;
 use GMO\Beanstalk\Queue\Response\TubeStats;
+use GMO\Beanstalk\Tube\TubeControlInterface;
 use GMO\Common\Collections\ArrayCollection;
 use Psr\Log\LoggerAwareInterface;
 

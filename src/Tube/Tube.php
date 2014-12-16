@@ -3,7 +3,6 @@ namespace GMO\Beanstalk\Tube;
 
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Queue\Response\TubeStats;
-use GMO\Beanstalk\Queue\TubeControlInterface;
 
 class Tube {
 
@@ -104,6 +103,5 @@ class Tube {
 	}
 
 	protected $name;
-	/** @var TubeControlInterface */
 	protected $queue;
 }
