@@ -34,6 +34,8 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 		$this->setLogger($log);
 		$queue->setLogger($log);
 
+		$this->attachLoggerToErrorHandlers();
+
 		$this->attachSignalHandler();
 	}
 
@@ -265,6 +267,14 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 		}
 
 		return new JobError();
+	}
+
+	protected function attachLoggerToErrorHandlers() {
+		foreach ($this->errorHandlers as $handler) {
+			if ($handler instanceof LoggerAwareInterface) {
+				$handler->setLogger($this->log);
+			}
+		}
 	}
 
 	/** @var WorkerInterface */
