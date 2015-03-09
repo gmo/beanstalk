@@ -38,5 +38,10 @@
 			"package.json",
 			"tests"
 		]
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-master": "2.4.x-dev"
+		}
 	}
 }
