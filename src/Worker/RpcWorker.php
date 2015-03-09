@@ -15,7 +15,7 @@ abstract class RpcWorker extends AbstractWorker {
 
 	public static function runRpc(TubeControlInterface $queue, $data, $priority = null) {
 		$replyToTube = static::makeReplyTube();
-		static::push($queue, array(
+		static::pushData($queue, array(
 			RpcRunner::RPC_REPLY_TO_FIELD => $replyToTube,
 			'data' => $data
 		), $priority);
