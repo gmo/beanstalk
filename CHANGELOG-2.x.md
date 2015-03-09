@@ -6,12 +6,16 @@ This changelog references the relevant changes done in 2.x minor versions.
 To get the diff between two versions, go to 
 https://bitbucket.org/gmodev/beanstalk-library/branches/compare/v2.0.0..v1.0.0
 
+* 2.4.x (2015-03-09)
+
+    * Added `ContainerAwareWorker`
+    * Allowing JobErrorHandlers to be given a logger if they implement `LoggerAwareInterface`.
+
 * 2.3.x (2014-12-11)
 
     * `RunnerInterface::preProcessJob` returns a `Job` instance
     * `RunnerDecorator` does not call wrapped runner's `processJob` method, since it breaks the wrapping.
     * Added pause command to console app
-    * Allowing JobErrorHandlers to be given a logger if they implement `LoggerAwareInterface`.
 
 * 2.2.0 (2014-12-11)
 
