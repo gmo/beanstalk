@@ -7,6 +7,7 @@ use GMO\Beanstalk\Exception\RangeException;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Job\UnserializableJob;
+use GMO\Beanstalk\Log\JobProcessor;
 use GMO\Beanstalk\Queue\Response\JobStats;
 use GMO\Beanstalk\Queue\Response\ServerStats;
 use GMO\Beanstalk\Queue\Response\TubeStats;
@@ -54,11 +55,13 @@ class Queue implements QueueInterface {
 				$this->pheanstalk->watchOnly(Pheanstalk\PheanstalkInterface::DEFAULT_TUBE);
 			}
 			if (!$job) {
+				$this->logProcessor->setCurrentJob(null);
 				return new NullJob();
 			}
 
 			return $this->createJob($job);
 		} catch (Pheanstalk\Exception\ClientException $e) {
+			$this->logProcessor->setCurrentJob(null);
 			return new NullJob();
 		}
 	}
@@ -233,6 +236,16 @@ class Queue implements QueueInterface {
 	}
 
 	/**
+	 * Gets a monolog processor that will add current job info.
+	 * Useful for workers.
+	 *
+	 * @return JobProcessor
+	 */
+	public function getJobProcessor() {
+		return $this->logProcessor;
+	}
+
+	/**
 	 * Sets up a new Queue
 	 *
 	 * @param string          $host
@@ -242,15 +255,18 @@ class Queue implements QueueInterface {
 	public function __construct($host = 'localhost', $port = 11300, LoggerInterface $logger = null) {
 		$this->setLogger($logger ?: new NullLogger());
 		$this->pheanstalk = new Pheanstalk\Pheanstalk($host, $port);
+		$this->logProcessor = new JobProcessor($this);
 	}
 
 	protected function createJob(Pheanstalk\Job $job) {
 		try {
 			$data = $this->unserializeJobData($job->getData());
-			return new Job($job->getId(), $data, $this);
+			$job = new Job($job->getId(), $data, $this);
 		} catch (NotSerializableException $e) {
-			return new UnserializableJob($job->getId(), $job->getData(), $this, $e);
+			$job = new UnserializableJob($job->getId(), $job->getData(), $this, $e);
 		}
+		$this->logProcessor->setCurrentJob($job);
+		return $job;
 	}
 
 	protected function serializeJobData($data) {
@@ -312,4 +328,6 @@ class Queue implements QueueInterface {
 	protected $pheanstalk;
 	/** @var LoggerInterface */
 	protected $log;
+	/** @var JobProcessor */
+	protected $logProcessor;
 }

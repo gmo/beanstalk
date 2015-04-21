@@ -10,6 +10,7 @@
 		"symfony/finder": "~2.5"
 	},
 	"require-dev": {
+		"monolog/monolog": "~1.0",
 		"phpunit/phpunit": "3.7.*",
 		"gmo/dependency-injection": "~1.0"
 	},
