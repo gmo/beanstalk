@@ -58,7 +58,7 @@ class Queue implements QueueInterface {
 			}
 
 			return $this->createJob($job);
-		} catch (Pheanstalk\Exception\SocketException $e) {
+		} catch (Pheanstalk\Exception\ClientException $e) {
 			return new NullJob();
 		}
 	}
