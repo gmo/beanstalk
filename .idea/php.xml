@@ -8,12 +8,25 @@
   <component name="PhpDebugIgnoredPathsSettings">
     <skipped_paths>
       <skipped_path path="/usr/local/bin/composer" />
+      <skipped_path path="$PROJECT_DIR$/vendor/composer" />
     </skipped_paths>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="5.3.0" />
+  <component name="PhpStepFilterConfiguration">
+    <option name="skippedFunctions">
+      <list>
+        <option value="Composer\Autoload\ClassLoader-&gt;loadClass" />
+        <option value="Composer\Autoload\ClassLoader-&gt;findFile" />
+        <option value="Composer\Autoload\ClassLoader-&gt;findFileWithExtension" />
+        <option value="Composer\Autoload\includeFile" />
+        <option value="Pimple-&gt;offsetGet" />
+        <option value="BoltApplication::{closure:/Users/Carson/Repos/beanstalk-library/vendor/pimple/pimple/lib/Pimple.php:122-130}" />
+      </list>
+    </option>
+  </component>
   <component name="PhpUnit">
     <phpunit_settings>
-      <PhpUnitSettings custom_loader_path="$PROJECT_DIR$/vendor/autoload.php" phpunit_phar_path="" />
+      <PhpUnitSettings />
     </phpunit_settings>
   </component>
 </project>

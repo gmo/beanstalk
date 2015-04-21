@@ -1,6 +1,5 @@
-workspace.xml
-vendor
+.idea
+/vendor
+composer.lock
 atlassian-ide-plugin.xml
 /.project
-.idea/dictionaries
-composer.lock
