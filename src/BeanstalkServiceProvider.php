@@ -23,9 +23,15 @@ class BeanstalkServiceProvider implements ServiceProviderInterface {
 
 		$container[BeanstalkKeys::WORKER_DIRECTORY] = null;
 		$container[BeanstalkKeys::QUEUE_LOGGER] =
-		$container[BeanstalkKeys::WORKER_MANAGER_LOGGER] = function() {
-			return new NullLogger();
-		};
+		$container[BeanstalkKeys::WORKER_MANAGER_LOGGER] = $container->share(function($app) {
+			if (isset($app['logger.new'])) {
+				return $app['logger.new']('Queue');
+			} elseif (isset($app['logger'])) {
+				return $app['logger'];
+			} else {
+				return new NullLogger();
+			}
+		});
 
 		$container[BeanstalkKeys::QUEUE] = $container->share(function($app) {
 			return new Queue(
