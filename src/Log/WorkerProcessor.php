@@ -12,7 +12,7 @@ class WorkerProcessor {
 	}
 
 	public function __construct($workerName) {
-		$this->workerName;
+		$this->workerName = $workerName;
 	}
 
 	protected $workerName;
