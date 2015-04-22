@@ -2,6 +2,7 @@
 namespace GMO\Beanstalk\Runner;
 
 use Exception;
+use GMO\Beanstalk\BeanstalkKeys;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\JobError\Action\JobActionInterface;
 use GMO\Beanstalk\Job\JobError\HasJobErrorInterface;
@@ -11,6 +12,7 @@ use GMO\Beanstalk\Job\JobError\JobErrorInterface;
 use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Job\UnserializableJob;
 use GMO\Beanstalk\Queue\QueueInterface;
+use GMO\Beanstalk\Worker\ContainerAwareWorker;
 use GMO\Beanstalk\Worker\WorkerInterface;
 use GMO\Common\Collections\ArrayCollection;
 use Psr\Log\LoggerAwareInterface;
@@ -122,6 +124,9 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface {
 	public function setupWorker(WorkerInterface $worker) {
 		try {
 			$worker->setup();
+			if ($worker instanceof ContainerAwareWorker) {
+				$this->queue = $worker->getService(BeanstalkKeys::QUEUE);
+			}
 		} catch (Exception $e) {
 			$this->log->critical("An error occurred when setting up the worker", array( "exception" => $e ));
 			throw $e;
