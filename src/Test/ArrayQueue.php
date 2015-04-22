@@ -4,6 +4,7 @@ namespace GMO\Beanstalk\Test;
 use GMO\Beanstalk\Exception\RangeException;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\NullJob;
+use GMO\Beanstalk\Log\JobProcessor;
 use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Queue\Response\JobStats;
 use GMO\Beanstalk\Queue\Response\ServerStats;
@@ -158,11 +159,13 @@ class ArrayQueue implements QueueInterface {
 		$tube = $this->getTube($tube);
 
 		if ($tube->isPaused()) {
+			$this->logProcessor->setCurrentJob(null);
 			return new NullJob();
 		}
 
 		/** @var ArrayJob|null $job */
 		$job = $tube->ready()->removeFirst();
+		$this->logProcessor->setCurrentJob($job);
 		if (!$job) {
 			return new NullJob();
 		}
@@ -296,9 +299,14 @@ class ArrayQueue implements QueueInterface {
 		return $this->tubes->get($tube);
 	}
 
+	public function getJobProcessor() {
+		return $this->logProcessor;
+	}
+
 	public function __construct() {
 		$this->tubes = new ArrayCollection();
 		$this->jobStats = new ArrayCollection();
+		$this->logProcessor = new JobProcessor($this);
 	}
 
 	protected function removeEmptyTube(ArrayTube $tube) {
@@ -346,4 +354,7 @@ class ArrayQueue implements QueueInterface {
 	protected $jobStats;
 
 	protected $jobCounter = 0;
+
+	/** @var JobProcessor */
+	protected $logProcessor;
 }
