@@ -14,11 +14,25 @@ class StatsCommand extends AbstractWorkerCommand {
 
 	protected function configure() {
 		parent::configure();
-		$this->setName('stats')->setDescription('Get stats about the workers');
+		$this
+			->setName('stats')
+			->setDescription('Get stats about the workers')
+			->addOption('pids', 'p', null, 'Only return a list of PIDs')
+		;
 	}
 
 	protected function executeManagerFunction(InputInterface $input, OutputInterface $output, WorkerManager $manager, $workers) {
 		$workers = $manager->getWorkers($workers);
+
+		if ($input->getOption('pids')) {
+			foreach ($workers as $worker) {
+				$pids = $worker->getPids()->join("\n");
+				if ($pids) {
+					$output->writeln($pids);
+				}
+			}
+			return;
+		}
 		if ($workers->isEmpty()) {
 			$output->writeln('There are no workers in: ' . $manager->getWorkerDir());
 			return;
