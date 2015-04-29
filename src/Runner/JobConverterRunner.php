@@ -22,6 +22,6 @@ abstract class JobConverterRunner extends RunnerDecorator {
 			$data = $this->convertJobData($job->getData());
 			$job = new Job($job->getId(), $data, $this->queue);
 		}
-		parent::preProcessJob($job);
+		return parent::preProcessJob($job);
 	}
 }
