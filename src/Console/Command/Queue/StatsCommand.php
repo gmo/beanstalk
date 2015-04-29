@@ -1,6 +1,7 @@
 <?php
 namespace GMO\Beanstalk\Console\Command\Queue;
 
+use GMO\Beanstalk\BeanstalkKeys;
 use GMO\Beanstalk\Queue;
 use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Common\Collections\ArrayCollection;
@@ -22,6 +23,7 @@ class StatsCommand extends AbstractQueueCommand {
 				InputArgument::IS_ARRAY,
 				'The name of one or more tubes (does not have to be exact) <comment>(default: all tubes)</comment>')
 			->addOption('refresh', 'f', InputOption::VALUE_NONE, 'Continue to refresh table every second')
+			->addOption('cron', null, InputOption::VALUE_NONE, 'Log stats from cron job')
 			->setDescription('Displays information about the current tubes')
 			->setHelp($this->getHelpText());
 	}
@@ -32,6 +34,10 @@ class StatsCommand extends AbstractQueueCommand {
 		$refresh = $input->getOption('refresh');
 		do {
 			list($stats, $error) = $this->getStats($input, $output);
+			if ($input->getOption('cron')) {
+				$this->logStats($stats);
+				return;
+			}
 			$output->writeln($this->renderStats($stats));
 			sleep($refresh ? 1 : 0);
 		} while($refresh);
@@ -115,6 +121,27 @@ class StatsCommand extends AbstractQueueCommand {
 		$table->render();
 
 		return $buffer->fetch();
+	}
+
+	/**
+	 * @param TubeStats[]|ArrayCollection $tubes
+	 */
+	private function logStats(ArrayCollection $tubes) {
+		$logger = $this->getService(BeanstalkKeys::QUEUE_LOGGER);
+		foreach ($tubes as $tube => $stats) {
+			$logger->info('Tube stats', array(
+				'tube' => $tube,
+				'ready' => $stats->readyJobs(),
+				'buried' => $stats->buriedJobs(),
+				'delayed' => $stats->delayedJobs(),
+				'total' => $stats->readyJobs() + $stats->buriedJobs() + $stats->delayedJobs(),
+				'pause_left' => $stats->pauseTimeLeft(),
+				'pause_elapsed' => $stats->pause(),
+				'workers' => $stats->watchingCount(),
+				'deleted_count' => $stats->cmdDeleteCount(),
+				'pause_count' => $stats->cmdPauseTubeCount(),
+			));
+		}
 	}
 
 	private function getHelpText() {

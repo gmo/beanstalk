@@ -12,6 +12,8 @@ https://bitbucket.org/gmodev/beanstalk-library/branches/compare/v2.0.0..v1.0.0
     * Allowing JobErrorHandlers to be given a logger if they implement `LoggerAwareInterface`.
     * Fix throwing exception if beanstalkd is down
     * Remove and ignore composer.lock
+    * Added Job and Worker Logger Processors
+    * Added cron option to queue stats command
 
 * 2.3.x (2014-12-11)
 
