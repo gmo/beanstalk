@@ -129,7 +129,11 @@ class Queue implements QueueInterface {
 
 	private function deleteJobs($state, $tube, $numberToDelete) {
 		$numberDeleted = 0;
-		while ($numberToDelete !== 0 && $job = $this->{"peek$state"}($tube)) {
+		while ($numberToDelete !== 0) {
+			$job = $this->{"peek$state"}($tube);
+			if ($this->isNullJob($job)) {
+				break;
+			}
 			$this->delete($job);
 			$numberDeleted++;
 			$numberToDelete--;
