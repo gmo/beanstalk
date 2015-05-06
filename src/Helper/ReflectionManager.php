@@ -3,11 +3,6 @@ namespace GMO\Beanstalk\Helper;
 
 use GMO\Common\ClassNameResolverInterface;
 use GMO\Common\Collections\ArrayCollection;
-use PHPParser\Error;
-use PhpParser\Lexer;
-use PHPParser\Node\Stmt\Namespace_ as NamespaceNode;
-use PHPParser\Node\Stmt\Class_ as ClassNode;
-use PhpParser\Parser;
 
 class ReflectionManager implements ClassNameResolverInterface {
 
@@ -30,24 +25,9 @@ class ReflectionManager implements ClassNameResolverInterface {
 	}
 
 	private static function getClassName($file) {
-		$parser = new Parser(new Lexer());
+		$parser = new NamespaceParser();
 		$phpCode = file_get_contents($file);
-		try {
-			$stmts = $parser->parse($phpCode);
-		} catch (Error $e) {
-			return false;
-		}
-		foreach ($stmts as $stmt) {
-			if ($stmt instanceof NamespaceNode) {
-				$namespace = implode("\\", $stmt->name->parts);
-				foreach($stmt->stmts as $subStmt) {
-					if ($subStmt instanceof ClassNode) {
-						return $namespace . "\\" . $subStmt->name;
-					}
-				}
-			}
-		}
-		return false;
+		return $parser->parse($phpCode);
 	}
 
 	public static function className() { return get_called_class(); }
