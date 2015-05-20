@@ -4,6 +4,7 @@ namespace GMO\Beanstalk\Queue;
 use GMO\Beanstalk\Job\JobControlInterface;
 use GMO\Beanstalk\Queue\Response\ServerStats;
 use GMO\Beanstalk\Queue\Response\TubeStats;
+use GMO\Beanstalk\Tube\Tube;
 use GMO\Beanstalk\Tube\TubeControlInterface;
 use GMO\Common\Collections\ArrayCollection;
 use Psr\Log\LoggerAwareInterface;
@@ -11,8 +12,23 @@ use Psr\Log\LoggerAwareInterface;
 interface QueueInterface extends TubeControlInterface, JobControlInterface, LoggerAwareInterface {
 
 	/**
+	 * Gets a tube by name
+	 * @param string $name
+	 * @return Tube
+	 */
+	public function getTube($name);
+
+	/**
+	 * Gets a list of all the tubes
+	 * @return Tube[]|ArrayCollection
+	 */
+	public function getTubes();
+
+	/**
 	 * Returns the names of all the tubes
 	 * @return ArrayCollection
+	 *
+	 * @deprecated Use {@see getTubes} instead
 	 */
 	public function listTubes();
 

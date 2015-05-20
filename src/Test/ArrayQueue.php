@@ -302,6 +302,10 @@ class ArrayQueue implements QueueInterface {
 		return $this->tubes->get($tube);
 	}
 
+	public function getTubes() {
+		return $this->tubes;
+	}
+
 	public function getJobProcessor() {
 		return $this->logProcessor;
 	}
