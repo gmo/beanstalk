@@ -2,6 +2,8 @@
 namespace GMO\Beanstalk\Test;
 
 use GMO\Beanstalk\Queue\Response\TubeStats;
+use GMO\Beanstalk\Tube\Tube;
+use GMO\Beanstalk\Tube\TubeControlInterface;
 use GMO\Common\Collections\ArrayCollection;
 use GMO\Common\DateTime;
 
@@ -9,7 +11,7 @@ use GMO\Common\DateTime;
  * ArrayTube is an in-memory representation of a beanstalk tube. Used with ArrayQueue.
  * @see \GMO\Beanstalk\Test\ArrayQueue
  */
-class ArrayTube {
+class ArrayTube extends Tube {
 
 	public function isPaused() {
 		if ($this->pauseDelay === 0) {
@@ -90,7 +92,9 @@ class ArrayTube {
 		return $this->buried;
 	}
 
-	public function __construct() {
+	public function __construct($name, TubeControlInterface $queue) {
+		parent::__construct($name, $queue);
+
 		$this->ready = new ArrayCollection();
 		$this->reserved = new ArrayCollection();
 		$this->delayed = new ArrayCollection();

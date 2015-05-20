@@ -297,7 +297,7 @@ class ArrayQueue implements QueueInterface {
 	 */
 	public function getTube($tube) {
 		if (!$this->tubes->containsKey($tube)) {
-			$this->tubes[$tube] = new ArrayTube();
+			$this->tubes[$tube] = new ArrayTube($tube, $this);
 		}
 		return $this->tubes->get($tube);
 	}
