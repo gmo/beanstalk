@@ -18,7 +18,7 @@ class ListCommand extends AbstractQueueCommand {
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		parent::execute($input, $output);
 
-		$tubes = $this->getQueue($input)->listTubes();
+		$tubes = $this->getQueue()->listTubes();
 		if ($tubes->isEmpty()) {
 			$output->writeln("There are no current tubes");
 			return;

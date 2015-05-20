@@ -25,7 +25,7 @@ abstract class ChangeStateCommand extends AbstractQueueCommand {
 			}
 		}
 
-		$queue = $this->getQueue($input);
+		$queue = $this->getQueue();
 		if ($input->getOption('all')) {
 			$error = false;
 			$tubes = $queue->listTubes();
@@ -33,7 +33,7 @@ abstract class ChangeStateCommand extends AbstractQueueCommand {
 				$output->writeln('There are no current tubes');
 			}
 		} else {
-			list($tubes, $error) = $this->matchTubeNames($input->getArgument('tube'), $input, $output);
+			list($tubes, $error) = $this->matchTubeNames($input->getArgument('tube'), $output);
 		}
 		foreach ($tubes as $tube) {
 			$this->forEachTube(new Tube($tube, $queue), $input, $output);

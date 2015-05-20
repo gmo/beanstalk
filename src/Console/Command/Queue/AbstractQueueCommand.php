@@ -11,24 +11,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class AbstractQueueCommand extends AbstractCommand {
 
-	protected function getQueue(InputInterface $input) {
-		$container = $this->getContainer();
-		if ($host = $input->getOption('host')) {
-			$container[BeanstalkKeys::HOST] = $host;
-		}
-		if ($port = $input->getOption('port')) {
-			$container[BeanstalkKeys::PORT] = $port;
-		}
-
-		/** @var QueueInterface $queue */
-		$queue = $container[BeanstalkKeys::QUEUE];
-		$queue->setLogger($this->logger);
-		return $queue;
+	/**
+	 * @return QueueInterface
+	 */
+	protected function getQueue() {
+		return $this->getService(BeanstalkKeys::QUEUE);
 	}
 
-	protected function matchTubeNames($tubesSearch, InputInterface $input, OutputInterface $output) {
+	protected function matchTubeNames($tubesSearch, OutputInterface $output) {
 		$matchedTubes = new ArrayCollection();
-		$queue = $this->getQueue($input);
+		$queue = $this->getQueue();
 		$error = false;
 		foreach ($tubesSearch as $tubeSearch) {
 			$matched = $queue
@@ -43,5 +35,26 @@ class AbstractQueueCommand extends AbstractCommand {
 			$matchedTubes->merge($matched);
 		}
 		return array($matchedTubes, $error);
+	}
+
+	protected function execute(InputInterface $input, OutputInterface $output) {
+		parent::execute($input, $output);
+		$this->setupQueue($input);
+	}
+
+	private function setupQueue(InputInterface $input) {
+		$container = $this->getContainer();
+		if ($host = $input->getOption('host')) {
+			$container[BeanstalkKeys::HOST] = $host;
+		}
+		if ($port = $input->getOption('port')) {
+			$container[BeanstalkKeys::PORT] = $port;
+		}
+
+		$logger = $this->logger;
+		$container[BeanstalkKeys::QUEUE] = $container->share($container->extend(BeanstalkKeys::QUEUE, function (QueueInterface $queue) use ($logger) {
+			$queue->setLogger($logger);
+			return $queue;
+		}));
 	}
 }
