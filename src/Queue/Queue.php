@@ -4,6 +4,7 @@ namespace GMO\Beanstalk\Queue;
 use GMO\Beanstalk\Exception\JobPushException;
 use GMO\Beanstalk\Exception\JobTooBigException;
 use GMO\Beanstalk\Exception\RangeException;
+use GMO\Beanstalk\Helper\JobDataSerializer;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Job\UnserializableJob;
@@ -13,7 +14,6 @@ use GMO\Beanstalk\Queue\Response\ServerStats;
 use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Common\Collections\ArrayCollection;
 use GMO\Common\Exception\NotSerializableException;
-use GMO\Common\ISerializable;
 use Pheanstalk;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -33,9 +33,10 @@ class Queue implements QueueInterface {
 			throw new RangeException("Priority must be between 0 and 4294967295. Given: $priority");
 		}
 		try {
+			$data = $this->serializer->serialize($data);
 			return $this->pheanstalk->putInTube(
 				$tube,
-				$this->serializeJobData($data),
+				$data,
 				$priority,
 				$delay ?: static::DEFAULT_DELAY,
 				$ttr ?: static::DEFAULT_TTR
@@ -260,68 +261,18 @@ class Queue implements QueueInterface {
 		$this->setLogger($logger ?: new NullLogger());
 		$this->pheanstalk = new Pheanstalk\Pheanstalk($host, $port);
 		$this->logProcessor = new JobProcessor($this);
+		$this->serializer = new JobDataSerializer();
 	}
 
 	protected function createJob(Pheanstalk\Job $job) {
 		try {
-			$data = $this->unserializeJobData($job->getData());
+			$data = $this->serializer->unserialize($job->getData());
 			$job = new Job($job->getId(), $data, $this);
 		} catch (NotSerializableException $e) {
 			$job = new UnserializableJob($job->getId(), $job->getData(), $this, $e);
 		}
 		$this->logProcessor->setCurrentJob($job);
 		return $job;
-	}
-
-	protected function serializeJobData($data) {
-		if ($data instanceof ISerializable) {
-			return $data->toJson();
-		}
-		if ($data instanceof \Traversable) {
-			$data = iterator_to_array($data, true);
-		}
-		if (is_scalar($data)) {
-			$data = array( 'data' => $data );
-		}
-		if (is_array($data)) {
-			foreach ($data as $key => &$value) {
-				if ($value instanceof ISerializable) {
-					$value = $value->toArray();
-				}
-			}
-			$data = json_encode($data);
-		}
-		return $data;
-	}
-
-	protected function unserializeJobData($data) {
-		$params = new ArrayCollection(json_decode($data, true));
-		if ($params->count() === 1 && $params->containsKey('data')) {
-			return $params['data'];
-		}
-
-		if ($params->containsKey('class')) {
-			/** @var ISerializable|string $cls */
-			$cls = $params['class'];
-			if (!class_exists($cls)) {
-				throw new NotSerializableException($cls . ' does not exist');
-			}
-			return $cls::fromArray($params->toArray());
-		}
-
-		foreach ($params as $key => $value) {
-			if (is_string($value)) {
-				$params[$key] = trim($value);
-			} elseif (is_array($value) && array_key_exists('class', $value)) {
-				/** @var ISerializable|string $cls */
-				$cls = $value['class'];
-				if (!class_exists($cls)) {
-					throw new NotSerializableException($cls . ' does not exist');
-				}
-				$params[$key] = $cls::fromArray($value);
-			}
-		}
-		return $params;
 	}
 
 	protected function isNullJob(Job $job) {
@@ -334,4 +285,6 @@ class Queue implements QueueInterface {
 	protected $log;
 	/** @var JobProcessor */
 	protected $logProcessor;
+	/** @var JobDataSerializer */
+	protected $serializer;
 }

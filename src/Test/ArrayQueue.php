@@ -2,6 +2,7 @@
 namespace GMO\Beanstalk\Test;
 
 use GMO\Beanstalk\Exception\RangeException;
+use GMO\Beanstalk\Helper\JobDataSerializer;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Log\JobProcessor;
@@ -134,6 +135,7 @@ class ArrayQueue implements QueueInterface {
 		}
 		$delay = $delay ?: static::DEFAULT_DELAY;
 
+		$data = $this->serializer->serialize($data);
 		$job = new ArrayJob($this->jobCounter++, $data, $this);
 		$job->setDelay($delay);
 		$job->setPriority($priority);
@@ -175,6 +177,7 @@ class ArrayQueue implements QueueInterface {
 		$stats->set('reserves', $stats->reserves() + 1);
 		$tube->reserved()->add($job);
 
+		$job->setData($this->serializer->unserialize($job->getData()));
 		$job->resetHandled();
 
 		return $job;
@@ -307,6 +310,7 @@ class ArrayQueue implements QueueInterface {
 		$this->tubes = new ArrayCollection();
 		$this->jobStats = new ArrayCollection();
 		$this->logProcessor = new JobProcessor($this);
+		$this->serializer = new JobDataSerializer();
 	}
 
 	protected function removeEmptyTube(ArrayTube $tube) {
@@ -357,4 +361,7 @@ class ArrayQueue implements QueueInterface {
 
 	/** @var JobProcessor */
 	protected $logProcessor;
+
+	/** @var JobDataSerializer */
+	protected $serializer;
 }
