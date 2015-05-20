@@ -3,8 +3,21 @@ namespace GMO\Beanstalk\Tube;
 
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Queue\Response\TubeStats;
+use GMO\Common\ISerializable;
 
 class Tube {
+
+	/**
+	 * Pushes a job to this tube
+	 * @param ISerializable|\Traversable|array|mixed $data     Job data
+	 * @param int|null                               $priority From 0 (most urgent) to 4294967295 (least urgent)
+	 * @param int|null                               $delay    Seconds to wait before job becomes ready
+	 * @param int|null                               $ttr      Time To Run: seconds a job can be reserved for
+	 * @return int The new job ID
+	 */
+	public function push($data, $priority = null, $delay = null, $ttr = null) {
+		return $this->queue->push($this->name, $data, $priority, $delay, $ttr);
+	}
 
 	/**
 	 * Reserves a job
@@ -86,6 +99,27 @@ class Tube {
 	}
 
 	/**
+	 * Is the tube currently paused?
+	 * @return bool
+	 */
+	public function isPaused() {
+		return $this->stats()->pauseTimeLeft() === 0;
+	}
+
+	/**
+	 * Does the tube have any jobs in any state?
+	 *
+	 * @return bool
+	 */
+	public function isEmpty() {
+		$stats = $this->stats();
+		return $stats->readyJobs() === 0 &&
+			   $stats->reservedJobs() === 0 &&
+			   $stats->delayedJobs() === 0 &&
+			   $stats->buriedJobs() === 0;
+	}
+
+	/**
 	 * Gets the tube's stats
 	 * @return TubeStats
 	 */
@@ -93,6 +127,10 @@ class Tube {
 		return $this->queue->statsTube($this->name);
 	}
 
+	/**
+	 * Gets the name of this tube
+	 * @return string
+	 */
 	public function name() {
 		return $this->name;
 	}
@@ -101,11 +139,19 @@ class Tube {
 		return $this->name();
 	}
 
+	/**
+	 * Tube Constructor.
+	 *
+	 * @param string               $name
+	 * @param TubeControlInterface $queue
+	 */
 	public function __construct($name, TubeControlInterface $queue) {
 		$this->name = $name;
 		$this->queue = $queue;
 	}
 
+	/** @var string */
 	protected $name;
+	/** @var TubeControlInterface */
 	protected $queue;
 }
