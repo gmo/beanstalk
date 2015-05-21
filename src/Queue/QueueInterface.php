@@ -5,6 +5,7 @@ use GMO\Beanstalk\Job\JobControlInterface;
 use GMO\Beanstalk\Queue\Response\ServerStats;
 use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Beanstalk\Tube\Tube;
+use GMO\Beanstalk\Tube\TubeCollection;
 use GMO\Beanstalk\Tube\TubeControlInterface;
 use GMO\Common\Collections\ArrayCollection;
 use Psr\Log\LoggerAwareInterface;
@@ -16,19 +17,19 @@ interface QueueInterface extends TubeControlInterface, JobControlInterface, Logg
 	 * @param string $name
 	 * @return Tube
 	 */
-	public function getTube($name);
+	public function tube($name);
 
 	/**
 	 * Gets a list of all the tubes
-	 * @return Tube[]|ArrayCollection
+	 * @return TubeCollection
 	 */
-	public function getTubes();
+	public function tubes();
 
 	/**
 	 * Returns the names of all the tubes
 	 * @return ArrayCollection
 	 *
-	 * @deprecated Use {@see getTubes} instead
+	 * @deprecated Use {@see tubes} instead
 	 */
 	public function listTubes();
 

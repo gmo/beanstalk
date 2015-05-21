@@ -52,7 +52,7 @@ class WorkerTest extends QueueTestCase {
 		));
 		$runner->run();
 
-		$tube = static::$queue->getTube(UnitTestWorkerProcessGenericException::className());
+		$tube = static::$queue->tube(UnitTestWorkerProcessGenericException::className());
 		$this->assertCount(0, $tube->ready());
 		$this->assertCount(1, $tube->buried());
 	}
@@ -60,7 +60,7 @@ class WorkerTest extends QueueTestCase {
 	public function testWorkerProcessingThrowsJobError() {
 		$runner = new TestRunner(static::$queue, new UnitTestWorkerProcessJobError());
 		$runner->run();
-		$tube = static::$queue->getTube(UnitTestWorkerProcessJobError::className());
+		$tube = static::$queue->tube(UnitTestWorkerProcessJobError::className());
 		$this->assertTrue($tube->isEmpty());
 	}
 

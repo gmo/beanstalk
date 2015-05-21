@@ -47,6 +47,10 @@ class ArrayTube extends Tube {
 		return $diff->s;
 	}
 
+	public function stats() {
+		return $this->getStats();
+	}
+
 	public function getStats() {
 		return new TubeStats(array(
 			'current-jobs-ready' => $this->ready()->count(),

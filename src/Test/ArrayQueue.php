@@ -10,6 +10,7 @@ use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Queue\Response\JobStats;
 use GMO\Beanstalk\Queue\Response\ServerStats;
 use GMO\Beanstalk\Queue\Response\TubeStats;
+use GMO\Beanstalk\Tube\TubeCollection;
 use GMO\Common\Collections\ArrayCollection;
 use GMO\Common\DateTime;
 use Psr\Log\LoggerInterface;
@@ -31,7 +32,7 @@ class ArrayQueue implements QueueInterface {
 		$stats = $this->jobStats[$job->getId()];
 		$stats->set('releases', $stats->releases() + 1);
 
-		$tube = $this->getTube($stats->tube());
+		$tube = $this->tube($stats->tube());
 		$tube->reserved()->removeElement($job);
 
 		$job->setDelay($delay);
@@ -54,7 +55,7 @@ class ArrayQueue implements QueueInterface {
 
 		$stats = $this->jobStats[$job->getId()];
 
-		$tube = $this->getTube($stats->tube());
+		$tube = $this->tube($stats->tube());
 		$tube->reserved()->removeElement($job);
 
 		$stats->set('state', 'buried');
@@ -68,7 +69,7 @@ class ArrayQueue implements QueueInterface {
 		}
 		$stats = $this->jobStats[$job->getId()];
 
-		$tube = $this->getTube($stats->tube());
+		$tube = $this->tube($stats->tube());
 		$tube->{$stats->state()}()->removeElement($job);
 
 		$this->jobStats->remove($job->getId());
@@ -82,7 +83,7 @@ class ArrayQueue implements QueueInterface {
 		}
 		$stats = $this->jobStats[$job->getId()];
 
-		$tube = $this->getTube($stats->tube());
+		$tube = $this->tube($stats->tube());
 		if ($job instanceof ArrayJob && $job->isDelayed()) {
 			$tube->delayed()->removeElement($job);
 		} else {
@@ -146,7 +147,7 @@ class ArrayQueue implements QueueInterface {
 			'pri' => $priority,
 			'created' => new DateTime(),
 		)));
-		$tube = $this->getTube($tube);
+		$tube = $this->tube($tube);
 		if ($delay > 0) {
 			$tube->delayed()->add($job);
 		} else {
@@ -158,7 +159,7 @@ class ArrayQueue implements QueueInterface {
 	}
 
 	public function reserve($tube, $timeout = null, $stopWatching = false) {
-		$tube = $this->getTube($tube);
+		$tube = $this->tube($tube);
 
 		if ($tube->isPaused()) {
 			$this->logProcessor->setCurrentJob(null);
@@ -184,7 +185,7 @@ class ArrayQueue implements QueueInterface {
 	}
 
 	public function kickTube($tube, $num = -1) {
-		$tube = $this->getTube($tube);
+		$tube = $this->tube($tube);
 
 		$kicked = 0;
 		if (($buriedCount = $tube->buried()->count()) > 0) {
@@ -219,24 +220,24 @@ class ArrayQueue implements QueueInterface {
 
 	public function peekJob($jobId) {
 		$tubeName = $this->jobStats[$jobId]->tube();
-		$tube = $this->getTube($tubeName);
+		$tube = $this->tube($tubeName);
 		return $this->getJobFromTubeWithId($tube, $jobId);
 	}
 
 	public function peekReady($tube) {
-		return $this->getTube($tube)->ready()->first() ?: new NullJob();
+		return $this->tube($tube)->ready()->first() ?: new NullJob();
 	}
 
 	public function peekBuried($tube) {
-		return $this->getTube($tube)->buried()->first() ?: new NullJob();
+		return $this->tube($tube)->buried()->first() ?: new NullJob();
 	}
 
 	public function peekDelayed($tube) {
-		return $this->getTube($tube)->delayed()->first() ?: new NullJob();
+		return $this->tube($tube)->delayed()->first() ?: new NullJob();
 	}
 
 	public function deleteReadyJobs($tube, $num = -1) {
-		$tube = $this->getTube($tube);
+		$tube = $this->tube($tube);
 
 		$readyCount = $tube->ready()->count();
 		$numToDelete = $num > 0 ? min($num, $readyCount) : $readyCount;
@@ -250,7 +251,7 @@ class ArrayQueue implements QueueInterface {
 	}
 
 	public function deleteBuriedJobs($tube, $num = -1) {
-		$tube = $this->getTube($tube);
+		$tube = $this->tube($tube);
 
 		$buriedCount = $tube->buried()->count();
 		$numToDelete = $num > 0 ? min($num, $buriedCount) : $buriedCount;
@@ -264,7 +265,7 @@ class ArrayQueue implements QueueInterface {
 	}
 
 	public function deleteDelayedJobs($tube, $num = -1) {
-		$tube = $this->getTube($tube);
+		$tube = $this->tube($tube);
 
 		$delayedCount = $tube->delayed()->count();
 		$numToDelete = $num > 0 ? min($num, $delayedCount) : $delayedCount;
@@ -278,7 +279,7 @@ class ArrayQueue implements QueueInterface {
 	}
 
 	public function pause($tube, $delay) {
-		$tube = $this->getTube($tube);
+		$tube = $this->tube($tube);
 		$tube->pause($delay);
 	}
 
@@ -295,14 +296,14 @@ class ArrayQueue implements QueueInterface {
 	 * @param string $tube
 	 * @return ArrayTube
 	 */
-	public function getTube($tube) {
+	public function tube($tube) {
 		if (!$this->tubes->containsKey($tube)) {
 			$this->tubes[$tube] = new ArrayTube($tube, $this);
 		}
 		return $this->tubes->get($tube);
 	}
 
-	public function getTubes() {
+	public function tubes() {
 		return $this->tubes;
 	}
 
@@ -311,7 +312,7 @@ class ArrayQueue implements QueueInterface {
 	}
 
 	public function __construct() {
-		$this->tubes = new ArrayCollection();
+		$this->tubes = new TubeCollection();
 		$this->jobStats = new ArrayCollection();
 		$this->logProcessor = new JobProcessor($this);
 		$this->serializer = new JobDataSerializer();
@@ -355,7 +356,7 @@ class ArrayQueue implements QueueInterface {
 		return $job->getId() === -1;
 	}
 
-	/** @var ArrayCollection|ArrayTube[] */
+	/** @var TubeCollection|ArrayTube[] */
 	protected $tubes;
 
 	/** @var ArrayCollection|JobStats[] */
