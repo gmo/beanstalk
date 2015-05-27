@@ -4,7 +4,7 @@ namespace GMO\Beanstalk\Console\Command\Queue;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Queue;
-use GMO\Beanstalk\Queue\QueueInterface;
+use GMO\Beanstalk\Tube\Tube;
 use GMO\Common\Collections\ArrayCollection;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -34,7 +34,7 @@ class PeekCommand extends ChangeStateCommand {
 		parent::execute($input, $output);
 
 		if ($id) {
-			$job = $this->getQueue($input)->peekJob(intval($id));
+			$job = $this->getQueue()->peekJob(intval($id));
 			$output->writeln("Peeking at job <info>#{$job->getId()}</info>");
 			$output->writeln($this->renderJobData($job));
 		}
@@ -44,22 +44,22 @@ class PeekCommand extends ChangeStateCommand {
 		}
 	}
 
-	protected function forEachTube(QueueInterface $queue, $tube, InputInterface $input, OutputInterface $output) {
+	protected function forEachTube(Tube $tube, InputInterface $input, OutputInterface $output) {
 		if ($input->getOption('ready')) {
-			$job = $queue->peekReady($tube);
+			$job = $tube->peekReady();
 			$this->outputJob($output, $job, $tube, 'ready');
 		}
 		if ($input->getOption('buried')) {
-			$job = $queue->peekBuried($tube);
+			$job = $tube->peekBuried();
 			$this->outputJob($output, $job, $tube, 'buried');
 		}
 		if ($input->getOption('delayed')) {
-			$job = $queue->peekDelayed($tube);
+			$job = $tube->peekDelayed();
 			$this->outputJob($output, $job, $tube, 'delayed');
 		}
 	}
 
-	protected function outputJob(OutputInterface $output, Job $job, $tube, $state) {
+	protected function outputJob(OutputInterface $output, Job $job, Tube $tube, $state) {
 		if ($job instanceof NullJob) {
 			$output->writeln("There are no $state jobs in <info>$tube</info> tube");
 			return;

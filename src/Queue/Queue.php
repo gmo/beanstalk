@@ -12,6 +12,8 @@ use GMO\Beanstalk\Log\JobProcessor;
 use GMO\Beanstalk\Queue\Response\JobStats;
 use GMO\Beanstalk\Queue\Response\ServerStats;
 use GMO\Beanstalk\Queue\Response\TubeStats;
+use GMO\Beanstalk\Tube\Tube;
+use GMO\Beanstalk\Tube\TubeCollection;
 use GMO\Common\Collections\ArrayCollection;
 use GMO\Common\Exception\NotSerializableException;
 use Pheanstalk;
@@ -213,6 +215,18 @@ class Queue implements QueueInterface {
 
 	//endregion
 
+	public function tube($name) {
+		return new Tube($name, $this);
+	}
+
+	public function tubes() {
+		$tubes = new TubeCollection();
+		foreach ($this->listTubes() as $tubeName) {
+			$tubes->set($tubeName, new Tube($tubeName, $this));
+		}
+		return $tubes;
+	}
+
 	public function listTubes() {
 		$tubes = ArrayCollection::create($this->pheanstalk->listTubes())
 			->sortValues();
@@ -222,11 +236,9 @@ class Queue implements QueueInterface {
 
 	/** @inheritdoc */
 	public function statsAllTubes() {
-		$tubes = new ArrayCollection();
-		foreach ($this->listTubes() as $tube) {
-			$tubes->set($tube, $this->statsTube($tube));
-		}
-		return $tubes;
+		return $this->tubes()->map(function (Tube $tube) {
+			return $tube->stats();
+		});
 	}
 
 	/** @inheritdoc */

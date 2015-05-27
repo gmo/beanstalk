@@ -49,12 +49,12 @@ class StatsCommand extends AbstractQueueCommand {
 	}
 
 	private function getStats(InputInterface $input, OutputInterface $output) {
-		$queue = $this->getQueue($input);
+		$queue = $this->getQueue();
 		if (!$tubes = $input->getArgument('tube')) {
 			$stats = $queue->statsAllTubes();
 			$error = false;
 		} else {
-			list($tubes, $error) = $this->matchTubeNames($tubes, $input, $output);
+			list($tubes, $error) = $this->matchTubeNames($tubes, $output);
 			$stats = new ArrayCollection();
 			foreach ($tubes as $tube) {
 				$stats->set($tube, $queue->statsTube($tube));

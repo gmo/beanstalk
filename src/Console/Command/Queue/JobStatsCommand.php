@@ -25,7 +25,7 @@ class JobStatsCommand extends AbstractQueueCommand {
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		parent::execute($input, $output);
 
-		$queue = $this->getQueue($input);
+		$queue = $this->getQueue();
 		$stats = new ArrayCollection();
 		foreach ($input->getArgument('id') as $id) {
 			$jobStats = $queue->statsJob($id);

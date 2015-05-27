@@ -1,7 +1,7 @@
 <?php
 namespace GMO\Beanstalk\Console\Command\Queue;
 
-use GMO\Beanstalk\Queue\QueueInterface;
+use GMO\Beanstalk\Tube\Tube;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class ChangeStateCommand extends AbstractQueueCommand {
 
-	abstract protected function forEachTube(QueueInterface $queue, $tube, InputInterface $input, OutputInterface $output);
+	abstract protected function forEachTube(Tube $tube, InputInterface $input, OutputInterface $output);
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		parent::execute($input, $output);
@@ -25,18 +25,18 @@ abstract class ChangeStateCommand extends AbstractQueueCommand {
 			}
 		}
 
-		$queue = $this->getQueue($input);
+		$queue = $this->getQueue();
 		if ($input->getOption('all')) {
 			$error = false;
-			$tubes = $queue->listTubes();
+			$tubes = $queue->tubes();
 			if ($tubes->isEmpty()) {
 				$output->writeln('There are no current tubes');
 			}
 		} else {
-			list($tubes, $error) = $this->matchTubeNames($input->getArgument('tube'), $input, $output);
+			list($tubes, $error) = $this->matchTubeNames($input->getArgument('tube'), $output);
 		}
 		foreach ($tubes as $tube) {
-			$this->forEachTube($queue, $tube, $input, $output);
+			$this->forEachTube($tube, $input, $output);
 		}
 
 		if ($error) {

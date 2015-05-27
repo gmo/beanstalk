@@ -2,7 +2,7 @@
 namespace GMO\Beanstalk\Console\Command\Queue;
 
 use GMO\Beanstalk\Queue;
-use GMO\Beanstalk\Queue\QueueInterface;
+use GMO\Beanstalk\Tube\Tube;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -18,18 +18,18 @@ class DeleteCommand extends ChangeStateCommand {
 		;
 	}
 
-	protected function forEachTube(QueueInterface $queue, $tube, InputInterface $input, OutputInterface $output) {
+	protected function forEachTube(Tube $tube, InputInterface $input, OutputInterface $output) {
 		$number = intval($input->getOption('number'));
 		if ($input->getOption('ready')) {
-			$num = $queue->deleteReadyJobs($tube, $number);
+			$num = $tube->deleteReadyJobs($number);
 			$output->writeln("Deleted <info>$num ready</info> jobs in <info>$tube</info>");
 		}
 		if ($input->getOption('buried')) {
-			$num = $queue->deleteBuriedJobs($tube, $number);
+			$num = $tube->deleteBuriedJobs($number);
 			$output->writeln("Deleted <info>$num buried</info> jobs in <info>$tube</info>");
 		}
 		if ($input->getOption('delayed')) {
-			$num = $queue->deleteDelayedJobs($tube, $number);
+			$num = $tube->deleteDelayedJobs($number);
 			$output->writeln("Deleted <info>$num delayed</info> jobs in <info>$tube</info>");
 		}
 	}

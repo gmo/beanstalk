@@ -45,7 +45,7 @@ abstract class QueueTestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	protected static function getJobs($tube) {
-		return static::$queue->getTube($tube)->ready();
+		return static::$queue->tube($tube)->ready();
 	}
 
 	protected static function assertTubeContains($value, $tube, $message = '', $ignoreCase = false) {
@@ -68,7 +68,7 @@ abstract class QueueTestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	protected static function assertTubeCount($expectedCount, $tube, $message = '') {
-		static::assertCount($expectedCount, static::$queue->getTube($tube)->ready(), $message);
+		static::assertCount($expectedCount, static::$queue->tube($tube)->ready(), $message);
 	}
 
 	protected static function assertTubeEmpty($tube, $message = '') {
