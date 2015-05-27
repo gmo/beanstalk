@@ -61,9 +61,9 @@ class RpcRunner extends BaseRunner {
 				usleep(100000);
 			}
 
-			$tubeList = $this->queue->listTubes();
+			$tubeList = $this->queue->tubes();
 
-			if ($tubeList->contains($tube)) {
+			if ($tubeList->containsKey($tube)) {
 				return true;
 			}
 			$retry++;
