@@ -1,20 +1,29 @@
 <?php
 namespace GMO\Beanstalk\Helper;
 
+use Carbon\Carbon;
+
 class Processor {
 
 	/**
 	 * @param int|string $pid
-	 * @param int $interval in milliseconds
+	 * @param int        $interval in milliseconds
+	 * @param int        $timeout  in seconds
+	 * @return bool Whether the process stopped or the timeout was hit
 	 */
-	public function waitForProcess($pid, $interval = 200) {
+	public function waitForProcess($pid, $interval = 200, $timeout = 10) {
+		$start = Carbon::now();
 		while ($this->isProcessRunning($pid)) {
+			if ($start->diffInSeconds() >= $timeout) {
+				return false;
+			}
 			usleep($interval * 1000); // convert to milliseconds
 		}
+		return true;
 	}
 
-	public function terminateProcess($pid) {
-		posix_kill($pid, SIGTERM);
+	public function terminateProcess($pid, $force = false) {
+		posix_kill($pid, $force ? SIGKILL : SIGTERM);
 	}
 
 	/**

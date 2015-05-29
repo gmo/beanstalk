@@ -63,11 +63,24 @@ class WorkerManager implements LoggerAwareInterface {
 				$this->processor->terminateProcess($pid);
 			}
 		}
+
+		$failed = new ArrayCollection();
 		foreach ($workers as $worker) {
+			$failed[$worker->getName()] = new ArrayCollection();
+
 			foreach ($worker->getPids() as $pid) {
 				$this->log->debug(sprintf("Waiting for: [%s] %s...", $pid, $worker->getName()));
-				$this->processor->waitForProcess($pid);
+				if (!$this->processor->waitForProcess($pid)) {
+					$failed[$worker->getName()][] = $pid;
+				}
 				$worker->removePid($pid);
+			}
+		}
+
+		foreach ($failed as $worker => $pids) {
+			foreach ($pids as $pid) {
+				$this->log->warning(sprintf('Failed to gracefully stop: [%s] %s. Killing it.', $pid, $worker));
+				$this->processor->terminateProcess($pid, true);
 			}
 		}
 	}
