@@ -2,12 +2,15 @@
 namespace GMO\Beanstalk\Log;
 
 use GMO\Beanstalk\Job\Job;
-use GMO\Beanstalk\Queue\QueueInterface;
 
 class JobProcessor {
 
 	public function setCurrentJob(Job $job = null) {
 		$this->currentJob = $job;
+	}
+
+	public function setPrefix($prefix) {
+		$this->prefix = $prefix;
 	}
 
 	public function __invoke(array $record) {
@@ -20,15 +23,12 @@ class JobProcessor {
 			'data' => $this->currentJob->getData(),
 			'result' => $this->currentJob->getResult(),
 		);
-		$record['extra']['job'] = $params;
+		$record['extra'][$this->prefix . 'job'] = $params;
 		return $record;
 	}
 
-	public function __construct(QueueInterface $queue) {
-		$this->queue = $queue;
-	}
-
-	protected $queue;
 	/** @var Job|null */
 	protected $currentJob;
+	/** @var string */
+	protected $prefix = '';
 }

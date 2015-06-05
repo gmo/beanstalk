@@ -314,7 +314,7 @@ class ArrayQueue implements QueueInterface {
 	public function __construct() {
 		$this->tubes = new TubeCollection();
 		$this->jobStats = new ArrayCollection();
-		$this->logProcessor = new JobProcessor($this);
+		$this->logProcessor = new JobProcessor();
 		$this->serializer = new JobDataSerializer();
 	}
 

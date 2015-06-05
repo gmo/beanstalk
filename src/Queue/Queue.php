@@ -272,7 +272,7 @@ class Queue implements QueueInterface {
 	public function __construct($host = 'localhost', $port = 11300, LoggerInterface $logger = null) {
 		$this->setLogger($logger ?: new NullLogger());
 		$this->pheanstalk = new Pheanstalk\Pheanstalk($host, $port);
-		$this->logProcessor = new JobProcessor($this);
+		$this->logProcessor = new JobProcessor();
 		$this->serializer = new JobDataSerializer();
 	}
 
