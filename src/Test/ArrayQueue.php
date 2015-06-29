@@ -9,7 +9,6 @@ use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Log\JobProcessor;
 use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Queue\Response\ServerStats;
-use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Beanstalk\Tube\TubeCollection;
 use GMO\Common\Collections\ArrayCollection;
 use Psr\Log\LoggerInterface;
@@ -270,12 +269,9 @@ class ArrayQueue implements QueueInterface {
 	}
 
 	public function statsTube($tube) {
-		if (!$this->tubes->containsKey($tube)) {
-			return TubeStats::create()
-				->set('name', $tube);
-		}
-		return $this->tubes[$tube]->getStats()
-			->set('name', $tube);
+		$tube = $this->tube($tube);
+		$this->removeEmptyTube($tube);
+		return $tube->stats();
 	}
 
 	/**

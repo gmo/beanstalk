@@ -3,6 +3,7 @@ namespace GMO\Beanstalk\Test;
 
 use Carbon\Carbon;
 use GMO\Beanstalk\Job\JobCollection;
+use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Beanstalk\Tube\Tube;
 use GMO\Beanstalk\Tube\TubeControlInterface;
@@ -47,17 +48,24 @@ class ArrayTube extends Tube {
 	}
 
 	public function stats() {
-		return $this->getStats();
-	}
-
-	public function getStats() {
+		$urgentJobs = $this->ready()->filter(function (ArrayJob $job) {
+			return $job->getPriority() < QueueInterface::DEFAULT_PRIORITY;
+		});
 		return new TubeStats(array(
-			'current-jobs-ready' => $this->ready()->count(),
+			'name'                  => $this->name,
+			'current-jobs-urgent'   => $urgentJobs->count(),
+			'current-jobs-ready'    => $this->ready()->count(),
 			'current-jobs-reserved' => $this->reserved()->count(),
-			'current-jobs-delayed' => $this->delayed()->count(),
-			'current-jobs-buried' => $this->buried()->count(),
-			'pause' => $this->getPauseSeconds(),
-			'pause-time-left' => $this->getPauseTimeLeft(),
+			'current-jobs-delayed'  => $this->delayed()->count(),
+			'current-jobs-buried'   => $this->buried()->count(),
+			'total-jobs'            => $this->jobCount,
+			'current-using'         => 0,
+			'current-waiting'       => 0,
+			'current-watching'      => 0,
+			'pause'                 => $this->getPauseSeconds(),
+			'pause-time-left'       => $this->getPauseTimeLeft(),
+			'cmd-delete'            => $this->cmdDeleteCount,
+			'cmd-pause-tube'        => $this->cmdPauseCount,
 		));
 	}
 
