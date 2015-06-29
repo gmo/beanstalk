@@ -59,11 +59,12 @@ abstract class QueueTestCase extends \PHPUnit_Framework_TestCase {
 	}
 
 	protected static function assertTubeEquals($expected, $tube, $message = '', $ignoreCase = false, $delta = 0, $maxDepth = 10, $canonicalize = false) {
-		$jobs = static::getJobs($tube);
-		$jobs->map(function(Job $job) {
-			return $job->getData();
-		});
-		$jobs = new ArrayCollection($jobs->toArray());
+		$jobs = static::getJobs($tube)
+			->map(function(Job $job) {
+				return $job->getData();
+			})
+			->toArray();
+		$jobs = new ArrayCollection($jobs);
 		$expected = new ArrayCollection($expected);
 		static::assertEquals($expected, $jobs, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
 	}
