@@ -1,7 +1,7 @@
 <?php
 namespace GMO\Beanstalk\Job;
 
-use GMO\Beanstalk\Queue\Response\TubeStats;
+use GMO\Beanstalk\Queue\Response\JobStats;
 
 class NullJob extends Job {
 
@@ -36,7 +36,7 @@ class NullJob extends Job {
 	public function touch() { }
 
 	public function stats() {
-		return new TubeStats();
+		return new JobStats();
 	}
 
 	public function offsetExists($offset) {
