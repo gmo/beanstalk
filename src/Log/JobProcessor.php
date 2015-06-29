@@ -14,7 +14,7 @@ class JobProcessor {
 	}
 
 	public function __invoke(array $record) {
-		if (!$this->currentJob) {
+		if (!$this->currentJob || $this->currentJob->getId() === -1) {
 			return $record;
 		}
 

@@ -2,10 +2,10 @@
 namespace GMO\Beanstalk\Test;
 
 use Carbon\Carbon;
+use GMO\Beanstalk\Job\JobCollection;
 use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Beanstalk\Tube\Tube;
 use GMO\Beanstalk\Tube\TubeControlInterface;
-use GMO\Common\Collections\ArrayCollection;
 
 /**
  * ArrayTube is an in-memory representation of a beanstalk tube. Used with ArrayQueue.
@@ -98,10 +98,10 @@ class ArrayTube extends Tube {
 	public function __construct($name, TubeControlInterface $queue) {
 		parent::__construct($name, $queue);
 
-		$this->ready = new ArrayCollection();
-		$this->reserved = new ArrayCollection();
-		$this->delayed = new ArrayCollection();
-		$this->buried = new ArrayCollection();
+		$this->ready = new JobCollection();
+		$this->reserved = new JobCollection();
+		$this->delayed = new JobCollection();
+		$this->buried = new JobCollection();
 
 		$this->pauseTime = new Carbon();
 	}
@@ -126,13 +126,13 @@ class ArrayTube extends Tube {
 		}
 	}
 
-	/** @var ArrayCollection|ArrayJob[] */
+	/** @var JobCollection|ArrayJob[] */
 	protected $ready;
-	/** @var ArrayCollection|ArrayJob[] */
+	/** @var JobCollection|ArrayJob[] */
 	protected $reserved;
-	/** @var ArrayCollection|ArrayJob[] */
+	/** @var JobCollection|ArrayJob[] */
 	protected $delayed;
-	/** @var ArrayCollection|ArrayJob[] */
+	/** @var JobCollection|ArrayJob[] */
 	protected $buried;
 
 	/** @var Carbon */

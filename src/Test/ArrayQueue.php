@@ -154,11 +154,11 @@ class ArrayQueue implements QueueInterface {
 			return new NullJob();
 		}
 
-		/** @var ArrayJob|null $job */
+		/** @var ArrayJob|NullJob $job */
 		$job = $tube->ready()->removeFirst();
 		$this->logProcessor->setCurrentJob($job);
-		if (!$job) {
-			return new NullJob();
+		if ($this->isNullJob($job)) {
+			return $job;
 		}
 
 		$job->setState('reserved');
@@ -211,15 +211,15 @@ class ArrayQueue implements QueueInterface {
 	}
 
 	public function peekReady($tube) {
-		return $this->tube($tube)->ready()->first() ?: new NullJob();
+		return $this->tube($tube)->ready()->first();
 	}
 
 	public function peekBuried($tube) {
-		return $this->tube($tube)->buried()->first() ?: new NullJob();
+		return $this->tube($tube)->buried()->first();
 	}
 
 	public function peekDelayed($tube) {
-		return $this->tube($tube)->delayed()->first() ?: new NullJob();
+		return $this->tube($tube)->delayed()->first();
 	}
 
 	public function deleteReadyJobs($tube, $num = -1) {
