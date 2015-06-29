@@ -1,11 +1,11 @@
 <?php
 namespace GMO\Beanstalk\Test;
 
+use Carbon\Carbon;
 use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Beanstalk\Tube\Tube;
 use GMO\Beanstalk\Tube\TubeControlInterface;
 use GMO\Common\Collections\ArrayCollection;
-use GMO\Common\DateTime;
 
 /**
  * ArrayTube is an in-memory representation of a beanstalk tube. Used with ArrayQueue.
@@ -18,7 +18,7 @@ class ArrayTube extends Tube {
 			return false;
 		}
 
-		if ($this->pauseTime > new DateTime("-{$this->pauseDelay} sec")) {
+		if ($this->pauseTime > new Carbon("-{$this->pauseDelay} sec")) {
 			return true;
 		} else {
 			$this->pauseDelay = 0;
@@ -28,7 +28,7 @@ class ArrayTube extends Tube {
 
 	public function pause($delay) {
 		$this->pauseDelay = $delay;
-		$this->pauseTime = new DateTime();
+		$this->pauseTime = new Carbon();
 		$this->cmdPauseCount++;
 	}
 
@@ -36,15 +36,14 @@ class ArrayTube extends Tube {
 		if (!$this->isPaused()) {
 			return 0;
 		}
-		return $this->pauseTime->diff(new DateTime())->s;
+		return $this->pauseTime->diffInSeconds();
 	}
 
 	public function getPauseTimeLeft() {
 		if (!$this->isPaused()) {
 			return 0;
 		}
-		$diff = DateTime::now()->modify("-{$this->pauseDelay} sec")->diff($this->pauseTime);
-		return $diff->s;
+		return $this->pauseTime->diffInSeconds(new Carbon("-{$this->pauseDelay} sec"));
 	}
 
 	public function stats() {
@@ -104,7 +103,7 @@ class ArrayTube extends Tube {
 		$this->delayed = new ArrayCollection();
 		$this->buried = new ArrayCollection();
 
-		$this->pauseTime = new DateTime();
+		$this->pauseTime = new Carbon();
 	}
 
 	protected function prioritizeJobs() {
@@ -136,7 +135,7 @@ class ArrayTube extends Tube {
 	/** @var ArrayCollection|ArrayJob[] */
 	protected $buried;
 
-	/** @var DateTime */
+	/** @var Carbon */
 	protected $pauseTime;
 	protected $pauseDelay = 0;
 
