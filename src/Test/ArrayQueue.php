@@ -4,15 +4,14 @@ namespace GMO\Beanstalk\Test;
 use GMO\Beanstalk\Exception\RangeException;
 use GMO\Beanstalk\Helper\JobDataSerializer;
 use GMO\Beanstalk\Job\Job;
+use GMO\Beanstalk\Job\JobCollection;
 use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Log\JobProcessor;
 use GMO\Beanstalk\Queue\QueueInterface;
-use GMO\Beanstalk\Queue\Response\JobStats;
 use GMO\Beanstalk\Queue\Response\ServerStats;
 use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Beanstalk\Tube\TubeCollection;
 use GMO\Common\Collections\ArrayCollection;
-use GMO\Common\DateTime;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -29,19 +28,18 @@ class ArrayQueue implements QueueInterface {
 			return;
 		}
 		/** @var ArrayJob $job */
-		$stats = $this->jobStats[$job->getId()];
-		$stats->set('releases', $stats->releases() + 1);
+		$job->incrementReleases();
 
-		$tube = $this->tube($stats->tube());
+		$tube = $this->tube($job->stats()->tube());
 		$tube->reserved()->removeElement($job);
 
 		$job->setDelay($delay);
 		$job->setPriority($priority);
 		if ($delay > 0) {
-			$stats->set('state', 'delayed');
+			$job->setState('delayed');
 			$tube->delayed()->add($job);
 		} else {
-			$stats->set('state', 'ready');
+			$job->setState('ready');
 			$tube->ready()->add($job);
 		}
 	}
@@ -53,13 +51,12 @@ class ArrayQueue implements QueueInterface {
 		/** @var ArrayJob $job */
 		$job->setPriority($priority);
 
-		$stats = $this->jobStats[$job->getId()];
-
-		$tube = $this->tube($stats->tube());
+		$tube = $this->tube($job->stats()->tube());
 		$tube->reserved()->removeElement($job);
 
-		$stats->set('state', 'buried');
-		$stats->set('buries', $stats->buries() + 1);
+		$job->setState('buried');
+		$job->incrementBuries();
+
 		$tube->buried()->add($job);
 	}
 
@@ -67,12 +64,12 @@ class ArrayQueue implements QueueInterface {
 		if ($this->isNullJob($job)) {
 			return;
 		}
-		$stats = $this->jobStats[$job->getId()];
+		$stats = $job->stats();
 
 		$tube = $this->tube($stats->tube());
 		$tube->{$stats->state()}()->removeElement($job);
 
-		$this->jobStats->remove($job->getId());
+		$this->jobs->remove($job->getId());
 		$tube->incrementDeleteCount();
 		$this->removeEmptyTube($tube);
 	}
@@ -81,32 +78,28 @@ class ArrayQueue implements QueueInterface {
 		if ($this->isNullJob($job)) {
 			return;
 		}
-		$stats = $this->jobStats[$job->getId()];
+		/** @var ArrayJob $job */
 
-		$tube = $this->tube($stats->tube());
+		$tube = $this->tube($job->stats()->tube());
 		if ($job instanceof ArrayJob && $job->isDelayed()) {
 			$tube->delayed()->removeElement($job);
 		} else {
 			$tube->buried()->removeElement($job);
 		}
 
-		$stats->set('state', 'ready');
-		$stats->set('kicks', $stats->kicks() + 1);
+		$job->setState('ready');
+		$job->incrementKicks();
+
 		$tube->ready()->add($job);
-		if ($job instanceof ArrayJob) {
-			$job->setDelay(0);
-		}
+		$job->setDelay(0);
 	}
 
 	/** @inheritdoc */
 	public function statsJob($job) {
-		$id = $job instanceof Job ? $job->getId() : $job;
-		$stats = $this->jobStats[$id];
-		/** @var DateTime $created */
-		$created = $stats->get('created');
-		$stats->set('age', $created->diff(new DateTime())->s);
-
-		return $stats;
+		if (is_numeric($job)) {
+			$job = $this->jobs[intval($job)];
+		}
+		return $job->stats();
 	}
 
 	public function touch(Job $job) { }
@@ -137,16 +130,11 @@ class ArrayQueue implements QueueInterface {
 		$delay = $delay ?: static::DEFAULT_DELAY;
 
 		$data = $this->serializer->serialize($data);
-		$job = new ArrayJob($this->jobCounter++, $data, $this);
-		$job->setDelay($delay);
-		$job->setPriority($priority);
-		$this->jobStats->set($job->getId(), new JobStats(array(
-			'id' => $job->getId(),
-			'tube' => $tube,
-			'state' => $delay > 0 ? 'delayed' : 'ready',
-			'pri' => $priority,
-			'created' => new DateTime(),
-		)));
+		$job = new ArrayJob($this->jobCounter++, $data, $priority, $delay, $tube, $this);
+		$job->setState($delay > 0 ? 'delayed' : 'ready');
+
+		$this->jobs[$job->getId()] = $job;
+
 		$tube = $this->tube($tube);
 		if ($delay > 0) {
 			$tube->delayed()->add($job);
@@ -172,10 +160,10 @@ class ArrayQueue implements QueueInterface {
 		if (!$job) {
 			return new NullJob();
 		}
-		$stats = $this->jobStats[$job->getId()];
 
-		$stats->set('state', 'reserved');
-		$stats->set('reserves', $stats->reserves() + 1);
+		$job->setState('reserved');
+		$job->incrementReserves();
+
 		$tube->reserved()->add($job);
 
 		$job->setData($this->serializer->unserialize($job->getData()));
@@ -219,9 +207,7 @@ class ArrayQueue implements QueueInterface {
 	}
 
 	public function peekJob($jobId) {
-		$tubeName = $this->jobStats[$jobId]->tube();
-		$tube = $this->tube($tubeName);
-		return $this->getJobFromTubeWithId($tube, $jobId);
+		return $this->jobs[$jobId];
 	}
 
 	public function peekReady($tube) {
@@ -312,8 +298,8 @@ class ArrayQueue implements QueueInterface {
 	}
 
 	public function __construct() {
+		$this->jobs = new JobCollection();
 		$this->tubes = new TubeCollection();
-		$this->jobStats = new ArrayCollection();
 		$this->logProcessor = new JobProcessor();
 		$this->serializer = new JobDataSerializer();
 	}
@@ -324,43 +310,15 @@ class ArrayQueue implements QueueInterface {
 		}
 	}
 
-	protected function getJobFromTubeWithId(ArrayTube $tube, $jobId) {
-		$filter = function(ArrayJob $job) use ($jobId) {
-			return $job->getId() === $jobId;
-		};
-
-		$job = $tube->ready()->filter($filter)->first();
-		if ($job) {
-			return $job;
-		}
-
-		$job = $tube->reserved()->filter($filter)->first();
-		if ($job) {
-			return $job;
-		}
-
-		$job = $tube->buried()->filter($filter)->first();
-		if ($job) {
-			return $job;
-		}
-
-		$job = $tube->delayed()->filter($filter)->first();
-		if ($job) {
-			return $job;
-		}
-
-		return new NullJob();
-	}
-
 	protected function isNullJob(Job $job) {
 		return $job->getId() === -1;
 	}
 
+	/** @var JobCollection|ArrayJob[] */
+	protected $jobs;
+
 	/** @var TubeCollection|ArrayTube[] */
 	protected $tubes;
-
-	/** @var ArrayCollection|JobStats[] */
-	protected $jobStats;
 
 	protected $jobCounter = 0;
 
