@@ -1,6 +1,9 @@
 <?php
 namespace GMO\Beanstalk\Worker;
 
+/**
+ * @property \Pimple $container
+ */
 abstract class ContainerAwareWorker extends AbstractWorker
 {
     private $container;
@@ -20,5 +23,12 @@ abstract class ContainerAwareWorker extends AbstractWorker
             $this->container = $this->getDefaultContainer();
         }
         return $this->container;
+    }
+
+    public function __get($name) {
+        if ($name === 'container') {
+            return $this->getContainer();
+        }
+        throw new \BadMethodCallException();
     }
 }
