@@ -5,6 +5,7 @@ use GMO\Common\Collections\ArrayCollection;
 
 class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate {
 
+	protected $id;
 	/**
 	 * Pheanstalk\Job::data is ignored because it's private and we allow write access
 	 * @var ArrayCollection|mixed
@@ -16,9 +17,13 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate {
 	protected $handled = false;
 
 	public function __construct($id, $data, JobControlInterface $queue) {
+		$this->id = $id;
 		$this->queue = $queue;
 		$this->jobData = is_array($data) ? new ArrayCollection($data) : $data;
-		parent::__construct($id, $this->jobData);
+	}
+
+	public function getId() {
+		return $this->id;
 	}
 
 	public function setData($data) {
