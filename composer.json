@@ -9,7 +9,8 @@
 		"pda/pheanstalk": "~3.0",
 		"nesbot/carbon": "~1.19",
 		"nikic/php-parser": "~0.9|~1.0",
-		"symfony/finder": "~2.5"
+		"symfony/finder": "~2.5",
+		"videlalvaro/php-amqplib": "~2.5"
 	},
 	"require-dev": {
 		"monolog/monolog": "~1.0",
