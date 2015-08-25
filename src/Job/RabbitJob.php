@@ -11,6 +11,18 @@ class RabbitJob extends Job {
 	protected $state;
 
 	/**
+	 * @param AMQPMessage         $message
+	 * @param string              $data
+	 * @param string              $state
+	 * @param JobControlInterface $queue
+	 */
+	public function __construct(AMQPMessage $message, $data, $state, JobControlInterface $queue) {
+		$this->message = $message;
+		$this->state = $state;
+		parent::__construct($message->get('correlation_id'), $data, $queue);
+	}
+
+	/**
 	 * @return AMQPMessage
 	 */
 	public function getMessage() {

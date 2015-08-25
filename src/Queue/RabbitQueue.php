@@ -5,6 +5,7 @@ use GMO\Beanstalk\Helper\JobDataSerializer;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Job\RabbitJob;
+use GMO\Beanstalk\Job\RabbitManagementJob;
 use GMO\Beanstalk\Queue\Response\JobStats;
 use GMO\Beanstalk\Queue\Response\ServerStats;
 use GMO\Beanstalk\Queue\Response\TubeStats;
@@ -158,9 +159,10 @@ class RabbitQueue implements QueueInterface {
 		if ($message === null) {
 			return new NullJob();
 		}
-		$job = new RabbitJob($message->get('correlation_id'), $message->body, $this);
-		$job->setMessage($message);
-		$job->setState(RabbitJob::STATUS_RESERVED);
+
+		$data = $this->serializer->unserialize($message->body);
+		$job = new RabbitJob($message, $data, Job::STATUS_RESERVED, $this);
+
 		return $job;
 	}
 
@@ -301,21 +303,51 @@ class RabbitQueue implements QueueInterface {
 	}
 
 	/**
-	 * Gets a list of all the tubes
-	 * @return TubeCollection
+	 * {@inheritdoc}
 	 */
 	public function tubes() {
+		$tubes = new TubeCollection();
+		foreach ($this->listTubes() as $tubeName) {
+			$tubes->set($tubeName, new Tube($tubeName, $this));
+		}
 
+		return $tubes;
 	}
 
 	/**
-	 * Returns the names of all the tubes
-	 * @return ArrayCollection
-	 *
-	 * @deprecated Use {@see tubes} instead
+	 * {@inheritdoc}
 	 */
 	public function listTubes() {
+		$tubes = $this->management->getQueues();
+		$suffix = static::BURIED_SUFFIX;
+		$tubes = $tubes->filter(function ($tube) use ($suffix) {
+			return !String::endsWith($tube, $suffix);
+		});
+		return $tubes;
+	}
 
+	/**
+	 * @param string $tube
+	 * @param string $state
+	 * @param int    $count
+	 *
+	 * @return RabbitManagementJob[]
+	 *
+	 * @throws \GMO\Common\Exception\NotSerializableException
+	 */
+	protected function listJobs($tube, $state, $count = PHP_INT_MAX) {
+		if ($state === Job::STATUS_BURIED) {
+			$tube .= static::BURIED_SUFFIX;
+		}
+		$json = $this->management->getMessages($tube, $count);
+		$jobs = array();
+		foreach ($json as $message) {
+			$amqpMsg = new AMQPMessage($message['payload'], $message['properties']);
+			$data = $this->serializer->unserialize($amqpMsg->body);
+			$jobs[] = new RabbitManagementJob($amqpMsg, $data, $state, $this);
+		}
+
+		return $jobs;
 	}
 
 	/**
@@ -335,12 +367,23 @@ class RabbitQueue implements QueueInterface {
 	}
 
 	/**
-	 * Inspect a job in the system by ID
-	 * @param int $jobId
-	 * @return \GMO\Beanstalk\Job\Job
+	 * {@inheritdoc}
 	 */
 	public function peekJob($jobId) {
+		foreach ($this->listTubes() as $tube) {
+			foreach ($this->listJobs($tube, Job::STATUS_READY) as $job) {
+				if ($job->getId() === $jobId) {
+					return $job;
+				}
+			}
+			foreach ($this->listJobs($tube, Job::STATUS_BURIED) as $job) {
+				if ($job->getId() === $jobId) {
+					return $job;
+				}
+			}
+		}
 
+		return new NullJob();
 	}
 
 	/**
