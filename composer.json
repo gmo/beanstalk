@@ -5,6 +5,7 @@
 		"ext-pcntl": "*",
 		"gmo/common": "~1.22",
 		"gmo/console": "~2.0",
+		"guzzle/guzzle": "^3.9",
 		"psr/log": "1.0.0",
 		"pda/pheanstalk": "~3.0",
 		"nesbot/carbon": "~1.19",

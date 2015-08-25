@@ -46,22 +46,27 @@ class RabbitQueue implements QueueInterface {
 	protected $serializer;
 	/** @var LoggerInterface */
 	protected $logger;
+	/** @var RabbitManagement */
+	protected $management;
 
 	protected $declaredQueues;
 
 	public static function create($host = 'localhost', $port = 5672, $user = 'guest', $password = 'guest', $vhost = '/') {
-		return new static(new AMQPLazyConnection($host, $port, $user, $password, $vhost));
+		$connection = new AMQPLazyConnection($host, $port, $user, $password, $vhost);
+		$management = new RabbitManagement($host, RabbitManagement::DEFAULT_PORT, $user, $password, $vhost);
+		return new static($connection, $management);
 	}
 
 	/**
 	 * RabbitQueue constructor.
 	 * @param AbstractConnection $connection
 	 */
-	public function __construct(AbstractConnection $connection) {
+	public function __construct(AbstractConnection $connection, RabbitManagement $management) {
 		$this->connection = $connection;
 		$this->serializer = new JobDataSerializer();
 		$this->logger = new NullLogger();
 		$this->declaredQueues = new ArrayCollection();
+		$this->management = $management;
 	}
 
 	protected function getChannel() {
@@ -69,6 +74,7 @@ class RabbitQueue implements QueueInterface {
 			$this->channel = $this->connection->channel(1);
 			// ready tube
 			$this->channel->exchange_declare(static::EXCHANGE, 'direct', false, true, false);
+			// buried tube
 			$this->channel->exchange_declare(static::EXCHANGE . '-buried', 'direct', false, true, false);
 			// delayed tube
 			$this->channel->exchange_declare(static::EXCHANGE . '-delayed', 'direct', false, true, false, false, false, new AMQPTable(array(
@@ -150,7 +156,7 @@ class RabbitQueue implements QueueInterface {
 		if ($message === null) {
 			return new NullJob();
 		}
-		$job = new RabbitJob($message->get('correlation_id'), $message->body, $this);//TODO ID
+		$job = new RabbitJob($message->get('correlation_id'), $message->body, $this);
 		$job->setMessage($message);
 		return $job;
 	}
