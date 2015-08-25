@@ -31,8 +31,12 @@ use Psr\Log\NullLogger;
  *
  */
 class RabbitQueue implements QueueInterface {
+
 	const EXCHANGE = 'my_exchange';
-	const MAX_PRIORITY = 4294967295;
+
+	const LOW_PRIORITY = 0;
+	const DEFAULT_PRIORITY = 1;
+	const HIGH_PRIORITY = 2;
 
 	/** @var AbstractConnection */
 	protected $connection;
@@ -94,7 +98,7 @@ class RabbitQueue implements QueueInterface {
 		 */
 	}
 
-	protected function createMessage($data, $priority = 0) {
+	protected function createMessage($data, $priority) {
 		$data = $this->serializer->serialize($data);
 		return new AMQPMessage($data, array(
 			'content_type'  => 'text/plain',
@@ -124,8 +128,9 @@ class RabbitQueue implements QueueInterface {
 	 *                                                                     for
 	 * @return int The new job ID
 	 */
-	public function push($tube, $data, $priority = null, $delay = null, $ttr = null) {
-		$message = $this->createMessage($data);
+	public function push($tube, $data, $priority = self::DEFAULT_PRIORITY, $delay = null, $ttr = null) {
+		$priority = $this->normalizePriority($priority);
+		$message = $this->createMessage($data, $priority);
 		$this->publish($tube, $message);
 	}
 
@@ -154,7 +159,7 @@ class RabbitQueue implements QueueInterface {
 		$job = $this->assertRabbitJob($job);
 		if ($priority !== null) {
 			// TODO Not sure if message can be modified
-			$job->setPriority($priority);
+			$job->setPriority($this->normalizePriority($priority));
 		}
 		if ($delay > 0) {
 			//TODO Delay job
@@ -191,6 +196,25 @@ class RabbitQueue implements QueueInterface {
 	public function delete($job) {
 		$job = $this->assertRabbitJob($job);
 		$this->getChannel()->basic_ack($job->getDeliveryTag());
+	}
+
+	protected function normalizePriority($priority) {
+		if ($priority < 0) {
+			throw new \InvalidArgumentException('Priority has to be positive');
+		}
+
+		// Assume already normalized
+		if ($priority <= static::HIGH_PRIORITY) {
+			return $priority;
+		}
+
+		if ($priority < QueueInterface::DEFAULT_PRIORITY) {
+			return static::LOW_PRIORITY;
+		}
+		if ($priority == QueueInterface::DEFAULT_PRIORITY) {
+			return static::DEFAULT_PRIORITY;
+		}
+		return static::HIGH_PRIORITY;
 	}
 
 	/**
