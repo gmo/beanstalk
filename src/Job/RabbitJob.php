@@ -8,6 +8,7 @@ class RabbitJob extends Job {
 
 	/** @var AmqpMessage */
 	protected $message;
+	protected $state;
 
 	/**
 	 * @return AMQPMessage
@@ -39,5 +40,13 @@ class RabbitJob extends Job {
 
 	public function setPriority($priority) {
 		$this->message->set('priority', $priority);
+	}
+
+	public function setState($state) {
+		$this->state = $state;
+	}
+
+	public function getState() {
+		return $this->state;
 	}
 }

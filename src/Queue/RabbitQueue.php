@@ -11,6 +11,7 @@ use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Beanstalk\Tube\Tube;
 use GMO\Beanstalk\Tube\TubeCollection;
 use GMO\Common\Collections\ArrayCollection;
+use GMO\Common\String;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AbstractConnection;
 use PhpAmqpLib\Connection\AMQPLazyConnection;
@@ -33,10 +34,11 @@ use Psr\Log\NullLogger;
 class RabbitQueue implements QueueInterface {
 
 	const EXCHANGE = 'my_exchange';
+	const BURIED_SUFFIX = '-buried';
 
-	const LOW_PRIORITY = 0;
-	const DEFAULT_PRIORITY = 1;
-	const HIGH_PRIORITY = 2;
+	const AMQP_LOW_PRIORITY = 0;
+	const AMQP_DEFAULT_PRIORITY = 1;
+	const AMQP_HIGH_PRIORITY = 2;
 
 	/** @var AbstractConnection */
 	protected $connection;
@@ -75,7 +77,7 @@ class RabbitQueue implements QueueInterface {
 			// ready tube
 			$this->channel->exchange_declare(static::EXCHANGE, 'direct', false, true, false);
 			// buried tube
-			$this->channel->exchange_declare(static::EXCHANGE . '-buried', 'direct', false, true, false);
+			$this->channel->exchange_declare(static::EXCHANGE . static::BURIED_SUFFIX, 'direct', false, true, false);
 			// delayed tube
 			$this->channel->exchange_declare(static::EXCHANGE . '-delayed', 'direct', false, true, false, false, false, new AMQPTable(array(
 				'x-delayed-type' => 'direct',
@@ -92,7 +94,7 @@ class RabbitQueue implements QueueInterface {
 //			"x-expires"      => 16000 // How long a queue can be unused for before it is automatically deleted (milliseconds)
 		)));
 		$ch->queue_bind($name, static::EXCHANGE, $name, false, new AMQPTable(array()));
-		$ch->queue_bind($name, static::EXCHANGE . '-buried', $name, false, new AMQPTable(array()));
+		$ch->queue_bind($name, static::EXCHANGE . static::BURIED_SUFFIX, $name, false, new AMQPTable(array()));
 		$ch->queue_bind($name, static::EXCHANGE . '-delayed', $name, false, new AMQPTable(array()));
 
 		/*
@@ -134,7 +136,7 @@ class RabbitQueue implements QueueInterface {
 	 *                                                                     for
 	 * @return int The new job ID
 	 */
-	public function push($tube, $data, $priority = self::DEFAULT_PRIORITY, $delay = null, $ttr = null) {
+	public function push($tube, $data, $priority = self::AMQP_DEFAULT_PRIORITY, $delay = null, $ttr = null) {
 		$priority = $this->normalizePriority($priority);
 		$message = $this->createMessage($data, $priority);
 		$this->publish($tube, $message);
@@ -158,27 +160,40 @@ class RabbitQueue implements QueueInterface {
 		}
 		$job = new RabbitJob($message->get('correlation_id'), $message->body, $this);
 		$job->setMessage($message);
+		$job->setState(RabbitJob::STATUS_RESERVED);
 		return $job;
 	}
 
 	public function release(Job $job, $priority = null, $delay = null) {
 		$job = $this->assertRabbitJob($job);
+		if ($job->getState() !== Job::STATUS_RESERVED) {
+			throw new \LogicException('Only reserved jobs can be released');
+		}
+
 		if ($priority !== null) {
 			// TODO Not sure if message can be modified
 			$job->setPriority($this->normalizePriority($priority));
 		}
 		if ($delay > 0) {
-			//TODO Delay job
+			// delay job
+			$job->setState(Job::STATUS_DELAYED); // Handle transition after time
 			$this->publish($job->getTubeName(), $job->getMessage(), $delay);
 		} else {
 			// requeue job
 			$this->getChannel()->basic_reject($job->getDeliveryTag(), true);
+			$job->setState(Job::STATUS_READY);
 		}
 	}
 
 	public function bury(Job $job, $priority = null) {
 		$job = $this->assertRabbitJob($job);
-		$this->publish($job->getTubeName() . '-buried', $job->getMessage());
+		if ($job->getState() !== Job::STATUS_RESERVED) {
+			throw new \LogicException('Only reserved jobs can be buried');
+		}
+
+		$this->publish($job->getTubeName() . static::BURIED_SUFFIX, $job->getMessage());
+		$job->setState(Job::STATUS_BURIED);
+
 		$this->delete($job);
 	}
 
@@ -210,17 +225,17 @@ class RabbitQueue implements QueueInterface {
 		}
 
 		// Assume already normalized
-		if ($priority <= static::HIGH_PRIORITY) {
+		if ($priority <= static::AMQP_HIGH_PRIORITY) {
 			return $priority;
 		}
 
 		if ($priority < QueueInterface::DEFAULT_PRIORITY) {
-			return static::LOW_PRIORITY;
+			return static::AMQP_LOW_PRIORITY;
 		}
 		if ($priority == QueueInterface::DEFAULT_PRIORITY) {
-			return static::DEFAULT_PRIORITY;
+			return static::AMQP_DEFAULT_PRIORITY;
 		}
-		return static::HIGH_PRIORITY;
+		return static::AMQP_HIGH_PRIORITY;
 	}
 
 	/**
@@ -242,7 +257,16 @@ class RabbitQueue implements QueueInterface {
 	 * @param Job $job
 	 */
 	public function kickJob($job) {
+		$job = $this->assertRabbitJob($job);
+		if ($job->getState() !== Job::STATUS_BURIED) {
+			throw new \LogicException('Only buried jobs can be kicked');
+		}
 
+		$tube = String::removeLast($job->getTubeName(), static::BURIED_SUFFIX);
+		$this->publish($tube, $job->getMessage());
+		$job->setState(Job::STATUS_READY);
+
+		$this->delete($job);
 	}
 
 	/**
