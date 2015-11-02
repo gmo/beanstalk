@@ -69,7 +69,7 @@ class Tube {
 	 * @return int number of jobs deleted
 	 */
 	public function deleteReadyJobs($num = -1) {
-		$this->queue->deleteReadyJobs($this->name, $num);
+		return $this->queue->deleteReadyJobs($this->name, $num);
 	}
 
 	/**
@@ -78,7 +78,7 @@ class Tube {
 	 * @return int number of jobs deleted
 	 */
 	public function deleteBuriedJobs($num = -1) {
-		$this->queue->deleteBuriedJobs($this->name, $num);
+		return $this->queue->deleteBuriedJobs($this->name, $num);
 	}
 
 	/**
@@ -87,7 +87,7 @@ class Tube {
 	 * @return int number of jobs deleted
 	 */
 	public function deleteDelayedJobs($num = -1) {
-		$this->queue->deleteDelayedJobs($this->name, $num);
+		return $this->queue->deleteDelayedJobs($this->name, $num);
 	}
 
 	/**
