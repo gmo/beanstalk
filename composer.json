@@ -14,7 +14,8 @@
 	"require-dev": {
 		"monolog/monolog": "~1.0",
 		"phpunit/phpunit": "3.7.*",
-		"gmo/dependency-injection": "~1.0"
+		"gmo/dependency-injection": "~1.0",
+		"symfony/var-dumper": "^2.6"
 	},
 	"suggest": {
 		"gmo/dependency-injection": "Provides a service provider for dependency injection"

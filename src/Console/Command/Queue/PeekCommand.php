@@ -75,7 +75,7 @@ class PeekCommand extends ChangeStateCommand {
 			$data = $data->toArray();
 		}
 
-		return print_r($data, true);
+		return $this->dumpVar($data);
 	}
 
 	protected function renderStats(OutputInterface $output, array $ids) {
