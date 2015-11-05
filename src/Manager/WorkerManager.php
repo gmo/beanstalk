@@ -149,8 +149,14 @@ class WorkerManager implements LoggerAwareInterface {
 	protected function spawnWorker(WorkerInfo $worker) {
 		//TODO: Use actual logger not redirection
 		$cmd =
-			sprintf('nohup %s "\"%s\"" "%s" %s %d >> /var/log/gmo/beanstalkd/%s.log 2>&1 &', './runner', $this->workerDir,
+			sprintf('nohup %s "\"%s\"" "%s" %s %d >> /var/log/gmo/beanstalkd/%s.log 2>&1 &',
+				'./runner', $this->workerDir,
 				$worker->getFullyQualifiedName(), $this->host, $this->port, $worker->getName());
+
+		if(!$this->processor->isCurrentUserTheWorkerUser()) {
+			$cmd = $this->processor->getSwitchUserCommand($cmd);
+		}
+
 		$this->processor->executeFromDir($cmd, __DIR__ . '/../../bin');
 	}
 

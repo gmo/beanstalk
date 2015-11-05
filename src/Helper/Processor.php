@@ -5,6 +5,8 @@ use Carbon\Carbon;
 
 class Processor {
 
+	const WORKER_USERNAME = 'alfred';
+
 	/**
 	 * @param int|string $pid
 	 * @param int        $interval in milliseconds
@@ -23,7 +25,16 @@ class Processor {
 	}
 
 	public function terminateProcess($pid, $force = false) {
-		posix_kill($pid, $force ? SIGKILL : SIGTERM);
+		$cmd =
+			sprintf('kill -%d %d',
+				$force ? SIGKILL : SIGTERM, $pid
+			);
+
+		if(!$this->isCurrentUserTheWorkerUser()) {
+			$cmd = $this->getSwitchUserCommand($cmd);
+		}
+
+		$this->execute($cmd);
 	}
 
 	/**
@@ -59,4 +70,21 @@ class Processor {
 	public function execute($command, array &$output = null, &$return_var = null) {
 		exec($command, $output, $return_var);
 	}
+
+	public function isCurrentUserTheWorkerUser() {
+		$workerUserExists = is_array(posix_getpwnam(static::WORKER_USERNAME));
+		return !$workerUserExists || static::getCurrentUsername() === static::WORKER_USERNAME;
+	}
+
+	public function getCurrentUsername() {
+		$userData = posix_getpwuid(posix_geteuid());
+		return $userData['name'];
+	}
+
+	public function getSwitchUserCommand($command) {
+		return sprintf('sudo -u %s bash -c \'%s\'',
+			static::WORKER_USERNAME, $command
+		);
+	}
+
 }
