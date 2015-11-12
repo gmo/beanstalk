@@ -2,7 +2,7 @@
 namespace GMO\Beanstalk\Tube;
 
 use GMO\Common\Collections\ArrayCollection;
-use GMO\Common\String;
+use GMO\Common\Str;
 
 class TubeCollection extends ArrayCollection
 {
@@ -21,7 +21,7 @@ class TubeCollection extends ArrayCollection
 			$terms = $p;
 			$p = function (Tube $tube) use ($terms) {
 				foreach ($terms as $term) {
-					if (String::contains($tube->name(), $term, false)) {
+					if (Str::contains($tube->name(), $term, false)) {
 						return true;
 					}
 				}

@@ -6,7 +6,7 @@ use GMO\Beanstalk\Console\Command\AbstractCommand;
 use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Tube\Tube;
 use GMO\Common\Collections\ArrayCollection;
-use GMO\Common\String;
+use GMO\Common\Str;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -27,7 +27,7 @@ class AbstractQueueCommand extends AbstractCommand {
 			$matched = $queue
 				->tubes()
 				->filter(function(Tube $tube) use ($tubeSearch) {
-					return String::contains($tube->name(), $tubeSearch, false);
+					return Str::contains($tube->name(), $tubeSearch, false);
 				});
 			if ($matched->isEmpty()) {
 				$output->writeln("<warn>No tubes matched to: $tubeSearch</warn>");

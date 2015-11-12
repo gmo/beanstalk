@@ -1,7 +1,7 @@
 <?php
 namespace GMO\Beanstalk\Queue\Response;
 
-use GMO\Common\String;
+use GMO\Common\Str;
 
 class ServerStats extends AbstractStats {
 
@@ -412,7 +412,7 @@ class ServerStats extends AbstractStats {
 
 	public function getGroup($startsWith) {
 		return $this->filter(function($key) use ($startsWith) {
-			return String::startsWith($key, $startsWith);
+			return Str::startsWith($key, $startsWith);
 		});
 	}
 }

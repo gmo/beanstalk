@@ -2,13 +2,13 @@
 namespace GMO\Beanstalk\Queue\Response;
 
 use GMO\Common\Collections\ArrayCollection;
-use GMO\Common\String;
+use GMO\Common\Str;
 
 abstract class AbstractStats extends ArrayCollection {
 
 	protected static function convertToType($value) {
 		if (is_numeric($value)) {
-			if (String::contains($value, '.')) {
+			if (Str::contains($value, '.')) {
 				return floatval($value);
 			}
 			return intval($value);

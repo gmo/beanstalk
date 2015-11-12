@@ -4,7 +4,7 @@ namespace GMO\Beanstalk\Worker;
 use GMO\Beanstalk\Job\JobProducerInterface;
 use GMO\Beanstalk\Runner\BaseRunner;
 use GMO\Common\Collections\ArrayCollection;
-use GMO\Common\String;
+use GMO\Common\Str;
 
 /**
  * Sets default values for WorkerInterface
@@ -24,7 +24,7 @@ abstract class AbstractWorker implements WorkerInterface {
 	}
 
 	public static function getTubeName() {
-		return String::className(static::className());
+		return Str::className(static::className());
 	}
 
 	public static function getRunner() { return new BaseRunner(); }

@@ -1,7 +1,7 @@
 <?php
 namespace GMO\Beanstalk\Helper;
 
-use GMO\Common\String;
+use GMO\Common\Str;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -193,7 +193,7 @@ class ClassFinder implements \IteratorAggregate, \Countable {
 	}
 
 	private function addFileExtensionToPattern($pattern) {
-		if (String::startsWith($pattern, '/')) {
+		if (Str::startsWith($pattern, '/')) {
 			$pos = strrpos($pattern, '$');
 			if ($pos === false) {
 				return $pattern;
@@ -207,7 +207,7 @@ class ClassFinder implements \IteratorAggregate, \Countable {
 	}
 
 	private function convertNamespaceToPattern($pattern) {
-		if (String::startsWith($pattern, '/')) {
+		if (Str::startsWith($pattern, '/')) {
 //			$pattern = substr($pattern, 1);
 //			$pos = strrpos($pattern, '/');
 //			list ($str1, $str2) = $this->splitStringAt($pattern, $pos);

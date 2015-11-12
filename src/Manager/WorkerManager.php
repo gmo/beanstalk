@@ -4,7 +4,7 @@ namespace GMO\Beanstalk\Manager;
 use GMO\Beanstalk\Helper\ClassFinder;
 use GMO\Beanstalk\Helper\Processor;
 use GMO\Common\Collections\ArrayCollection;
-use GMO\Common\String;
+use GMO\Common\Str;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -111,7 +111,7 @@ class WorkerManager implements LoggerAwareInterface {
 					$filter = array($filter);
 				}
 				foreach ($filter as $f) {
-					if (String::contains($worker->getName(), $f, false)) {
+					if (Str::contains($worker->getName(), $f, false)) {
 						return true;
 					}
 				}
