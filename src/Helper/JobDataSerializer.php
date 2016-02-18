@@ -32,7 +32,11 @@ class JobDataSerializer {
 	public function unserialize($data) {
 		$params = new ArrayCollection(json_decode($data, true));
 		if ($params->count() === 1 && $params->containsKey('data')) {
-			return $params['data'];
+			$data = $params['data'];
+
+			if ($this->nativeUnserialize($data, $unserialized)) {
+				return $unserialized;
+			}
 		}
 
 		if ($params->containsKey('class')) {
@@ -46,7 +50,13 @@ class JobDataSerializer {
 
 		foreach ($params as $key => $value) {
 			if (is_string($value)) {
-				$params[$key] = trim($value);
+				$value = trim($value);
+
+				if ($this->nativeUnserialize($value, $data)) {
+					$value = $data;
+				}
+
+				$params[$key] = $value;
 			} elseif (is_array($value) && array_key_exists('class', $value)) {
 				/** @var ISerializable|string $cls */
 				$cls = $value['class'];
@@ -57,5 +67,22 @@ class JobDataSerializer {
 			}
 		}
 		return $params;
+	}
+
+	/**
+	 * @param string $value serialized data
+	 * @param mixed  $data  Pass variable to set unserialized data to (if successful)
+	 *
+	 * @return bool Whether the unserialization was successful.
+	 */
+	private function nativeUnserialize($value, &$data)
+	{
+		if ($value === 'b:0;') { // serialized representation of false
+			$data = false;
+			return true;
+		}
+
+		$data = @unserialize($value);
+		return $data !== false;
 	}
 }
