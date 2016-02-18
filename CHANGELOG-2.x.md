@@ -6,14 +6,29 @@ This changelog references the relevant changes done in 2.x minor versions.
 To get the diff between two versions, go to 
 https://bitbucket.org/gmodev/beanstalk-library/branches/compare/v2.0.0..v1.0.0
 
+* NEXT
+    * Updated WebJobProducer to wrap Queue instead of creating it
+    * Updated job unserialization to handle native serialization
+    * Moved console commands to ServiceProvider and automatically add them to "console" key
+
+* 2.5.x (2015-11-12)
+    * Added Tube class which wraps Queue commands for a specific tube
+    * Added getTube($name) and getTubes() to Queue. Deprecated listTubes()
+    * Added Job and Worker Logger Processors
+    * Added FluentJobError
+    * Updated peek command to dump job data with Symfony VarDumper (if installed)
+    * Updated String to Str for PHP 7.0 compatibility
+    * Added cron option to queue stats command
+    * Many updates to ArrayQueue
+    * Fixed delete jobs command getting stuck in infinite loop
+    * Fixed workers not starting with Ansible (using "nohup")
+
 * 2.4.x (2015-03-09)
 
     * Added `ContainerAwareWorker`
     * Allowing JobErrorHandlers to be given a logger if they implement `LoggerAwareInterface`.
     * Fix throwing exception if beanstalkd is down
     * Remove and ignore composer.lock
-    * Added Job and Worker Logger Processors
-    * Added cron option to queue stats command
 
 * 2.3.x (2014-12-11)
 
