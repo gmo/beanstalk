@@ -62,7 +62,7 @@ abstract class ChangeStateCommand extends AbstractQueueCommand {
 	}
 
 	protected function addNumberOption() {
-		return $this->addOption('number', 'n', InputOption::VALUE_REQUIRED, 'Number of jobs to ' . $this->getName(), -1);
+		return $this->addOption('number', 'm', InputOption::VALUE_REQUIRED, 'Number of jobs to ' . $this->getName(), -1);
 	}
 
 	protected function validateState($enable = true) {

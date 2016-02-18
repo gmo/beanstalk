@@ -13,7 +13,7 @@ class StartCommand extends AbstractWorkerCommand {
 		parent::configure();
 		$this->setName('start')
 			->addOption(
-				'number', 'n',
+				'number', 'm',
 				InputOption::VALUE_REQUIRED,
 				'Override number of workers to start <comment>(default: up to the number specified by the worker)</comment>')
 			->setDescription('Start workers');
