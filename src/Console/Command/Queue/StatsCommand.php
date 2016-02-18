@@ -4,6 +4,7 @@ namespace GMO\Beanstalk\Console\Command\Queue;
 use GMO\Beanstalk\BeanstalkKeys;
 use GMO\Beanstalk\Queue;
 use GMO\Beanstalk\Queue\Response\TubeStats;
+use GMO\Beanstalk\Tube\TubeCollection;
 use GMO\Common\Collections\ArrayCollection;
 use GMO\Console\Helper\AutoHidingTable;
 use Symfony\Component\Console\Helper\Table;
@@ -54,10 +55,11 @@ class StatsCommand extends AbstractQueueCommand {
 			$stats = $queue->statsAllTubes();
 			$error = false;
 		} else {
+			/** @var $tubes TubeCollection */
 			list($tubes, $error) = $this->matchTubeNames($tubes, $output);
 			$stats = new ArrayCollection();
-			foreach ($tubes as $tube) {
-				$stats->set($tube, $queue->statsTube($tube));
+			foreach ($tubes as $name => $tube) {
+				$stats->set($name, $tube->stats());
 			}
 		}
 		return array($stats, $error);
