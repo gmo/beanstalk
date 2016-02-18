@@ -12,6 +12,24 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class AbstractQueueCommand extends AbstractCommand {
 
+	protected $namePrefix;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param $namePrefix
+	 */
+	public function __construct($namePrefix = 'queue')
+	{
+		parent::__construct();
+		$this->namePrefix = $namePrefix ? rtrim($namePrefix, ':') . ':' : '';
+	}
+
+	public function setName($name)
+	{
+		return parent::setName($this->namePrefix . $name);
+	}
+
 	/**
 	 * @return QueueInterface
 	 */

@@ -1,8 +1,10 @@
 <?php
 namespace GMO\Beanstalk\Console;
 
+use GMO\Beanstalk\BeanstalkServiceProvider;
 use GMO\Beanstalk\Console\Command;
 use GMO\Console\ConsoleApplication;
+use GMO\DependencyInjection\Container;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
@@ -10,22 +12,14 @@ use Symfony\Component\Console\Input\InputOption;
 class QueueConsoleApplication extends ConsoleApplication {
 
 	public function __construct(\Pimple $container = null) {
+		if ($container === null) {
+			$container = new Container();
+			$container->registerService(new BeanstalkServiceProvider(), array(
+				'beanstalk.console_commands.queue_prefix' => '',
+			));
+		}
 		parent::__construct('Queue', null, $container);
-		$this->addCommands(array(
-			new Command\Queue\ListCommand(),
-			new Command\Queue\KickCommand(),
-			new Command\Queue\DeleteCommand(),
-			new Command\Queue\BuryCommand(),
-			new Command\Queue\PeekCommand(),
-			new Command\Queue\PauseCommand(),
-			new Command\Queue\StatsCommand(),
-			new Command\Queue\ServerStatsCommand(),
-			new Command\Queue\JobStatsCommand(),
-			new Command\Worker\StartCommand(),
-			new Command\Worker\StopCommand(),
-			new Command\Worker\RestartCommand(),
-			new Command\Worker\StatsCommand(),
-		));
+		$this->addCommands($container['beanstalk.console_commands']);
 	}
 
 	protected function getDefaultInputDefinition() {

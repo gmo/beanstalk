@@ -1,6 +1,7 @@
 <?php
 namespace GMO\Beanstalk;
 
+use GMO\Beanstalk\Console\Command;
 use GMO\Beanstalk\Manager\WorkerManager;
 use GMO\Beanstalk\Queue\Queue;
 use GMO\Beanstalk\Queue\WebJobProducer;
@@ -56,6 +57,38 @@ class BeanstalkServiceProvider implements ServiceProviderInterface {
 				$app[BeanstalkKeys::PORT]
 			);
 		});
+
+		$container['beanstalk.console_commands.queue_prefix'] = 'queue';
+		$container['beanstalk.console_commands'] = $container->share(function ($app) {
+			$prefix = $app['beanstalk.console_commands.queue_prefix'];
+			return array(
+				new Command\Queue\ListCommand($prefix),
+				new Command\Queue\KickCommand($prefix),
+				new Command\Queue\DeleteCommand($prefix),
+				new Command\Queue\BuryCommand($prefix),
+				new Command\Queue\PeekCommand($prefix),
+				new Command\Queue\PauseCommand($prefix),
+				new Command\Queue\StatsCommand($prefix),
+				new Command\Queue\ServerStatsCommand($prefix),
+				new Command\Queue\JobStatsCommand($prefix),
+				new Command\Worker\StartCommand(),
+				new Command\Worker\StopCommand(),
+				new Command\Worker\RestartCommand(),
+				new Command\Worker\StatsCommand(),
+			);
+		});
+
+		$container['beanstalk.console_commands.auto_add'] = true;
+		if (isset($container['console'])) {
+			$container['console'] = $container->share($container->extend('console', function ($console, $app) {
+				if (!$app['beanstalk.console_commands.auto_add'] || !$console instanceof \Symfony\Component\Console\Application) {
+					return $console;
+				}
+				$console->addCommands($app['beanstalk.console_commands']);
+
+				return $console;
+			}));
+		}
 	}
 
 	/** @inheritdoc */
