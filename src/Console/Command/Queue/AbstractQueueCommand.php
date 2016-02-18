@@ -63,10 +63,10 @@ class AbstractQueueCommand extends AbstractCommand {
 
 	private function setupQueue(InputInterface $input) {
 		$container = $this->getContainer();
-		if ($host = $input->getOption('host')) {
+		if ($input->hasOption('host') && $host = $input->getOption('host')) {
 			$container[BeanstalkKeys::HOST] = $host;
 		}
-		if ($port = $input->getOption('port')) {
+		if ($input->hasOption('port') && $port = $input->getOption('port')) {
 			$container[BeanstalkKeys::PORT] = $port;
 		}
 

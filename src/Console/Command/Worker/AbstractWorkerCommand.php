@@ -36,13 +36,13 @@ class AbstractWorkerCommand extends AbstractCommand {
 
 	protected function getManager(InputInterface $input) {
 		$container = $this->getContainer();
-		if ($host = $input->getOption('host')) {
+		if ($input->hasOption('host') && $host = $input->getOption('host')) {
 			$container[BeanstalkKeys::HOST] = $host;
 		}
-		if ($port = $input->getOption('port')) {
+		if ($input->hasOption('port') && $port = $input->getOption('port')) {
 			$container[BeanstalkKeys::PORT] = $port;
 		}
-		if ($dir = $input->getOption('dir')) {
+		if ($input->hasOption('dir') && $dir = $input->getOption('dir')) {
 			$container[BeanstalkKeys::WORKER_DIRECTORY] = $dir;
 		}
 
