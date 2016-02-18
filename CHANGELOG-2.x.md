@@ -7,11 +7,15 @@ To get the diff between two versions, go to
 https://bitbucket.org/gmodev/beanstalk-library/branches/compare/v2.0.0..v1.0.0
 
 * NEXT
+
+
+* 2.6.0 (2016-02-18)
     * Updated WebJobProducer to wrap Queue instead of creating it
     * Updated job unserialization to handle native serialization
     * Moved console commands to ServiceProvider and automatically add them to "console" key
+    * Fixed queue:stats command accepting tubes to filter
 
-* 2.5.x (2015-11-12)
+* 2.5.0 (2015-11-12)
     * Added Tube class which wraps Queue commands for a specific tube
     * Added getTube($name) and getTubes() to Queue. Deprecated listTubes()
     * Added Job and Worker Logger Processors
