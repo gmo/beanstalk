@@ -30,6 +30,7 @@ class WebJobProducer implements JobProducerInterface, LoggerAwareInterface {
 	}
 
 	public function __construct(QueueInterface $queue, LoggerInterface $logger = null) {
+		$this->queue = $queue;
 		$this->setLogger($logger ?: new NullLogger());
 	}
 
