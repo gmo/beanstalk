@@ -21,8 +21,8 @@ class AbstractQueueCommand extends AbstractCommand {
 	 */
 	public function __construct($namePrefix = 'queue')
 	{
-		parent::__construct();
 		$this->namePrefix = $namePrefix ? rtrim($namePrefix, ':') . ':' : '';
+		parent::__construct();
 	}
 
 	public function setName($name)
