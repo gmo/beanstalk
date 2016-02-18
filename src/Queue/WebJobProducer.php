@@ -17,10 +17,6 @@ class WebJobProducer implements JobProducerInterface, LoggerAwareInterface {
 			'tube' => $tube,
 			'data' => $data,
 		);
-		if (!$this->queue) {
-			$this->log->error('Queue not initialized, cannot push job', $context);
-			return -1;
-		}
 		try {
 			return $this->queue->push($tube, $data, $priority, $delay, $ttr);
 		} catch (\Exception $e) {
@@ -33,16 +29,8 @@ class WebJobProducer implements JobProducerInterface, LoggerAwareInterface {
 		$this->log = $logger;
 	}
 
-	public function __construct($host = 'localhost', $port = 11300, LoggerInterface $logger = null) {
+	public function __construct(QueueInterface $queue, LoggerInterface $logger = null) {
 		$this->setLogger($logger ?: new NullLogger());
-		try {
-			$this->queue = new Queue($host, $port, $logger);
-		} catch (\Exception $e) {
-			$this->queue = null;
-			$this->log->error('Error creating Queue', array(
-				'exception' => $e,
-			));
-		}
 	}
 
 	/** @var LoggerInterface */

@@ -43,8 +43,7 @@ class BeanstalkServiceProvider implements ServiceProviderInterface {
 
 		$container[BeanstalkKeys::WEB_JOB_PRODUCER] = $container->share(function($app) {
 			return new WebJobProducer(
-				$app[BeanstalkKeys::HOST],
-				$app[BeanstalkKeys::PORT],
+				$app[BeanstalkKeys::QUEUE],
 				$app[BeanstalkKeys::QUEUE_LOGGER]
 			);
 		});
