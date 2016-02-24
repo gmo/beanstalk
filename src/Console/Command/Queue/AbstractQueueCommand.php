@@ -7,7 +7,9 @@ use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Tube\Tube;
 use GMO\Common\Collections\ArrayCollection;
 use GMO\Common\Str;
+use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class AbstractQueueCommand extends AbstractCommand {
@@ -37,11 +39,19 @@ class AbstractQueueCommand extends AbstractCommand {
 		return $this->getService(BeanstalkKeys::QUEUE);
 	}
 
+	public function completeArgumentValues($argumentName, CompletionContext $context) {
+		if ($argumentName === 'tube') {
+			return $this->completeTubeNames($context);
+		}
+
+		return parent::completeArgumentValues($argumentName, $context);
+	}
+
 	protected function matchTubeNames($tubesSearch, OutputInterface $output) {
 		$matchedTubes = new ArrayCollection();
 		$queue = $this->getQueue();
 		$error = false;
-		foreach ($tubesSearch as $tubeSearch) {
+		foreach ((array) $tubesSearch as $tubeSearch) {
 			$matched = $queue
 				->tubes()
 				->filter(function(Tube $tube) use ($tubeSearch) {
@@ -75,5 +85,31 @@ class AbstractQueueCommand extends AbstractCommand {
 			$queue->setLogger($logger);
 			return $queue;
 		}));
+	}
+
+	private function completeTubeNames(CompletionContext $context) {
+		$input = $this->createInputFromContext($context);
+
+		$currentTubes = array_map('strtolower', $input->getArgument('tube'));
+		$currentWord = $context->getCurrentWord();
+
+		if (empty($currentWord)) {
+			$tubes = $this->getQueue()->tubes();
+		} else {
+			list($tubes, $error) = $this->matchTubeNames($currentWord, new NullOutput());
+		}
+
+		return $tubes
+			->getKeys()
+			->filter(function($name) use ($currentTubes) {
+				// filter out tubes already defined in input
+				return !in_array(strtolower($name), $currentTubes);
+			})
+			->map(function ($name) use ($currentWord) {
+				// change case to match current word, else it will be filtered out
+				return $currentWord . substr($name, strlen($currentWord));
+			})
+			->toArray()
+		;
 	}
 }

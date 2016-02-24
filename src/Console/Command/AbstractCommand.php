@@ -4,14 +4,31 @@ namespace GMO\Beanstalk\Console\Command;
 use GMO\Beanstalk\BeanstalkServiceProvider;
 use GMO\Console\ContainerAwareCommand;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Stecman\Component\Symfony\Console\BashCompletion\Completion\CompletionAwareInterface;
+use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
-class AbstractCommand extends ContainerAwareCommand {
+class AbstractCommand extends ContainerAwareCommand implements CompletionAwareInterface {
+
+	public function __construct($name = null) {
+		parent::__construct($name);
+		$this->logger = new NullLogger();
+	}
+
+	public function completeOptionValues($optionName, CompletionContext $context) {
+		return false;
+	}
+
+	public function completeArgumentValues($argumentName, CompletionContext $context) {
+		return false;
+	}
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$this->logger = new ConsoleLogger($output);
@@ -63,6 +80,13 @@ class AbstractCommand extends ContainerAwareCommand {
 	 */
 	public function addOption($name, $shortcut = null, $mode = null, $description = '', $default = null) {
 		return parent::addOption($name, $shortcut, $mode, $description, $default);
+	}
+
+	protected function createInputFromContext(CompletionContext $context) {
+		$words = $context->getWords();
+		$words = array_filter($words);
+		$this->mergeApplicationDefinition();
+		return new ArgvInput($words, $this->getDefinition());
 	}
 
 	/**

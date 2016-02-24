@@ -9,6 +9,7 @@
 		"pda/pheanstalk": "~3.0",
 		"nesbot/carbon": "~1.19",
 		"nikic/php-parser": "~0.9|~1.0",
+		"stecman/symfony-console-completion": "^0.7",
 		"symfony/finder": "~2.5"
 	},
 	"require-dev": {
