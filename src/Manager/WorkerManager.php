@@ -161,7 +161,10 @@ class WorkerManager implements LoggerAwareInterface {
 	 * @param int             $port      Beanstalkd port
 	 */
 	public function __construct($workerDir, LoggerInterface $logger = null, $host = 'localhost', $port = 11300) {
-		$this->workerDir = $workerDir ? realpath($workerDir) . "/" : null;
+		if (empty($workerDir)) {
+			throw new \InvalidArgumentException('Worker directory is required');
+		}
+		$this->workerDir = realpath($workerDir) . '/';
 		$this->processor = new Processor();
 		$this->setLogger($logger ?: new NullLogger());
 		$this->host = $host;
