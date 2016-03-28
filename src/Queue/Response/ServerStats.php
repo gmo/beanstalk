@@ -8,6 +8,21 @@ class ServerStats extends AbstractStats {
 	//region Current Counts
 
 	/**
+	 * The numbers of jobs in all states.
+	 *
+	 * @return int
+	 */
+	public function currentJobs()
+	{
+		return $this->currentUrgentJobs()
+			+ $this->currentReadyJobs()
+			+ $this->currentReservedJobs()
+			+ $this->currentDelayedJobs()
+			+ $this->currentBuriedJobs()
+		;
+	}
+
+	/**
 	 * The number of ready jobs with priority < 1024
 	 * @return int
 	 */

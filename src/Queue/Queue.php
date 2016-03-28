@@ -152,7 +152,7 @@ class Queue implements QueueInterface {
 	public function statsTube($tube) {
 		/** @var Pheanstalk\Response\ArrayResponse $response */
 		$response = $this->pheanstalk->statsTube($tube);
-		$stats = TubeStats::create($response);
+		$stats = new TubeStats($response);
 		return $stats;
 	}
 
@@ -245,7 +245,7 @@ class Queue implements QueueInterface {
 	public function statsServer() {
 		/** @var Pheanstalk\Response\ArrayResponse $stats */
 		$stats = $this->pheanstalk->stats();
-		return ServerStats::create($stats);
+		return new ServerStats($stats);
 	}
 
 	public function setLogger(LoggerInterface $logger) {

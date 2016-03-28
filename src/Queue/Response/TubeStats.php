@@ -12,6 +12,23 @@ class TubeStats extends AbstractStats {
 	}
 
 	/**
+	 * The number of current jobs in all states.
+	 *
+	 * Not to be confused with totalJobs() which isn't the current number.
+	 *
+	 * @return int
+	 */
+	public function jobs()
+	{
+		return $this->urgentJobs()
+			+ $this->readyJobs()
+			+ $this->reservedJobs()
+			+ $this->delayedJobs()
+			+ $this->buriedJobs()
+		;
+	}
+
+	/**
 	 * The number of ready jobs with priority < 1024 in this tube
 	 * @return int
 	 */
