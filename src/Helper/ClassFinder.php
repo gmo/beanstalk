@@ -228,7 +228,6 @@ class ClassFinder implements \IteratorAggregate, \Countable {
 
 	public function __construct($in) {
 		$this->finder = Finder::create()
-			->useBestAdapter()
 			->files()
 			->in($in);
 	}
