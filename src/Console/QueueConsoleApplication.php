@@ -37,5 +37,5 @@ class QueueConsoleApplication extends ConsoleApplication {
 
 	protected function getPackageName() { return 'gmo/beanstalk'; }
 
-	protected function getProjectDirectory() { return __DIR__ . '/../..'; }
+	public function getProjectDirectory() { return __DIR__ . '/../..'; }
 }

@@ -5,7 +5,7 @@
 	"require": {
 		"ext-pcntl": "*",
 		"gmo/common": "^1.29",
-		"gmo/console": "~2.0",
+		"gmo/console": "^2.3",
 		"psr/log": "1.0.0",
 		"pda/pheanstalk": "~3.0",
 		"nesbot/carbon": "~1.19",
