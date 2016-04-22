@@ -1,5 +1,6 @@
 {
 	"name": "gmo/beanstalk",
+	"license": "MIT",
 	"description": "Common beanstalk worker abstraction and queue utilities",
 	"require": {
 		"ext-pcntl": "*",
