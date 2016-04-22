@@ -34,16 +34,6 @@
 	"bin": [
 		"bin/queue"
 	],
-	"repositories": [
-		{ "type": "composer", "url": "composer.gmodev.com" }
-	],
-	"archive": {
-		"exclude": [
-			"node_modules/",
-			"package.json",
-			"tests"
-		]
-	},
 	"extra": {
 		"branch-alias": {
 			"dev-master": "2.6.x-dev"
