@@ -1,22 +1,32 @@
 <?php
 namespace GMO\Beanstalk\Console;
 
-use GMO\Beanstalk\BeanstalkServiceProvider;
+use GMO\Beanstalk\BeanstalkPimple1ServiceProvider;
+use GMO\Beanstalk\BeanstalkPimple3ServiceProvider;
 use GMO\Beanstalk\Console\Command;
 use GMO\Console\ConsoleApplication;
-use GMO\DependencyInjection\Container;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 
 class QueueConsoleApplication extends ConsoleApplication {
 
-	public function __construct(\Pimple $container = null) {
+	/**
+	 * Constructor.
+	 *
+	 * @param \Pimple|\Pimple\Container|null $container
+	 */
+	public function __construct($container = null) {
 		if ($container === null) {
-			$container = new Container();
-			$container->registerService(new BeanstalkServiceProvider(), array(
-				'beanstalk.console_commands.queue_prefix' => '',
-			));
+			if (class_exists('Pimple\Container')) {
+				$container = new \Pimple\Container();
+				$container->register(new BeanstalkPimple3ServiceProvider());
+			} else {
+				$container = new \Pimple();
+				$sp = new BeanstalkPimple1ServiceProvider();
+				$sp->register($container);
+			}
+			$container['beanstalk.console_commands.queue_prefix'] = '';
 		}
 		parent::__construct('Queue', null, $container);
 		$this->addCommands($container['beanstalk.console_commands']);

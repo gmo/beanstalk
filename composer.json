@@ -8,6 +8,7 @@
 		"gmo/console": "^2.3",
 		"psr/log": "1.0.0",
 		"pda/pheanstalk": "~3.0",
+		"pimple/pimple": "^1.0 || ^3.0",
 		"nesbot/carbon": "~1.19",
 		"nikic/php-parser": "~0.9|~1.0",
 		"stecman/symfony-console-completion": "^0.7",
@@ -18,9 +19,6 @@
 		"phpunit/phpunit": "3.7.*",
 		"gmo/dependency-injection": "~1.0",
 		"symfony/var-dumper": "^2.6 || ^3.0"
-	},
-	"suggest": {
-		"gmo/dependency-injection": "Provides a service provider for dependency injection"
 	},
 	"autoload": {
 		"psr-4": {
