@@ -26,8 +26,8 @@ class QueueConsoleApplication extends ConsoleApplication {
 				$sp = new BeanstalkPimple1ServiceProvider();
 				$sp->register($container);
 			}
-			$container['beanstalk.console_commands.queue_prefix'] = '';
 		}
+		$container['beanstalk.console_commands.queue_prefix'] = '';
 		parent::__construct('Queue', null, $container);
 		$this->addCommands($container['beanstalk.console_commands']);
 	}
