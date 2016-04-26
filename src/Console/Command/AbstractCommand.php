@@ -1,7 +1,6 @@
 <?php
 namespace GMO\Beanstalk\Console\Command;
 
-use GMO\Beanstalk\BeanstalkServiceProvider;
 use GMO\Console\ContainerAwareCommand;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -43,11 +42,6 @@ class AbstractCommand extends ContainerAwareCommand implements CompletionAwareIn
 		}
 		$dimensions = $app->getTerminalDimensions();
 		return $dimensions[0];
-	}
-
-	protected function getDefaultContainer() {
-		return parent::getDefaultContainer()
-			->registerService(new BeanstalkServiceProvider());
 	}
 
 	/**
