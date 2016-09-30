@@ -81,10 +81,21 @@ class AbstractQueueCommand extends AbstractCommand {
 		}
 
 		$logger = $this->logger;
-		$container[BeanstalkKeys::QUEUE] = $container->share($container->extend(BeanstalkKeys::QUEUE, function (QueueInterface $queue) use ($logger) {
-			$queue->setLogger($logger);
-			return $queue;
-		}));
+		if ($container instanceof \Pimple) {
+            $container[BeanstalkKeys::QUEUE] = $container->share($container->extend(BeanstalkKeys::QUEUE, function (QueueInterface $queue) use ($logger) {
+                $queue->setLogger($logger);
+                return $queue;
+            }));
+        } elseif ($container instanceof \Pimple\Container) {
+            $container->extend(BeanstalkKeys::QUEUE, function (QueueInterface $queue) use ($logger) {
+                $queue->setLogger($logger);
+                return $queue;
+            });
+        } else {
+            $queue = $container[BeanstalkKeys::QUEUE];
+            $queue->setLogger($logger);
+            $container[BeanstalkKeys::QUEUE] = $queue;
+        }
 	}
 
 	private function completeTubeNames(CompletionContext $context) {
