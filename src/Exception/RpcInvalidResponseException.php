@@ -1,4 +1,7 @@
 <?php
+
 namespace GMO\Beanstalk\Exception;
 
-class RpcInvalidResponseException extends QueueException {}
+class RpcInvalidResponseException extends QueueException
+{
+}

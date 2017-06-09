@@ -1,8 +1,8 @@
 <?php
+
 namespace GMO\Beanstalk\Console\Command\Queue;
 
 use GMO\Beanstalk\BeanstalkKeys;
-use GMO\Beanstalk\Queue;
 use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Beanstalk\Tube\TubeCollection;
 use GMO\Common\Collections\ArrayCollection;
@@ -14,147 +14,158 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class StatsCommand extends AbstractQueueCommand {
+class StatsCommand extends AbstractQueueCommand
+{
+    protected function configure()
+    {
+        parent::configure();
+        $this->setName('stats')
+            ->addArgument(
+                'tube',
+                InputArgument::IS_ARRAY,
+                'The name of one or more tubes (does not have to be exact) <comment>(default: all tubes)</comment>'
+            )
+            ->addOption('refresh', 'f', InputOption::VALUE_NONE, 'Continue to refresh table every second')
+            ->addOption('cron', null, InputOption::VALUE_NONE, 'Log stats from cron job')
+            ->setDescription('Displays information about the current tubes')
+            ->setHelp($this->getHelpText())
+        ;
+    }
 
-	protected function configure() {
-		parent::configure();
-		$this->setName('stats')
-			->addArgument(
-				'tube',
-				InputArgument::IS_ARRAY,
-				'The name of one or more tubes (does not have to be exact) <comment>(default: all tubes)</comment>')
-			->addOption('refresh', 'f', InputOption::VALUE_NONE, 'Continue to refresh table every second')
-			->addOption('cron', null, InputOption::VALUE_NONE, 'Log stats from cron job')
-			->setDescription('Displays information about the current tubes')
-			->setHelp($this->getHelpText());
-	}
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        parent::execute($input, $output);
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
-		parent::execute($input, $output);
+        $refresh = $input->getOption('refresh');
+        do {
+            list($stats, $error) = $this->getStats($input, $output);
+            if ($input->getOption('cron')) {
+                $this->logStats($stats);
 
-		$refresh = $input->getOption('refresh');
-		do {
-			list($stats, $error) = $this->getStats($input, $output);
-			if ($input->getOption('cron')) {
-				$this->logStats($stats);
-				return;
-			}
-			$output->writeln($this->renderStats($stats));
-			sleep($refresh ? 1 : 0);
-		} while($refresh);
+                return;
+            }
+            $output->writeln($this->renderStats($stats));
+            sleep($refresh ? 1 : 0);
+        } while ($refresh);
 
-		if ($error) {
-			$output->writeln('');
-			$this->callCommand($output, ListCommand::NAME);
-		}
-	}
+        if ($error) {
+            $output->writeln('');
+            $this->callCommand($output, ListCommand::NAME);
+        }
+    }
 
-	private function getStats(InputInterface $input, OutputInterface $output) {
-		$queue = $this->getQueue();
-		if (!$tubes = $input->getArgument('tube')) {
-			$stats = $queue->statsAllTubes();
-			$error = false;
-		} else {
-			/** @var $tubes TubeCollection */
-			list($tubes, $error) = $this->matchTubeNames($tubes, $output);
-			$stats = new ArrayCollection();
-			foreach ($tubes as $name => $tube) {
-				$stats->set($name, $tube->stats());
-			}
-		}
-		return array($stats, $error);
-	}
+    private function getStats(InputInterface $input, OutputInterface $output)
+    {
+        $queue = $this->getQueue();
+        if (!$tubes = $input->getArgument('tube')) {
+            $stats = $queue->statsAllTubes();
+            $error = false;
+        } else {
+            /** @var $tubes TubeCollection */
+            list($tubes, $error) = $this->matchTubeNames($tubes, $output);
+            $stats = new ArrayCollection();
+            foreach ($tubes as $name => $tube) {
+                $stats->set($name, $tube->stats());
+            }
+        }
 
-	/**
-	 * @param TubeStats[]|ArrayCollection $stats
-	 * @param int|null                    $width
-	 * @return string
-	 */
-	private function renderStats(ArrayCollection $stats, $width = null) {
-		if ($stats->isEmpty()) {
-			return 'There are no current tubes';
-		}
+        return array($stats, $error);
+    }
 
-		$buffer = new BufferedOutput();
-		$buffer->setDecorated(true);
+    /**
+     * @param TubeStats[]|ArrayCollection $stats
+     * @param int|null                    $width
+     *
+     * @return string
+     */
+    private function renderStats(ArrayCollection $stats, $width = null)
+    {
+        if ($stats->isEmpty()) {
+            return 'There are no current tubes';
+        }
 
-		$width = $width ?: $this->getConsoleWidth();
-		$table = $width ? new AutoHidingTable($buffer, $width) : new Table($buffer);
-		$table->setHeaders(array(
-			'Tube',
-			'Ready',
-			'Buried',
-			'Reserved',
-			'Delayed',
-			'Urgent',
-			'Total',
-			'',
-			'Using',
-			'Watching',
-			'Waiting',
-			'',
-			'Pause Elapsed',
-			'Pause Left',
-			'',
-			'Delete Count',
-			'Pause Count',
-		));
-		foreach ($stats as $tubeStats) {
-			$table->addRow(array(
-				$tubeStats->name(),
-				$tubeStats->readyJobs(),
-				$tubeStats->buriedJobs(),
-				$tubeStats->reservedJobs(),
-				$tubeStats->delayedJobs(),
-				$tubeStats->urgentJobs(),
-				$tubeStats->totalJobs(),
-				'',
-				$tubeStats->usingCount(),
-				$tubeStats->watchingCount(),
-				$tubeStats->waitingCount(),
-				'',
-				$tubeStats->pause(),
-				$tubeStats->pauseTimeLeft(),
-				'',
-				$tubeStats->cmdDeleteCount(),
-				$tubeStats->cmdPauseTubeCount(),
-			));
-		}
-		$table->render();
+        $buffer = new BufferedOutput();
+        $buffer->setDecorated(true);
 
-		return $buffer->fetch();
-	}
+        $width = $width ?: $this->getConsoleWidth();
+        $table = $width ? new AutoHidingTable($buffer, $width) : new Table($buffer);
+        $table->setHeaders(array(
+            'Tube',
+            'Ready',
+            'Buried',
+            'Reserved',
+            'Delayed',
+            'Urgent',
+            'Total',
+            '',
+            'Using',
+            'Watching',
+            'Waiting',
+            '',
+            'Pause Elapsed',
+            'Pause Left',
+            '',
+            'Delete Count',
+            'Pause Count',
+        ));
+        foreach ($stats as $tubeStats) {
+            $table->addRow(array(
+                $tubeStats->name(),
+                $tubeStats->readyJobs(),
+                $tubeStats->buriedJobs(),
+                $tubeStats->reservedJobs(),
+                $tubeStats->delayedJobs(),
+                $tubeStats->urgentJobs(),
+                $tubeStats->totalJobs(),
+                '',
+                $tubeStats->usingCount(),
+                $tubeStats->watchingCount(),
+                $tubeStats->waitingCount(),
+                '',
+                $tubeStats->pause(),
+                $tubeStats->pauseTimeLeft(),
+                '',
+                $tubeStats->cmdDeleteCount(),
+                $tubeStats->cmdPauseTubeCount(),
+            ));
+        }
+        $table->render();
 
-	/**
-	 * @param TubeStats[]|ArrayCollection $tubes
-	 */
-	private function logStats(ArrayCollection $tubes) {
-		$logger = $this->getService(BeanstalkKeys::QUEUE_LOGGER);
-		foreach ($tubes as $tube => $stats) {
-			$logger->info('Tube stats', array(
-				'tube' => $tube,
-				'ready' => $stats->readyJobs(),
-				'buried' => $stats->buriedJobs(),
-				'delayed' => $stats->delayedJobs(),
-				'total' => $stats->readyJobs() + $stats->buriedJobs() + $stats->delayedJobs(),
-				'pause_left' => $stats->pauseTimeLeft(),
-				'pause_elapsed' => $stats->pause(),
-				'workers' => $stats->watchingCount(),
-				'deleted_count' => $stats->cmdDeleteCount(),
-				'pause_count' => $stats->cmdPauseTubeCount(),
-			));
-		}
-	}
+        return $buffer->fetch();
+    }
 
-	private function getHelpText() {
-		$exampleStats = ArrayCollection::create(array(
-			new TubeStats(array('name' => 'TubeA')),
-			new TubeStats(array('name' => 'SendApi')),
-			new TubeStats(array('name' => 'ReceiveApi')),
-		));
-		$stats = preg_replace("#\n#", "\n      ", $this->renderStats($exampleStats, 78));
+    /**
+     * @param TubeStats[]|ArrayCollection $tubes
+     */
+    private function logStats(ArrayCollection $tubes)
+    {
+        $logger = $this->getService(BeanstalkKeys::QUEUE_LOGGER);
+        foreach ($tubes as $tube => $stats) {
+            $logger->info('Tube stats', array(
+                'tube'          => $tube,
+                'ready'         => $stats->readyJobs(),
+                'buried'        => $stats->buriedJobs(),
+                'delayed'       => $stats->delayedJobs(),
+                'total'         => $stats->readyJobs() + $stats->buriedJobs() + $stats->delayedJobs(),
+                'pause_left'    => $stats->pauseTimeLeft(),
+                'pause_elapsed' => $stats->pause(),
+                'workers'       => $stats->watchingCount(),
+                'deleted_count' => $stats->cmdDeleteCount(),
+                'pause_count'   => $stats->cmdPauseTubeCount(),
+            ));
+        }
+    }
 
-		return <<<EOF
+    private function getHelpText()
+    {
+        $exampleStats = ArrayCollection::create(array(
+            new TubeStats(array('name' => 'TubeA')),
+            new TubeStats(array('name' => 'SendApi')),
+            new TubeStats(array('name' => 'ReceiveApi')),
+        ));
+        $stats = preg_replace("#\n#", "\n      ", $this->renderStats($exampleStats, 78));
+
+        return <<<EOF
 
 The <info>%command.name%</info> command displays information about the current tubes
 
@@ -187,5 +198,5 @@ The <info>%command.name%</info> command displays information about the current t
    Pause Count      The cumulative number of pause commands for the tube
 
 EOF;
-	}
+    }
 }

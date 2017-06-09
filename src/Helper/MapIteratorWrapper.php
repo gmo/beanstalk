@@ -1,37 +1,44 @@
 <?php
+
 namespace GMO\Beanstalk\Helper;
 
-class MapIteratorWrapper implements \Iterator {
+class MapIteratorWrapper implements \Iterator
+{
+    private $iterator;
+    private $func;
 
-	public function current() {
-		return call_user_func($this->func, $this->iterator->current());
-	}
+    /**
+     * @param \Iterator $iterator
+     * @param callable  $func
+     */
+    public function __construct(\Iterator $iterator, $func)
+    {
+        $this->iterator = $iterator;
+        $this->func = $func;
+    }
 
-	public function next() {
-		$this->iterator->next();
-	}
+    public function current()
+    {
+        return call_user_func($this->func, $this->iterator->current());
+    }
 
-	public function key() {
-		return $this->iterator->key();
-	}
+    public function next()
+    {
+        $this->iterator->next();
+    }
 
-	public function valid() {
-		return $this->iterator->valid();
-	}
+    public function key()
+    {
+        return $this->iterator->key();
+    }
 
-	public function rewind() {
-		$this->iterator->rewind();
-	}
+    public function valid()
+    {
+        return $this->iterator->valid();
+    }
 
-	/**
-	 * @param \Iterator $iterator
-	 * @param callable  $func
-	 */
-	public function __construct(\Iterator $iterator, $func) {
-		$this->iterator = $iterator;
-		$this->func = $func;
-	}
-
-	private $iterator;
-	private $func;
+    public function rewind()
+    {
+        $this->iterator->rewind();
+    }
 }

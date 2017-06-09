@@ -1,62 +1,75 @@
 <?php
+
 namespace GMO\Beanstalk\Helper;
 
 use Carbon\Carbon;
 
-class Processor {
+class Processor
+{
+    /**
+     * @param int|string $pid
+     * @param int        $interval in milliseconds
+     * @param int        $timeout  in seconds
+     *
+     * @return bool Whether the process stopped or the timeout was hit
+     */
+    public function waitForProcess($pid, $interval = 200, $timeout = 10)
+    {
+        $start = Carbon::now();
+        while ($this->isProcessRunning($pid)) {
+            if ($start->diffInSeconds() >= $timeout) {
+                return false;
+            }
+            usleep($interval * 1000); // convert to milliseconds
+        }
 
-	/**
-	 * @param int|string $pid
-	 * @param int        $interval in milliseconds
-	 * @param int        $timeout  in seconds
-	 * @return bool Whether the process stopped or the timeout was hit
-	 */
-	public function waitForProcess($pid, $interval = 200, $timeout = 10) {
-		$start = Carbon::now();
-		while ($this->isProcessRunning($pid)) {
-			if ($start->diffInSeconds() >= $timeout) {
-				return false;
-			}
-			usleep($interval * 1000); // convert to milliseconds
-		}
-		return true;
-	}
+        return true;
+    }
 
-	public function terminateProcess($pid, $force = false) {
-		posix_kill($pid, $force ? SIGKILL : SIGTERM);
-	}
+    public function terminateProcess($pid, $force = false)
+    {
+        posix_kill($pid, $force ? SIGKILL : SIGTERM);
+    }
 
-	/**
-	 * Checks if pid is running
-	 * @param $pid
-	 * @return bool
-	 */
-	public function isProcessRunning($pid) {
-		$this->execute("ps $pid", $lines, $exitCode);
-		return $exitCode === 0;
-	}
+    /**
+     * Checks if pid is running
+     *
+     * @param $pid
+     *
+     * @return bool
+     */
+    public function isProcessRunning($pid)
+    {
+        $this->execute("ps $pid", $lines, $exitCode);
 
-	public function grepForPids($grep) {
-		$results = array();
-		$this->execute("ps ax -o pid,command | grep -v grep | grep \"$grep\"", $processes);
-		foreach ($processes as $process) {
-			if (!preg_match_all('/"[^"]+"|\S+/', $process, $matches)) {
-				continue;
-			}
-			$parts = $matches[0];
-			$results[] = array($parts[4], $parts[0]);
-		}
-		return $results;
-	}
+        return $exitCode === 0;
+    }
 
-	public function executeFromDir($command, $dir) {
-		$cwd = getcwd();
-		chdir($dir);
-		$this->execute($command);
-		chdir($cwd);
-	}
+    public function grepForPids($grep)
+    {
+        $results = array();
+        $this->execute("ps ax -o pid,command | grep -v grep | grep \"$grep\"", $processes);
+        foreach ($processes as $process) {
+            if (!preg_match_all('/"[^"]+"|\S+/', $process, $matches)) {
+                continue;
+            }
+            $parts = $matches[0];
+            $results[] = array($parts[4], $parts[0]);
+        }
 
-	public function execute($command, array &$output = null, &$return_var = null) {
-		exec($command, $output, $return_var);
-	}
+        return $results;
+    }
+
+    public function executeFromDir($command, $dir)
+    {
+        $cwd = getcwd();
+        chdir($dir);
+        $this->execute($command);
+        chdir($cwd);
+    }
+
+    public function execute($command, array &$output = null, &$return_var = null)
+    {
+        exec($command, $output, $return_var);
+    }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace GMO\Beanstalk\Console\Command\Queue;
 
 use GMO\Beanstalk\Queue\Response\JobStats;
@@ -10,84 +11,90 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class JobStatsCommand extends AbstractQueueCommand {
+class JobStatsCommand extends AbstractQueueCommand
+{
+    const NAME = 'job-stats';
 
-	const NAME = 'job-stats';
+    protected function configure()
+    {
+        parent::configure();
+        $this->setName(static::NAME)
+            ->addArgument('id', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'The ID(s) of the job')
+            ->setDescription('Displays information about a job')
+            ->setHelp($this->getHelpText())
+        ;
+    }
 
-	protected function configure() {
-		parent::configure();
-		$this->setName(static::NAME)
-			->addArgument('id', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'The ID(s) of the job')
-			->setDescription('Displays information about a job')
-			->setHelp($this->getHelpText());
-	}
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        parent::execute($input, $output);
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
-		parent::execute($input, $output);
+        $queue = $this->getQueue();
+        $stats = new ArrayCollection();
+        foreach ($input->getArgument('id') as $id) {
+            $jobStats = $queue->statsJob($id);
+            if ($jobStats->id() !== -1) {
+                $stats->add($jobStats);
+            } else {
+                $output->writeln("Job <info>#$id</info> does not exist");
+            }
+        }
+        if (!$stats->isEmpty()) {
+            $output->writeln($this->renderStats($stats));
+        }
+    }
 
-		$queue = $this->getQueue();
-		$stats = new ArrayCollection();
-		foreach ($input->getArgument('id') as $id) {
-			$jobStats = $queue->statsJob($id);
-			if ($jobStats->id() !== -1) {
-				$stats->add($jobStats);
-			} else {
-				$output->writeln("Job <info>#$id</info> does not exist");
-			}
-		}
-		if (!$stats->isEmpty()) {
-			$output->writeln($this->renderStats($stats));
-		}
-	}
+    /**
+     * @param JobStats[]|ArrayCollection $statsList
+     *
+     * @return string
+     */
+    private function renderStats($statsList)
+    {
+        $buffer = new BufferedOutput();
+        $buffer->setDecorated(true);
 
-	/**
-	 * @param JobStats[]|ArrayCollection $statsList
-	 * @return string
-	 */
-	private function renderStats($statsList) {
-		$buffer = new BufferedOutput();
-		$buffer->setDecorated(true);
+        $width = $this->getConsoleWidth();
+        $table = $width ? new AutoHidingTable($buffer, $width) : new Table($buffer);
+        $table->setHeaders(array(
+            'ID',
+            'Tube',
+            'State',
+            '# Reserves',
+            '# Releases',
+            '# Buries',
+            '# Kicks',
+            'Priority',
+            'Time left (secs)',
+            '# Timeouts',
+            'Age (secs)',
+            'File',
+        ));
+        foreach ($statsList as $stats) {
+            $table->addRow(array(
+                $stats->id(),
+                $stats->tube(),
+                $stats->state(),
+                $stats->reserves(),
+                $stats->releases(),
+                $stats->buries(),
+                $stats->kicks(),
+                $stats->priority(),
+                in_array($stats->state(), array('reserved', 'delayed')) ? $stats->timeLeft() : 'N/A',
+                $stats->timeouts(),
+                $stats->age(),
+                $stats->file() === 0 ? 'N/A' : $stats->file(),
+            ));
+        }
 
-		$width = $this->getConsoleWidth();
-		$table = $width ? new AutoHidingTable($buffer, $width) : new Table($buffer);
-		$table->setHeaders(array(
-			'ID',
-			'Tube',
-			'State',
-			'# Reserves',
-			'# Releases',
-			'# Buries',
-			'# Kicks',
-			'Priority',
-			'Time left (secs)',
-			'# Timeouts',
-			'Age (secs)',
-			'File',
-		));
-		foreach ($statsList as $stats) {
-			$table->addRow(array(
-				$stats->id(),
-				$stats->tube(),
-				$stats->state(),
-				$stats->reserves(),
-				$stats->releases(),
-				$stats->buries(),
-				$stats->kicks(),
-				$stats->priority(),
-				in_array($stats->state(), array('reserved', 'delayed')) ? $stats->timeLeft() : 'N/A',
-				$stats->timeouts(),
-				$stats->age(),
-				$stats->file() === 0 ? 'N/A' : $stats->file(),
-			));
-		}
+        $table->render();
 
-		$table->render();
+        return $buffer->fetch();
+    }
 
-		return $buffer->fetch();
-	}
-
-	private function getHelpText() {
-		return <<<EOF
+    private function getHelpText()
+    {
+        return <<<EOF
 <comment>Header Explanation:</comment>
    <info>ID</info>          The job's ID
    <info>Tube</info>        The tube the job is located
@@ -104,6 +111,5 @@ class JobStatsCommand extends AbstractQueueCommand {
                  Only applicable if binlogs are enabled.
 
 EOF;
-	}
-
+    }
 }

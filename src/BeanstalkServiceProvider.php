@@ -1,7 +1,7 @@
 <?php
+
 namespace GMO\Beanstalk;
 
-use GMO\Beanstalk\Console\Command;
 use GMO\DependencyInjection\ServiceProviderInterface;
 use Pimple;
 

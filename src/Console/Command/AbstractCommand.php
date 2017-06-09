@@ -1,4 +1,5 @@
 <?php
+
 namespace GMO\Beanstalk\Console\Command;
 
 use GMO\Console\ContainerAwareCommand;
@@ -14,116 +15,130 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
-class AbstractCommand extends ContainerAwareCommand implements CompletionAwareInterface {
+class AbstractCommand extends ContainerAwareCommand implements CompletionAwareInterface
+{
+    /** @var LoggerInterface */
+    protected $logger;
+    /** @var OutputInterface */
+    private $output;
+    /** @var VarCloner */
+    private $cloner;
 
-	public function __construct($name = null) {
-		parent::__construct($name);
-		$this->logger = new NullLogger();
-	}
+    public function __construct($name = null)
+    {
+        parent::__construct($name);
+        $this->logger = new NullLogger();
+    }
 
-	public function completeOptionValues($optionName, CompletionContext $context) {
-		return false;
-	}
+    public function completeOptionValues($optionName, CompletionContext $context)
+    {
+        return false;
+    }
 
-	public function completeArgumentValues($argumentName, CompletionContext $context) {
-		return false;
-	}
+    public function completeArgumentValues($argumentName, CompletionContext $context)
+    {
+        return false;
+    }
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
-		$this->logger = new ConsoleLogger($output);
-		$this->output = $output;
-		$this->output->getFormatter()->setStyle('warn', new OutputFormatterStyle('red'));
-	}
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $this->logger = new ConsoleLogger($output);
+        $this->output = $output;
+        $this->output->getFormatter()->setStyle('warn', new OutputFormatterStyle('red'));
+    }
 
-	public function getConsoleWidth() {
-		$app = $this->getApplication();
-		if (!$app) {
-			return null;
-		}
-		$dimensions = $app->getTerminalDimensions();
-		return $dimensions[0];
-	}
+    public function getConsoleWidth()
+    {
+        $app = $this->getApplication();
+        if (!$app) {
+            return null;
+        }
+        $dimensions = $app->getTerminalDimensions();
 
-	/**
-	 * @inheritdoc
-	 * @return $this
-	 */
-	public function setName($name) {
-		return parent::setName($name);
-	}
+        return $dimensions[0];
+    }
 
-	/**
-	 * @inheritdoc
-	 * @return $this
-	 */
-	public function setDescription($description) {
-		return parent::setDescription($description);
-	}
+    /**
+     * @inheritdoc
+     * @return $this
+     */
+    public function setName($name)
+    {
+        return parent::setName($name);
+    }
 
-	/**
-	 * @inheritdoc
-	 * @return $this
-	 */
-	public function addArgument($name, $mode = null, $description = '', $default = null) {
-		return parent::addArgument($name, $mode, $description, $default);
-	}
+    /**
+     * @inheritdoc
+     * @return $this
+     */
+    public function setDescription($description)
+    {
+        return parent::setDescription($description);
+    }
 
-	/**
-	 * @inheritdoc
-	 * @return $this
-	 */
-	public function addOption($name, $shortcut = null, $mode = null, $description = '', $default = null) {
-		return parent::addOption($name, $shortcut, $mode, $description, $default);
-	}
+    /**
+     * @inheritdoc
+     * @return $this
+     */
+    public function addArgument($name, $mode = null, $description = '', $default = null)
+    {
+        return parent::addArgument($name, $mode, $description, $default);
+    }
 
-	protected function createInputFromContext(CompletionContext $context) {
-		$words = $context->getWords();
-		$words = array_filter($words);
-		$this->mergeApplicationDefinition();
-		return new ArgvInput($words, $this->getDefinition());
-	}
+    /**
+     * @inheritdoc
+     * @return $this
+     */
+    public function addOption($name, $shortcut = null, $mode = null, $description = '', $default = null)
+    {
+        return parent::addOption($name, $shortcut, $mode, $description, $default);
+    }
 
-	/**
-	 * Returns a string representation of the variable.
-	 *
-	 * Symfony VarDumper is used if installed, else print_r is used.
-	 *
-	 * @param mixed $var
-	 *
-	 * @return string
-	 */
-	protected function dumpVar($var) {
-		if (!class_exists('\Symfony\Component\VarDumper\VarDumper')) {
-			return print_r($var, true);
-		}
+    protected function createInputFromContext(CompletionContext $context)
+    {
+        $words = $context->getWords();
+        $words = array_filter($words);
+        $this->mergeApplicationDefinition();
 
-		$data = $this->getCloner()->cloneVar($var);
+        return new ArgvInput($words, $this->getDefinition());
+    }
 
-		$res = fopen('php://temp', 'r+');
-		$dumper = new CliDumper($res);
-		$dumper->setColors($this->output->isDecorated());
-		$dumper->dump($data);
-		$str = stream_get_contents($res, -1, 0);
-		fclose($res);
+    /**
+     * Returns a string representation of the variable.
+     *
+     * Symfony VarDumper is used if installed, else print_r is used.
+     *
+     * @param mixed $var
+     *
+     * @return string
+     */
+    protected function dumpVar($var)
+    {
+        if (!class_exists('\Symfony\Component\VarDumper\VarDumper')) {
+            return print_r($var, true);
+        }
 
-		return $str;
-	}
+        $data = $this->getCloner()->cloneVar($var);
 
-	/**
-	 * @return VarCloner
-	 */
-	private function getCloner() {
-		if (!$this->cloner) {
-			$this->cloner = new VarCloner();
-		}
+        $res = fopen('php://temp', 'r+');
+        $dumper = new CliDumper($res);
+        $dumper->setColors($this->output->isDecorated());
+        $dumper->dump($data);
+        $str = stream_get_contents($res, -1, 0);
+        fclose($res);
 
-		return $this->cloner;
-	}
+        return $str;
+    }
 
-	/** @var LoggerInterface */
-	protected $logger;
-	/** @var OutputInterface */
-	private $output;
-	/** @var VarCloner */
-	private $cloner;
+    /**
+     * @return VarCloner
+     */
+    private function getCloner()
+    {
+        if (!$this->cloner) {
+            $this->cloner = new VarCloner();
+        }
+
+        return $this->cloner;
+    }
 }

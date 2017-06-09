@@ -1,41 +1,41 @@
 {
-	"name": "gmo/beanstalk",
-	"license": "MIT",
-	"description": "Common beanstalk worker abstraction and queue utilities",
-	"require": {
-		"ext-pcntl": "*",
-		"gmo/common": "^1.29",
-		"gmo/console": "^2.3",
-		"psr/log": "1.0.0",
-		"pda/pheanstalk": "~3.0",
-		"pimple/pimple": "^1.0 || ^3.0",
-		"nesbot/carbon": "~1.19",
-		"nikic/php-parser": "~0.9|~1.0",
-		"stecman/symfony-console-completion": "^0.7",
-		"symfony/finder": "^2.5 || ^3.0"
-	},
-	"require-dev": {
-		"monolog/monolog": "~1.0",
-		"phpunit/phpunit": "3.7.*",
-		"gmo/dependency-injection": "~1.0",
-		"symfony/var-dumper": "^2.6 || ^3.0"
-	},
-	"autoload": {
-		"psr-4": {
-			"GMO\\Beanstalk\\": "src/"
-		}
-	},
-	"autoload-dev": {
-		"psr-0": {
-			"": "tests/"
-		}
-	},
-	"bin": [
-		"bin/queue"
-	],
-	"extra": {
-		"branch-alias": {
-			"dev-master": "2.6.x-dev"
-		}
-	}
+    "name": "gmo/beanstalk",
+    "license": "MIT",
+    "description": "Common beanstalk worker abstraction and queue utilities",
+    "require": {
+        "ext-pcntl": "*",
+        "gmo/common": "^1.29",
+        "gmo/console": "^2.3",
+        "psr/log": "1.0.0",
+        "pda/pheanstalk": "~3.0",
+        "pimple/pimple": "^1.0 || ^3.0",
+        "nesbot/carbon": "~1.19",
+        "nikic/php-parser": "~0.9|~1.0",
+        "stecman/symfony-console-completion": "^0.7",
+        "symfony/finder": "^2.5 || ^3.0"
+    },
+    "require-dev": {
+        "monolog/monolog": "~1.0",
+        "phpunit/phpunit": "3.7.*",
+        "gmo/dependency-injection": "~1.0",
+        "symfony/var-dumper": "^2.6 || ^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "GMO\\Beanstalk\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-0": {
+            "": "tests/"
+        }
+    },
+    "bin": [
+        "bin/queue"
+    ],
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.6.x-dev"
+        }
+    }
 }

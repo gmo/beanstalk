@@ -1,37 +1,45 @@
 <?php
+
 namespace GMO\Beanstalk\Helper;
 
 use GMO\Common\ClassNameResolverInterface;
 use GMO\Common\Collections\ArrayCollection;
 
-class ReflectionManager implements ClassNameResolverInterface {
+class ReflectionManager implements ClassNameResolverInterface
+{
+    /** @var ArrayCollection */
+    private static $classes;
 
-	/**
-	 * @param string $file file path
-	 * @return \ReflectionClass
-	 */
-	public static function getClass($file) {
-		$file = (string) $file;
-		if (!static::$classes) {
-			static::$classes = new ArrayCollection();
-		}
+    /**
+     * @param string $file file path
+     *
+     * @return \ReflectionClass
+     */
+    public static function getClass($file)
+    {
+        $file = (string) $file;
+        if (!static::$classes) {
+            static::$classes = new ArrayCollection();
+        }
 
-		if (!static::$classes->get($file)) {
-			$name = ReflectionManager::getClassName($file);
-			static::$classes->set($file, new \ReflectionClass($name));
-		}
+        if (!static::$classes->get($file)) {
+            $name = ReflectionManager::getClassName($file);
+            static::$classes->set($file, new \ReflectionClass($name));
+        }
 
-		return static::$classes->get($file);
-	}
+        return static::$classes->get($file);
+    }
 
-	private static function getClassName($file) {
-		$parser = new NamespaceParser();
-		$phpCode = file_get_contents($file);
-		return $parser->parse($phpCode);
-	}
+    private static function getClassName($file)
+    {
+        $parser = new NamespaceParser();
+        $phpCode = file_get_contents($file);
 
-	public static function className() { return get_called_class(); }
+        return $parser->parse($phpCode);
+    }
 
-	/** @var ArrayCollection */
-	private static $classes;
+    public static function className()
+    {
+        return get_called_class();
+    }
 }

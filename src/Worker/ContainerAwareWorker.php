@@ -1,4 +1,5 @@
 <?php
+
 namespace GMO\Beanstalk\Worker;
 
 /**
@@ -13,19 +14,23 @@ abstract class ContainerAwareWorker extends AbstractWorker
      */
     abstract protected function getDefaultContainer();
 
-    public function getService($name) {
+    public function getService($name)
+    {
         return $this->getContainer()->offsetGet($name);
     }
 
     /** @return \Pimple */
-    public function getContainer() {
+    public function getContainer()
+    {
         if ($this->container === null) {
             $this->container = $this->getDefaultContainer();
         }
+
         return $this->container;
     }
 
-    public function __get($name) {
+    public function __get($name)
+    {
         if ($name === 'container') {
             return $this->getContainer();
         }

@@ -1,18 +1,21 @@
 <?php
+
 namespace GMO\Beanstalk\Job\JobError\Retry;
 
-class JobRetry implements JobRetryInterface {
+class JobRetry implements JobRetryInterface
+{
+    protected $retry;
 
-	public function getMaxRetries() {
-		return $this->retry;
-	}
+    /**
+     * @param int $retry
+     */
+    public function __construct($retry)
+    {
+        $this->retry = intval($retry);
+    }
 
-	/**
-	 * @param int $retry
-	 */
-	public function __construct($retry) {
-		$this->retry = intval($retry);
-	}
-
-	protected $retry;
+    public function getMaxRetries()
+    {
+        return $this->retry;
+    }
 }

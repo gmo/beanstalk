@@ -1,4 +1,5 @@
 <?php
+
 namespace GMO\Beanstalk\Test;
 
 use GMO\Beanstalk\Job\Job;
@@ -6,30 +7,39 @@ use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Runner\BaseRunner;
 use GMO\Beanstalk\Worker\WorkerInterface;
 
-class TestRunner extends BaseRunner {
+class TestRunner extends BaseRunner
+{
+    protected $currentJob;
 
-	public function __construct(QueueInterface $queue, WorkerInterface $worker) {
-		$this->setup($queue, $worker);
-		$this->stopRunning();
-	}
+    public function __construct(QueueInterface $queue, WorkerInterface $worker)
+    {
+        $this->setup($queue, $worker);
+        $this->stopRunning();
+    }
 
-	/**
-	 * @return Job
-	 */
-	public function run() {
-		parent::run();
-		return $this->currentJob;
-	}
+    /**
+     * @return Job
+     */
+    public function run()
+    {
+        parent::run();
 
-	public function getJob(Job $previousJob) {
-		$job = parent::getJob($previousJob);
-		$this->currentJob = $job;
-		return $job;
-	}
+        return $this->currentJob;
+    }
 
-	protected function attachSignalHandler() { }
+    public function getJob(Job $previousJob)
+    {
+        $job = parent::getJob($previousJob);
+        $this->currentJob = $job;
 
-	protected function checkForTerminationSignal() { }
+        return $job;
+    }
 
-	protected $currentJob;
+    protected function attachSignalHandler()
+    {
+    }
+
+    protected function checkForTerminationSignal()
+    {
+    }
 }

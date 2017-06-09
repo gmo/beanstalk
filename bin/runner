@@ -4,19 +4,19 @@
 use GMO\Beanstalk\Queue\Queue;
 
 if (file_exists(__DIR__ . '/../vendor')) {
-	/** @noinspection PhpIncludeInspection */
-	require_once __DIR__ . '/../vendor/autoload.php';
+    /** @noinspection PhpIncludeInspection */
+    require_once __DIR__ . '/../vendor/autoload.php';
 } else {
-	/** @noinspection PhpIncludeInspection */
-	require_once __DIR__ . '/../../../../vendor/autoload.php';
+    /** @noinspection PhpIncludeInspection */
+    require_once __DIR__ . '/../../../../vendor/autoload.php';
 }
 
 list(
-	$cmd,
-	$workerDir,
-	$workerName,
-	$host,
-	$port,
+    $cmd,
+    $workerDir,
+    $workerName,
+    $host,
+    $port,
 ) = $argv;
 
 /** @var GMO\Beanstalk\Worker\WorkerInterface $worker */

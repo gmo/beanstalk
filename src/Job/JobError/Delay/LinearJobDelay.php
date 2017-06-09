@@ -1,25 +1,29 @@
 <?php
+
 namespace GMO\Beanstalk\Job\JobError\Delay;
 
-class LinearJobDelay implements JobDelayInterface {
+class LinearJobDelay implements JobDelayInterface
+{
+    protected $delay;
+    protected $pause;
 
-	public function getDelay($numRetries) {
-		return $this->delay;
-	}
+    /**
+     * @param int  $delay in seconds
+     * @param bool $pauseTube
+     */
+    public function __construct($delay, $pauseTube = false)
+    {
+        $this->delay = intval($delay);
+        $this->pause = $pauseTube;
+    }
 
-	public function shouldPauseTube() {
-		return $this->pause;
-	}
+    public function getDelay($numRetries)
+    {
+        return $this->delay;
+    }
 
-	/**
-	 * @param int  $delay in seconds
-	 * @param bool $pauseTube
-	 */
-	public function __construct($delay, $pauseTube = false) {
-		$this->delay = intval($delay);
-		$this->pause = $pauseTube;
-	}
-
-	protected $delay;
-	protected $pause;
+    public function shouldPauseTube()
+    {
+        return $this->pause;
+    }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace GMO\Beanstalk\Queue;
 
 use GMO\Beanstalk\Exception\JobPushException;
@@ -25,278 +26,321 @@ use Psr\Log\NullLogger;
  *
  * @package GMO\Beanstalk
  */
-class Queue implements QueueInterface {
+class Queue implements QueueInterface
+{
+    /** @var Pheanstalk\Pheanstalk */
+    protected $pheanstalk;
+    /** @var LoggerInterface */
+    protected $log;
+    /** @var JobProcessor */
+    protected $logProcessor;
+    /** @var JobDataSerializer */
+    protected $serializer;
 
-	//region Tube Control
+    /**
+     * Sets up a new Queue
+     *
+     * @param string          $host
+     * @param int             $port
+     * @param LoggerInterface $logger [Optional] Default: NullLogger
+     */
+    public function __construct($host = 'localhost', $port = 11300, LoggerInterface $logger = null)
+    {
+        $this->setLogger($logger ?: new NullLogger());
+        $this->pheanstalk = new Pheanstalk\Pheanstalk($host, $port);
+        $this->logProcessor = new JobProcessor();
+        $this->serializer = new JobDataSerializer();
+    }
 
-	public function push($tube, $data, $priority = null, $delay = null, $ttr = null) {
-		$priority = $priority ?: static::DEFAULT_PRIORITY;
-		if ($priority < 0 || $priority > 4294967295) {
-			throw new RangeException("Priority must be between 0 and 4294967295. Given: $priority");
-		}
-		try {
-			$data = $this->serializer->serialize($data);
-			return $this->pheanstalk->putInTube(
-				$tube,
-				$data,
-				$priority,
-				$delay ?: static::DEFAULT_DELAY,
-				$ttr ?: static::DEFAULT_TTR
-			);
-		} catch (Pheanstalk\Exception $e) {
-			if ($e->getMessage() === Pheanstalk\Response::RESPONSE_JOB_TOO_BIG) {
-				throw new JobTooBigException($tube, $data, $e);
-			}
-			throw new JobPushException($tube, $data, $e);
-		}
-	}
+    //region Tube Control
 
-	public function reserve($tube, $timeout = null, $stopWatching = false) {
-		try {
-			$job = $this->pheanstalk->reserveFromTube($tube, $timeout);
-			if ($stopWatching) {
-				$this->pheanstalk->watchOnly(Pheanstalk\PheanstalkInterface::DEFAULT_TUBE);
-			}
-			if (!$job) {
-				$this->logProcessor->setCurrentJob(null);
-				return new NullJob();
-			}
+    public function push($tube, $data, $priority = null, $delay = null, $ttr = null)
+    {
+        $priority = $priority ?: static::DEFAULT_PRIORITY;
+        if ($priority < 0 || $priority > 4294967295) {
+            throw new RangeException("Priority must be between 0 and 4294967295. Given: $priority");
+        }
+        try {
+            $data = $this->serializer->serialize($data);
 
-			return $this->createJob($job);
-		} catch (Pheanstalk\Exception\ClientException $e) {
-			$this->logProcessor->setCurrentJob(null);
-			return new NullJob();
-		}
-	}
+            return $this->pheanstalk->putInTube(
+                $tube,
+                $data,
+                $priority,
+                $delay ?: static::DEFAULT_DELAY,
+                $ttr ?: static::DEFAULT_TTR
+            );
+        } catch (Pheanstalk\Exception $e) {
+            if ($e->getMessage() === Pheanstalk\Response::RESPONSE_JOB_TOO_BIG) {
+                throw new JobTooBigException($tube, $data, $e);
+            }
+            throw new JobPushException($tube, $data, $e);
+        }
+    }
 
-	public function kickTube($tube, $num = -1) {
-		$this->pheanstalk->useTube($tube);
-		$kicked = 0;
+    public function reserve($tube, $timeout = null, $stopWatching = false)
+    {
+        try {
+            $job = $this->pheanstalk->reserveFromTube($tube, $timeout);
+            if ($stopWatching) {
+                $this->pheanstalk->watchOnly(Pheanstalk\PheanstalkInterface::DEFAULT_TUBE);
+            }
+            if (!$job) {
+                $this->logProcessor->setCurrentJob(null);
 
-		$stats = $this->statsTube($tube);
-		if ($stats->buriedJobs() > 0) {
-			$numToKick = $num > 0 ? min($num, $stats->buriedJobs()) : $stats->buriedJobs();
-			$kicked += $this->pheanstalk->kick($numToKick);
-			$num -= $numToKick;
-			if ($num === 0) {
-				return $kicked;
-			}
-		}
-		$numToKick = $num > 0 ? $num : $stats->delayedJobs();
-		$kicked += $this->pheanstalk->kick($numToKick);
+                return new NullJob();
+            }
 
-		return $kicked;
-	}
+            return $this->createJob($job);
+        } catch (Pheanstalk\Exception\ClientException $e) {
+            $this->logProcessor->setCurrentJob(null);
 
-	public function peekJob($jobId) {
-		try {
-			$job = $this->pheanstalk->peek($jobId);
-		} catch (Pheanstalk\Exception\ServerException $e) {
-			return new NullJob();
-		}
-		return $this->createJob($job);
-	}
+            return new NullJob();
+        }
+    }
 
-	public function peekReady($tube) {
-		return $this->peek($tube, 'Ready');
-	}
+    public function kickTube($tube, $num = -1)
+    {
+        $this->pheanstalk->useTube($tube);
+        $kicked = 0;
 
-	public function peekBuried($tube) {
-		return $this->peek($tube, 'Buried');
-	}
+        $stats = $this->statsTube($tube);
+        if ($stats->buriedJobs() > 0) {
+            $numToKick = $num > 0 ? min($num, $stats->buriedJobs()) : $stats->buriedJobs();
+            $kicked += $this->pheanstalk->kick($numToKick);
+            $num -= $numToKick;
+            if ($num === 0) {
+                return $kicked;
+            }
+        }
+        $numToKick = $num > 0 ? $num : $stats->delayedJobs();
+        $kicked += $this->pheanstalk->kick($numToKick);
 
-	public function peekDelayed($tube) {
-		return $this->peek($tube, 'Delayed');
-	}
+        return $kicked;
+    }
 
-	private function peek($tube, $state) {
-		try {
-			$job = $this->pheanstalk->{"peek$state"}($tube);
-		} catch (Pheanstalk\Exception\ServerException $e) {
-			return new NullJob();
-		}
-		return $this->createJob($job);
-	}
+    public function peekJob($jobId)
+    {
+        try {
+            $job = $this->pheanstalk->peek($jobId);
+        } catch (Pheanstalk\Exception\ServerException $e) {
+            return new NullJob();
+        }
 
-	public function deleteReadyJobs($tube, $num = -1) {
-		return $this->deleteJobs("Ready", $tube, $num);
-	}
+        return $this->createJob($job);
+    }
 
-	public function deleteBuriedJobs($tube, $num = -1) {
-		return $this->deleteJobs("Buried", $tube, $num);
-	}
+    public function peekReady($tube)
+    {
+        return $this->peek($tube, 'Ready');
+    }
 
-	public function deleteDelayedJobs($tube, $num = -1) {
-		return $this->deleteJobs("Delayed", $tube, $num);
-	}
+    public function peekBuried($tube)
+    {
+        return $this->peek($tube, 'Buried');
+    }
 
-	private function deleteJobs($state, $tube, $numberToDelete) {
-		$numberDeleted = 0;
-		while ($numberToDelete !== 0) {
-			$job = $this->{"peek$state"}($tube);
-			if ($this->isNullJob($job)) {
-				break;
-			}
-			$this->delete($job);
-			$numberDeleted++;
-			$numberToDelete--;
-		}
-		return $numberDeleted;
-	}
+    public function peekDelayed($tube)
+    {
+        return $this->peek($tube, 'Delayed');
+    }
 
-	public function pause($tube, $delay) {
-		$this->pheanstalk->pauseTube($tube, $delay);
-	}
+    private function peek($tube, $state)
+    {
+        try {
+            $job = $this->pheanstalk->{"peek$state"}($tube);
+        } catch (Pheanstalk\Exception\ServerException $e) {
+            return new NullJob();
+        }
 
-	/** @inheritdoc */
-	public function statsTube($tube) {
-		/** @var Pheanstalk\Response\ArrayResponse $response */
-		$response = $this->pheanstalk->statsTube($tube);
-		$stats = new TubeStats($response);
-		return $stats;
-	}
+        return $this->createJob($job);
+    }
 
-	//endregion
+    public function deleteReadyJobs($tube, $num = -1)
+    {
+        return $this->deleteJobs("Ready", $tube, $num);
+    }
 
-	//region Job Control
+    public function deleteBuriedJobs($tube, $num = -1)
+    {
+        return $this->deleteJobs("Buried", $tube, $num);
+    }
 
-	public function release(Job $job, $priority = null, $delay = null) {
-		if ($this->isNullJob($job)) {
-			return;
-		}
-		$priority = $priority ?: Pheanstalk\Pheanstalk::DEFAULT_PRIORITY;
-		$delay = $delay ?: Pheanstalk\Pheanstalk::DEFAULT_DELAY;
-		$this->pheanstalk->release($job, $priority, $delay);
-	}
+    public function deleteDelayedJobs($tube, $num = -1)
+    {
+        return $this->deleteJobs("Delayed", $tube, $num);
+    }
 
-	public function bury(Job $job, $priority = null) {
-		if ($this->isNullJob($job)) {
-			return;
-		}
-		$priority = $priority ?: Pheanstalk\Pheanstalk::DEFAULT_PRIORITY;
-		$this->pheanstalk->bury($job, $priority);
-	}
+    private function deleteJobs($state, $tube, $numberToDelete)
+    {
+        $numberDeleted = 0;
+        while ($numberToDelete !== 0) {
+            $job = $this->{"peek$state"}($tube);
+            if ($this->isNullJob($job)) {
+                break;
+            }
+            $this->delete($job);
+            $numberDeleted++;
+            $numberToDelete--;
+        }
 
-	public function delete($job) {
-		if ($this->isNullJob($job)) {
-			return;
-		}
-		try {
-			$this->pheanstalk->delete($job);
-		} catch (Pheanstalk\Exception\ServerException $e) {
-			$this->log->notice("Error deleting job", array( "exception" => $e ));
-		}
-	}
+        return $numberDeleted;
+    }
 
-	public function kickJob($job) {
-		if ($this->isNullJob($job)) {
-			return;
-		}
-		$this->pheanstalk->kickJob($job);
-	}
+    public function pause($tube, $delay)
+    {
+        $this->pheanstalk->pauseTube($tube, $delay);
+    }
 
-	/** @inheritdoc */
-	public function statsJob($job) {
-		try {
-			/** @var Pheanstalk\Response\ArrayResponse $stats */
-			$stats = $this->pheanstalk->statsJob($job);
-		} catch (Pheanstalk\Exception\ServerException $e) {
-			$stats = array('id' => -1);
-		}
-		return JobStats::create($stats);
-	}
+    /** @inheritdoc */
+    public function statsTube($tube)
+    {
+        /** @var Pheanstalk\Response\ArrayResponse $response */
+        $response = $this->pheanstalk->statsTube($tube);
+        $stats = new TubeStats($response);
 
-	public function touch(Job $job) {
-		if ($this->isNullJob($job)) {
-			return;
-		}
-		$this->pheanstalk->touch($job);
-	}
+        return $stats;
+    }
 
-	//endregion
+    //endregion
 
-	public function tube($name) {
-		return new Tube($name, $this);
-	}
+    //region Job Control
 
-	public function tubes() {
-		$tubes = new TubeCollection();
-		foreach ($this->listTubes() as $tubeName) {
-			$tubes->set($tubeName, new Tube($tubeName, $this));
-		}
-		return $tubes;
-	}
+    public function release(Job $job, $priority = null, $delay = null)
+    {
+        if ($this->isNullJob($job)) {
+            return;
+        }
+        $priority = $priority ?: Pheanstalk\Pheanstalk::DEFAULT_PRIORITY;
+        $delay = $delay ?: Pheanstalk\Pheanstalk::DEFAULT_DELAY;
+        $this->pheanstalk->release($job, $priority, $delay);
+    }
 
-	public function listTubes() {
-		$tubes = ArrayCollection::create($this->pheanstalk->listTubes())
-			->sortValues();
-		$tubes->removeElement(Pheanstalk\PheanstalkInterface::DEFAULT_TUBE);
-		return $tubes;
-	}
+    public function bury(Job $job, $priority = null)
+    {
+        if ($this->isNullJob($job)) {
+            return;
+        }
+        $priority = $priority ?: Pheanstalk\Pheanstalk::DEFAULT_PRIORITY;
+        $this->pheanstalk->bury($job, $priority);
+    }
 
-	/** @inheritdoc */
-	public function statsAllTubes() {
-		return $this->tubes()->map(function (Tube $tube) {
-			return $tube->stats();
-		});
-	}
+    public function delete($job)
+    {
+        if ($this->isNullJob($job)) {
+            return;
+        }
+        try {
+            $this->pheanstalk->delete($job);
+        } catch (Pheanstalk\Exception\ServerException $e) {
+            $this->log->notice("Error deleting job", array("exception" => $e));
+        }
+    }
 
-	/** @inheritdoc */
-	public function statsServer() {
-		/** @var Pheanstalk\Response\ArrayResponse $stats */
-		$stats = $this->pheanstalk->stats();
-		return new ServerStats($stats);
-	}
+    public function kickJob($job)
+    {
+        if ($this->isNullJob($job)) {
+            return;
+        }
+        $this->pheanstalk->kickJob($job);
+    }
 
-	public function setLogger(LoggerInterface $logger) {
-		$this->log = $logger;
-	}
+    /** @inheritdoc */
+    public function statsJob($job)
+    {
+        try {
+            /** @var Pheanstalk\Response\ArrayResponse $stats */
+            $stats = $this->pheanstalk->statsJob($job);
+        } catch (Pheanstalk\Exception\ServerException $e) {
+            $stats = array('id' => -1);
+        }
 
-	/**
-	 * Gets a monolog processor that will add current job info.
-	 * Useful for workers.
-	 *
-	 * @return JobProcessor
-	 */
-	public function getJobProcessor() {
-		return $this->logProcessor;
-	}
+        return JobStats::create($stats);
+    }
 
-	/**
-	 * Sets up a new Queue
-	 *
-	 * @param string          $host
-	 * @param int             $port
-	 * @param LoggerInterface $logger [Optional] Default: NullLogger
-	 */
-	public function __construct($host = 'localhost', $port = 11300, LoggerInterface $logger = null) {
-		$this->setLogger($logger ?: new NullLogger());
-		$this->pheanstalk = new Pheanstalk\Pheanstalk($host, $port);
-		$this->logProcessor = new JobProcessor();
-		$this->serializer = new JobDataSerializer();
-	}
+    public function touch(Job $job)
+    {
+        if ($this->isNullJob($job)) {
+            return;
+        }
+        $this->pheanstalk->touch($job);
+    }
 
-	protected function createJob(Pheanstalk\Job $job) {
-		try {
-			$data = $this->serializer->unserialize($job->getData());
-			$job = new Job($job->getId(), $data, $this);
-		} catch (NotSerializableException $e) {
-			$job = new UnserializableJob($job->getId(), $job->getData(), $this, $e);
-		}
-		$this->logProcessor->setCurrentJob($job);
-		return $job;
-	}
+    //endregion
 
-	protected function isNullJob(Job $job) {
-		return $job instanceof NullJob || $job->getId() === -1;
-	}
+    public function tube($name)
+    {
+        return new Tube($name, $this);
+    }
 
-	/** @var Pheanstalk\Pheanstalk */
-	protected $pheanstalk;
-	/** @var LoggerInterface */
-	protected $log;
-	/** @var JobProcessor */
-	protected $logProcessor;
-	/** @var JobDataSerializer */
-	protected $serializer;
+    public function tubes()
+    {
+        $tubes = new TubeCollection();
+        foreach ($this->listTubes() as $tubeName) {
+            $tubes->set($tubeName, new Tube($tubeName, $this));
+        }
+
+        return $tubes;
+    }
+
+    public function listTubes()
+    {
+        $tubes = ArrayCollection::create($this->pheanstalk->listTubes())
+            ->sortValues()
+        ;
+        $tubes->removeElement(Pheanstalk\PheanstalkInterface::DEFAULT_TUBE);
+
+        return $tubes;
+    }
+
+    /** @inheritdoc */
+    public function statsAllTubes()
+    {
+        return $this->tubes()->map(function (Tube $tube) {
+            return $tube->stats();
+        });
+    }
+
+    /** @inheritdoc */
+    public function statsServer()
+    {
+        /** @var Pheanstalk\Response\ArrayResponse $stats */
+        $stats = $this->pheanstalk->stats();
+
+        return new ServerStats($stats);
+    }
+
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->log = $logger;
+    }
+
+    /**
+     * Gets a monolog processor that will add current job info.
+     * Useful for workers.
+     *
+     * @return JobProcessor
+     */
+    public function getJobProcessor()
+    {
+        return $this->logProcessor;
+    }
+
+    protected function createJob(Pheanstalk\Job $job)
+    {
+        try {
+            $data = $this->serializer->unserialize($job->getData());
+            $job = new Job($job->getId(), $data, $this);
+        } catch (NotSerializableException $e) {
+            $job = new UnserializableJob($job->getId(), $job->getData(), $this, $e);
+        }
+        $this->logProcessor->setCurrentJob($job);
+
+        return $job;
+    }
+
+    protected function isNullJob(Job $job)
+    {
+        return $job instanceof NullJob || $job->getId() === -1;
+    }
 }

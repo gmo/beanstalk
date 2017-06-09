@@ -1,4 +1,5 @@
 <?php
+
 namespace GMO\Beanstalk\Test;
 
 use Carbon\Carbon;
@@ -9,98 +10,114 @@ use GMO\Beanstalk\Queue\Response\JobStats;
 /**
  * ArrayJob is used by {@see ArrayQueue} to
  * determine if the job is still delayed and the priority
+ *
  * @see ArrayQueue
  */
-class ArrayJob extends Job {
+class ArrayJob extends Job
+{
+    /** @var JobStats */
+    protected $stats;
+    /** @var Carbon */
+    protected $created;
+    /** @var Carbon */
+    protected $delayTime;
+    protected $delay = 0;
+    protected $priority = 0;
 
-	public function stats() {
-		$this->stats->set('age', $this->created->diffInSeconds());
-		return $this->stats;
-	}
+    /**
+     * @param int                 $id
+     * @param string              $data
+     * @param int                 $priority
+     * @param int                 $delay
+     * @param string              $tubeName
+     * @param JobControlInterface $queue
+     */
+    public function __construct($id, $data, $priority, $delay, $tubeName, JobControlInterface $queue)
+    {
+        parent::__construct($id, $data, $queue);
+        $this->stats = new JobStats(array(
+            'id'   => $id,
+            'tube' => $tubeName,
+        ));
+        $this->setPriority($priority);
+        $this->setDelay($delay);
+        $this->created = new Carbon();
+    }
 
-	public function isDelayed() {
-		if ($this->delay === 0) {
-			return false;
-		}
+    public function stats()
+    {
+        $this->stats->set('age', $this->created->diffInSeconds());
 
-		if ($this->delayTime > new Carbon("-{$this->delay} sec")) {
-			return true;
-		} else {
-			$this->delay = 0;
-			return false;
-		}
-	}
+        return $this->stats;
+    }
 
-	public function setDelay($delay) {
-		$this->delay = intval($delay);
-		$this->delayTime = new Carbon();
-	}
+    public function isDelayed()
+    {
+        if ($this->delay === 0) {
+            return false;
+        }
 
-	public function getPriority() {
-		return $this->priority;
-	}
+        if ($this->delayTime > new Carbon("-{$this->delay} sec")) {
+            return true;
+        } else {
+            $this->delay = 0;
 
-	/**
-	 * @param int $priority
-	 */
-	public function setPriority($priority) {
-		$this->priority = intval($priority);
-		$this->stats->set('pri', $this->priority);
-	}
+            return false;
+        }
+    }
 
-	public function resetHandled() {
-		$this->handled = false;
-	}
+    public function setDelay($delay)
+    {
+        $this->delay = intval($delay);
+        $this->delayTime = new Carbon();
+    }
 
-	public function setState($state) {
-		$this->stats->set('state', $state);
-	}
+    public function getPriority()
+    {
+        return $this->priority;
+    }
 
-	public function incrementReserves() {
-		$this->incrementStat('reserves');
-	}
+    /**
+     * @param int $priority
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = intval($priority);
+        $this->stats->set('pri', $this->priority);
+    }
 
-	public function incrementReleases() {
-		$this->incrementStat('releases');
-	}
+    public function resetHandled()
+    {
+        $this->handled = false;
+    }
 
-	public function incrementBuries() {
-		$this->incrementStat('buries');
-	}
+    public function setState($state)
+    {
+        $this->stats->set('state', $state);
+    }
 
-	public function incrementKicks() {
-		$this->incrementStat('kicks');
-	}
+    public function incrementReserves()
+    {
+        $this->incrementStat('reserves');
+    }
 
-	protected function incrementStat($name) {
-		$this->stats->set($name, $this->stats->get($name) + 1);
-	}
+    public function incrementReleases()
+    {
+        $this->incrementStat('releases');
+    }
 
-	/**
-	 * @param int                 $id
-	 * @param string              $data
-	 * @param int                 $priority
-	 * @param int                 $delay
-	 * @param string              $tubeName
-	 * @param JobControlInterface $queue
-	 */
-	public function __construct($id, $data, $priority, $delay, $tubeName, JobControlInterface $queue) {
-		parent::__construct($id, $data, $queue);
-		$this->stats = new JobStats(array(
-			'id'   => $id,
-			'tube' => $tubeName,
-		));
-		$this->setPriority($priority);
-		$this->setDelay($delay);
-		$this->created = new Carbon();
-	}
+    public function incrementBuries()
+    {
+        $this->incrementStat('buries');
+    }
 
-	/** @var JobStats */
-	protected $stats;
-	/** @var Carbon */
-	protected $created;
-	/** @var Carbon */
-	protected $delayTime;
-	protected $delay = 0;
-	protected $priority = 0;
+    public function incrementKicks()
+    {
+        $this->incrementStat('kicks');
+    }
+
+    protected function incrementStat($name)
+    {
+        $this->stats->set($name, $this->stats->get($name) + 1);
+    }
 }

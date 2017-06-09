@@ -1,4 +1,5 @@
 <?php
+
 namespace GMO\Beanstalk\Job\JobError;
 
 use GMO\Beanstalk\Job\JobError\Action\JobActionInterface;
@@ -11,4 +12,6 @@ use GMO\Beanstalk\Job\JobError\Retry\JobRetryInterface;
  *
  * Exceptions should implement this interface.
  */
-interface JobErrorInterface extends JobActionInterface, JobDelayInterface, JobRetryInterface { }
+interface JobErrorInterface extends JobActionInterface, JobDelayInterface, JobRetryInterface
+{
+}

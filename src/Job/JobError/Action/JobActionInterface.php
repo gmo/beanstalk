@@ -1,14 +1,16 @@
 <?php
+
 namespace GMO\Beanstalk\Job\JobError\Action;
 
-interface JobActionInterface {
+interface JobActionInterface
+{
+    const BURY = 'bury';
+    const DELETE = 'delete';
 
-	const BURY = 'bury';
-	const DELETE = 'delete';
-
-	/**
-	 * Returns the action to take on the job
-	 * @return int
-	 */
-	public function getActionToTake();
+    /**
+     * Returns the action to take on the job
+     *
+     * @return int
+     */
+    public function getActionToTake();
 }
