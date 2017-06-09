@@ -5,10 +5,9 @@ namespace GMO\Beanstalk\Worker;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\JobError\JobErrorHandlerInterface;
 use GMO\Beanstalk\Runner\RunnerInterface;
-use GMO\Common\ClassNameResolverInterface;
 use GMO\Common\Collections\ArrayCollection;
 
-interface WorkerInterface extends ClassNameResolverInterface
+interface WorkerInterface
 {
     /**
      * The tube name the worker should pull jobs from.

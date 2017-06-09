@@ -2,10 +2,9 @@
 
 namespace GMO\Beanstalk\Helper;
 
-use GMO\Common\ClassNameResolverInterface;
 use GMO\Common\Collections\ArrayCollection;
 
-class ReflectionManager implements ClassNameResolverInterface
+class ReflectionManager
 {
     /** @var ArrayCollection */
     private static $classes;

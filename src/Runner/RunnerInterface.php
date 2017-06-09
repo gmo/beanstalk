@@ -5,9 +5,8 @@ namespace GMO\Beanstalk\Runner;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Worker\WorkerInterface;
-use GMO\Common\ClassNameResolverInterface;
 
-interface RunnerInterface extends ClassNameResolverInterface
+interface RunnerInterface
 {
     public function setup(QueueInterface $queue, WorkerInterface $worker);
 
