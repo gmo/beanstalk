@@ -4,7 +4,7 @@
     "description": "Common beanstalk worker abstraction and queue utilities",
     "require": {
         "ext-pcntl": "*",
-        "gmo/common": "^1.29",
+        "gmo/common": "^1.30",
         "gmo/console": "^2.3",
         "psr/log": "1.0.0",
         "pda/pheanstalk": "~3.0",

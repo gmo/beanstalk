@@ -4,15 +4,16 @@ namespace GMO\Beanstalk\Helper;
 
 use GMO\Common\Collections\ArrayCollection;
 use GMO\Common\Exception\NotSerializableException;
-use GMO\Common\ISerializable;
+use GMO\Common\Json;
+use Gmo\Common\Serialization\SerializableInterface;
 use Traversable;
 
 class JobDataSerializer
 {
     public function serialize($data)
     {
-        if ($data instanceof ISerializable) {
-            return $data->toJson();
+        if ($data instanceof SerializableInterface) {
+            return Json::dump($data->toArray());
         }
         if ($data instanceof Traversable) {
             $data = iterator_to_array($data, true);
@@ -22,11 +23,11 @@ class JobDataSerializer
         }
         if (is_array($data)) {
             foreach ($data as $key => &$value) {
-                if ($value instanceof ISerializable) {
+                if ($value instanceof SerializableInterface) {
                     $value = $value->toArray();
                 }
             }
-            $data = json_encode($data);
+            $data = Json::dump($data);
         }
 
         return $data;
@@ -34,7 +35,7 @@ class JobDataSerializer
 
     public function unserialize($data)
     {
-        $params = new ArrayCollection(json_decode($data, true));
+        $params = new ArrayCollection(Json::parse($data));
         if ($params->count() === 1 && $params->containsKey('data')) {
             $data = $params['data'];
 
@@ -44,7 +45,7 @@ class JobDataSerializer
         }
 
         if ($params->containsKey('class')) {
-            /** @var ISerializable|string $cls */
+            /** @var SerializableInterface|string $cls */
             $cls = $params['class'];
             if (!class_exists($cls)) {
                 throw new NotSerializableException($cls . ' does not exist');
@@ -63,7 +64,7 @@ class JobDataSerializer
 
                 $params[$key] = $value;
             } elseif (is_array($value) && array_key_exists('class', $value)) {
-                /** @var ISerializable|string $cls */
+                /** @var SerializableInterface|string $cls */
                 $cls = $value['class'];
                 if (!class_exists($cls)) {
                     throw new NotSerializableException($cls . ' does not exist');

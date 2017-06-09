@@ -5,7 +5,7 @@ namespace GMO\Beanstalk\Job;
 use GMO\Common\Exception\NotSerializableException;
 
 /**
- * A Job whose data is unable to be unserialized via {@see \GMO\Common\ISerializable ISerializable}
+ * A Job whose data is unable to be unserialized via {@see \Gmo\Common\Serialization\SerializableInterface}
  */
 class UnserializableJob extends Job
 {
