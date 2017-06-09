@@ -1,5 +1,6 @@
 <?php
-namespace GMO\Beanstalk;
+
+namespace Gmo\Beanstalk\Bridge\Pimple3;
 
 use GMO\Beanstalk\Console\Command;
 use GMO\Beanstalk\Manager\WorkerManager;
@@ -13,19 +14,19 @@ use Symfony\Component\Console;
 /**
  * Service provider for Pimple v3.
  */
-class BeanstalkPimple3ServiceProvider implements ServiceProviderInterface
+class BeanstalkServiceProvider implements ServiceProviderInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function register(Container $container)
+    public function register(Container $app)
     {
-        $container['beanstalk.host'] = 'localhost';
-        $container['beanstalk.port'] = 11300;
+        $app['beanstalk.host'] = 'localhost';
+        $app['beanstalk.port'] = 11300;
 
-        $container['beanstalk.worker_manager.directory'] = null;
-        $container['beanstalk.queue.logger'] =
-        $container['beanstalk.worker_manager.logger'] = function ($app) {
+        $app['beanstalk.worker_manager.directory'] = null;
+        $app['beanstalk.queue.logger'] =
+        $app['beanstalk.worker_manager.logger'] = function ($app) {
             if (isset($app['logger.new'])) {
                 return $app['logger.new']('Queue');
             } elseif (isset($app['logger'])) {
@@ -35,7 +36,7 @@ class BeanstalkPimple3ServiceProvider implements ServiceProviderInterface
             }
         };
 
-        $container['beanstalk.queue'] = function ($app) {
+        $app['beanstalk.queue'] = function ($app) {
             return new Queue(
                 $app['beanstalk.host'],
                 $app['beanstalk.port'],
@@ -43,14 +44,14 @@ class BeanstalkPimple3ServiceProvider implements ServiceProviderInterface
             );
         };
 
-        $container['beanstalk.queue.web_job_producer'] = function ($app) {
+        $app['beanstalk.queue.web_job_producer'] = function ($app) {
             return new WebJobProducer(
                 $app['beanstalk.queue'],
                 $app['beanstalk.queue.logger']
             );
         };
 
-        $container['beanstalk.worker_manager'] = function ($app) {
+        $app['beanstalk.worker_manager'] = function ($app) {
             return new WorkerManager(
                 $app['beanstalk.worker_manager.directory'],
                 $app['beanstalk.worker_manager.logger'],
@@ -59,8 +60,8 @@ class BeanstalkPimple3ServiceProvider implements ServiceProviderInterface
             );
         };
 
-        $container['beanstalk.console_commands.queue_prefix'] = 'queue';
-        $container['beanstalk.console_commands'] = function ($app) {
+        $app['beanstalk.console_commands.queue_prefix'] = 'queue';
+        $app['beanstalk.console_commands'] = function ($app) {
             $prefix = $app['beanstalk.console_commands.queue_prefix'];
 
             return array(
@@ -80,9 +81,9 @@ class BeanstalkPimple3ServiceProvider implements ServiceProviderInterface
             );
         };
 
-        $container['beanstalk.console_commands.auto_add'] = true;
-        if (isset($container['console'])) {
-            $container->extend('console', function ($console, $app) {
+        $app['beanstalk.console_commands.auto_add'] = true;
+        if (isset($app['console'])) {
+            $app->extend('console', function ($console, $app) {
                 if (!$app['beanstalk.console_commands.auto_add'] || !$console instanceof Console\Application) {
                     return $console;
                 }

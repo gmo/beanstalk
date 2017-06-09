@@ -2,21 +2,13 @@
 
 namespace GMO\Beanstalk;
 
-use Silex\Application;
-use Silex\ServiceProviderInterface;
+use Gmo\Common\Deprecated;
+
+Deprecated::cls('\GMO\Beanstalk\BeanstalkSilex1ServiceProvider', 2.7, '\Gmo\Beanstalk\Bridge\Silex1\BeanstalkServiceProvider');
 
 /**
- * Service provider for Silex v1
+ * @deprecated will be removed in 3.0.
  */
-class BeanstalkSilex1ServiceProvider implements ServiceProviderInterface
+class BeanstalkSilex1ServiceProvider extends Bridge\Silex1\BeanstalkServiceProvider
 {
-    public function register(Application $app)
-    {
-        $sp = new BeanstalkPimple1ServiceProvider();
-        $sp->register($app);
-    }
-
-    public function boot(Application $app)
-    {
-    }
 }

@@ -1,5 +1,6 @@
 <?php
-namespace GMO\Beanstalk;
+
+namespace Gmo\Beanstalk\Bridge\Pimple1;
 
 use GMO\Beanstalk\Console\Command;
 use GMO\Beanstalk\Manager\WorkerManager;
@@ -11,19 +12,17 @@ use Symfony\Component\Console;
 
 /**
  * Service Provider for Pimple v1 syntax.
- * 
- * @internal Use {@see BeanstalkSilex1ServiceProvider} instead.
  */
-class BeanstalkPimple1ServiceProvider
+class BeanstalkServiceProvider
 {
-    public function register(Pimple $container)
+    public function register(Pimple $app)
     {
-        $container['beanstalk.host'] = 'localhost';
-        $container['beanstalk.port'] = 11300;
+        $app['beanstalk.host'] = 'localhost';
+        $app['beanstalk.port'] = 11300;
 
-        $container['beanstalk.worker_manager.directory'] = null;
-        $container['beanstalk.queue.logger'] =
-        $container['beanstalk.worker_manager.logger'] = $container->share(
+        $app['beanstalk.worker_manager.directory'] = null;
+        $app['beanstalk.queue.logger'] =
+        $app['beanstalk.worker_manager.logger'] = $app->share(
             function ($app) {
                 if (isset($app['logger.new'])) {
                     return $app['logger.new']('Queue');
@@ -35,7 +34,7 @@ class BeanstalkPimple1ServiceProvider
             }
         );
 
-        $container['beanstalk.queue'] = $container->share(
+        $app['beanstalk.queue'] = $app->share(
             function ($app) {
                 return new Queue(
                     $app['beanstalk.host'],
@@ -45,7 +44,7 @@ class BeanstalkPimple1ServiceProvider
             }
         );
 
-        $container['beanstalk.queue.web_job_producer'] = $container->share(
+        $app['beanstalk.queue.web_job_producer'] = $app->share(
             function ($app) {
                 return new WebJobProducer(
                     $app['beanstalk.queue'],
@@ -54,7 +53,7 @@ class BeanstalkPimple1ServiceProvider
             }
         );
 
-        $container['beanstalk.worker_manager'] = $container->share(
+        $app['beanstalk.worker_manager'] = $app->share(
             function ($app) {
                 return new WorkerManager(
                     $app['beanstalk.worker_manager.directory'],
@@ -65,8 +64,8 @@ class BeanstalkPimple1ServiceProvider
             }
         );
 
-        $container['beanstalk.console_commands.queue_prefix'] = 'queue';
-        $container['beanstalk.console_commands'] = $container->share(
+        $app['beanstalk.console_commands.queue_prefix'] = 'queue';
+        $app['beanstalk.console_commands'] = $app->share(
             function ($app) {
                 $prefix = $app['beanstalk.console_commands.queue_prefix'];
 
@@ -88,10 +87,10 @@ class BeanstalkPimple1ServiceProvider
             }
         );
 
-        $container['beanstalk.console_commands.auto_add'] = true;
-        if (isset($container['console'])) {
-            $container['console'] = $container->share(
-                $container->extend(
+        $app['beanstalk.console_commands.auto_add'] = true;
+        if (isset($app['console'])) {
+            $app['console'] = $app->share(
+                $app->extend(
                     'console',
                     function ($console, $app) {
                         if (!$app['beanstalk.console_commands.auto_add'] || !$console instanceof Console\Application) {

@@ -2,8 +2,7 @@
 
 namespace GMO\Beanstalk\Console;
 
-use GMO\Beanstalk\BeanstalkPimple1ServiceProvider;
-use GMO\Beanstalk\BeanstalkPimple3ServiceProvider;
+use Gmo\Beanstalk\Bridge;
 use GMO\Console\ConsoleApplication;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -21,10 +20,10 @@ class QueueConsoleApplication extends ConsoleApplication
         if ($container === null) {
             if (class_exists('Pimple\Container')) {
                 $container = new \Pimple\Container();
-                $container->register(new BeanstalkPimple3ServiceProvider());
+                $container->register(new Bridge\Pimple3\BeanstalkServiceProvider());
             } else {
                 $container = new \Pimple();
-                $sp = new BeanstalkPimple1ServiceProvider();
+                $sp = new Bridge\Pimple1\BeanstalkServiceProvider();
                 $sp->register($container);
             }
         }
