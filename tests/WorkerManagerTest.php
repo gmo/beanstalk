@@ -4,7 +4,7 @@ use GMO\Beanstalk\Helper\Processor;
 use GMO\Beanstalk\Manager\WorkerManager;
 use GMO\Beanstalk\Worker\WorkerInterface;
 use GMO\Common\Collections\ArrayCollection;
-use GMO\Common\String;
+use GMO\Common\Str;
 
 class WorkerManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -112,7 +112,7 @@ class TestProcessor extends Processor
 
         return $this->getProcessLines()
             ->filter(function ($line) use ($grep) {
-                return String::contains($line, $grep, false);
+                return Str::contains($line, $grep, false);
             })
             ->map(array($this, 'parseLines'))
             ->map(function ($line) {
