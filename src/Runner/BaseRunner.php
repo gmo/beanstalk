@@ -150,7 +150,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
         try {
             $worker->setup();
             if ($worker instanceof ContainerAwareWorker) {
-                $this->queue = $worker->getService(BeanstalkKeys::QUEUE);
+                $this->queue = $worker->getService('beanstalk.queue');
             }
         } catch (Exception $e) {
             $this->log->critical("An error occurred when setting up the worker", array("exception" => $e));

@@ -39,7 +39,7 @@ class AbstractQueueCommand extends AbstractCommand
      */
     protected function getQueue()
     {
-        return $this->getService(BeanstalkKeys::QUEUE);
+        return $this->getService('beanstalk.queue');
     }
 
     public function completeArgumentValues($argumentName, CompletionContext $context)
@@ -83,29 +83,29 @@ class AbstractQueueCommand extends AbstractCommand
     {
         $container = $this->getContainer();
         if ($input->hasOption('host') && $host = $input->getOption('host')) {
-            $container[BeanstalkKeys::HOST] = $host;
+            $container['beanstalk.host'] = $host;
         }
         if ($input->hasOption('port') && $port = $input->getOption('port')) {
-            $container[BeanstalkKeys::PORT] = $port;
+            $container['beanstalk.port'] = $port;
         }
 
         $logger = $this->logger;
         if ($container instanceof \Pimple) {
-            $container[BeanstalkKeys::QUEUE] = $container->share($container->extend(BeanstalkKeys::QUEUE, function (QueueInterface $queue) use ($logger) {
+            $container['beanstalk.queue'] = $container->share($container->extend('beanstalk.queue', function (QueueInterface $queue) use ($logger) {
                 $queue->setLogger($logger);
 
                 return $queue;
             }));
         } elseif ($container instanceof \Pimple\Container) {
-            $container->extend(BeanstalkKeys::QUEUE, function (QueueInterface $queue) use ($logger) {
+            $container->extend('beanstalk.queue', function (QueueInterface $queue) use ($logger) {
                 $queue->setLogger($logger);
 
                 return $queue;
             });
         } else {
-            $queue = $container[BeanstalkKeys::QUEUE];
+            $queue = $container['beanstalk.queue'];
             $queue->setLogger($logger);
-            $container[BeanstalkKeys::QUEUE] = $queue;
+            $container['beanstalk.queue'] = $queue;
         }
     }
 

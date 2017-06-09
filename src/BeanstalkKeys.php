@@ -2,6 +2,13 @@
 
 namespace GMO\Beanstalk;
 
+use Gmo\Common\Deprecated;
+
+Deprecated::cls('\GMO\Beanstalk\BeanstalkKeys', 2.7);
+
+/**
+ * @deprecated will be removed in 3.0.
+ */
 final class BeanstalkKeys
 {
     const HOST = 'beanstalk.host';

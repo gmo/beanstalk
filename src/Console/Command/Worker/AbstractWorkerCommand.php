@@ -57,17 +57,17 @@ class AbstractWorkerCommand extends AbstractCommand
     {
         $container = $this->getContainer();
         if ($input->hasOption('host') && $host = $input->getOption('host')) {
-            $container[BeanstalkKeys::HOST] = $host;
+            $container['beanstalk.host'] = $host;
         }
         if ($input->hasOption('port') && $port = $input->getOption('port')) {
-            $container[BeanstalkKeys::PORT] = $port;
+            $container['beanstalk.port'] = $port;
         }
         if ($input->hasOption('dir') && $dir = $input->getOption('dir')) {
-            $container[BeanstalkKeys::WORKER_DIRECTORY] = $dir;
+            $container['beanstalk.worker_manager.directory'] = $dir;
         }
 
         /** @var WorkerManager $manager */
-        $manager = $container[BeanstalkKeys::WORKER_MANAGER];
+        $manager = $container['beanstalk.worker_manager'];
         $manager->setLogger($this->logger);
 
         return $manager;

@@ -139,7 +139,7 @@ class StatsCommand extends AbstractQueueCommand
      */
     private function logStats(ArrayCollection $tubes)
     {
-        $logger = $this->getService(BeanstalkKeys::QUEUE_LOGGER);
+        $logger = $this->getService('beanstalk.queue.logger');
         foreach ($tubes as $tube => $stats) {
             $logger->info('Tube stats', array(
                 'tube'          => $tube,
