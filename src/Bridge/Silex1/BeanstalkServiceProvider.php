@@ -2,6 +2,7 @@
 
 namespace Gmo\Beanstalk\Bridge\Silex1;
 
+use Gmo\Beanstalk\Bridge;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 
@@ -12,7 +13,7 @@ class BeanstalkServiceProvider implements ServiceProviderInterface
 {
     public function register(Application $app)
     {
-        $sp = new BeanstalkServiceProvider();
+        $sp = new Bridge\Pimple1\BeanstalkServiceProvider();
         $sp->register($app);
     }
 
