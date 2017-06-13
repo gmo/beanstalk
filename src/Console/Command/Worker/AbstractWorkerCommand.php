@@ -2,7 +2,6 @@
 
 namespace GMO\Beanstalk\Console\Command\Worker;
 
-use GMO\Beanstalk\BeanstalkKeys;
 use GMO\Beanstalk\Console\Command\AbstractCommand;
 use GMO\Beanstalk\Manager\WorkerInfo;
 use GMO\Beanstalk\Manager\WorkerManager;

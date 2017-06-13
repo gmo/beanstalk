@@ -2,7 +2,6 @@
 
 namespace GMO\Beanstalk\Console\Command\Queue;
 
-use GMO\Beanstalk\BeanstalkKeys;
 use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Beanstalk\Tube\TubeCollection;
 use GMO\Common\Collections\ArrayCollection;

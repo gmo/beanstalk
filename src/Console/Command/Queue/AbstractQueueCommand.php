@@ -2,7 +2,6 @@
 
 namespace GMO\Beanstalk\Console\Command\Queue;
 
-use GMO\Beanstalk\BeanstalkKeys;
 use GMO\Beanstalk\Console\Command\AbstractCommand;
 use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Tube\Tube;

@@ -3,7 +3,6 @@
 namespace GMO\Beanstalk\Runner;
 
 use Exception;
-use GMO\Beanstalk\BeanstalkKeys;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\JobError\Action\JobActionInterface;
 use GMO\Beanstalk\Job\JobError\HasJobErrorInterface;
