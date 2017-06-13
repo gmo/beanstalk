@@ -6,7 +6,7 @@ use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\NullJob;
 
 /**
- * Modifies the runner to only process one job
+ * Modifies the runner to process jobs until there are no more and then stop.
  */
 class RunOnceRunnerDecorator extends RunnerDecorator
 {
@@ -14,7 +14,7 @@ class RunOnceRunnerDecorator extends RunnerDecorator
 
     public function shouldKeepRunning()
     {
-        if (!$this->currentJob instanceof NullJob) {
+        if ($this->currentJob instanceof NullJob) {
             return false;
         }
 
