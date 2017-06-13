@@ -11,6 +11,7 @@ class TestProcessor extends Processor
     private $workerDir;
     public $executeCalls;
     public $terminatedProcesses;
+    public $terminatedForcefullyProcesses;
     public $waitedForProcesses;
 
     public function __construct($workerDir)
@@ -18,10 +19,11 @@ class TestProcessor extends Processor
         $this->workerDir = realpath($workerDir) . '/';
         $this->executeCalls = new ArrayCollection();
         $this->terminatedProcesses = new ArrayCollection();
+        $this->terminatedForcefullyProcesses = new ArrayCollection();
         $this->waitedForProcesses = new ArrayCollection();
     }
 
-    public function waitForProcess($pid, $interval = 200)
+    public function waitForProcess($pid, $interval = 200, $timeout = 10)
     {
         $this->waitedForProcesses->add($pid);
     }
@@ -35,9 +37,13 @@ class TestProcessor extends Processor
         ;
     }
 
-    public function terminateProcess($pid)
+    public function terminateProcess($pid, $force = false)
     {
-        $this->terminatedProcesses->add($pid);
+        if ($force) {
+            $this->terminatedForcefullyProcesses->add($pid);
+        } else {
+            $this->terminatedProcesses->add($pid);
+        }
     }
 
     public function grepForPids($grep)

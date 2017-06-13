@@ -61,6 +61,7 @@ class WorkerManagerTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertSame($expectedPids, $this->processor->terminatedProcesses->toArray());
         $this->assertSame($expectedPids, $this->processor->waitedForProcesses->toArray());
+        $this->assertSame($expectedPids, $this->processor->terminatedForcefullyProcesses->toArray());
     }
 
     public function testStartWorkers()
