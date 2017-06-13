@@ -18,9 +18,11 @@ class RpcRunner extends BaseRunner
 
     public function preProcessJob(Job $job)
     {
-        parent::preProcessJob($job);
+        $job = parent::preProcessJob($job);
         $this->replyTo = $job->getData()->remove(static::RPC_REPLY_TO_FIELD);
         $job->setData($job->getData()->get('data'));
+
+        return $job;
     }
 
     public function postProcessJob(Job $job)

@@ -190,7 +190,7 @@ class ArrayQueue implements QueueInterface
         }
 
         /** @var ArrayJob|NullJob $job */
-        $job = $tube->ready()->removeFirst();
+        $job = $tube->ready()->removeFirst() ?: new NullJob();
         $this->logProcessor->setCurrentJob($job);
         if ($this->isNullJob($job)) {
             return $job;

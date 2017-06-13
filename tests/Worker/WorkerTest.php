@@ -1,19 +1,21 @@
 <?php
 
+namespace Gmo\Beanstalk\Tests\Worker;
+
 use GMO\Beanstalk\Test\QueueTestCase;
 use GMO\Beanstalk\Test\TestRunner;
+use Gmo\Beanstalk\Tests\Worker\TestWorkers\UnitTestWorker;
+use Gmo\Beanstalk\Tests\Worker\TestWorkers\UnitTestWorkerProcessGenericException;
+use Gmo\Beanstalk\Tests\Worker\TestWorkers\UnitTestWorkerProcessJobError;
+use Gmo\Beanstalk\Tests\Worker\TestWorkers\UnitTestWorkerSetupFailure;
 use GMO\Common\Collections\ArrayCollection;
-use workers\UnitTestWorker;
-use workers\UnitTestWorkerProcessGenericException;
-use workers\UnitTestWorkerProcessJobError;
-use workers\UnitTestWorkerSetupFailure;
 
 class WorkerTest extends QueueTestCase
 {
     public function testWorkerPushesAndProcessesAJob()
     {
         $runner = new TestRunner(static::$queue, new UnitTestWorker());
-        UnitTestWorker::push(static::$queue, array(
+        UnitTestWorker::pushData(static::$queue, array(
             'param1' => 'data1',
             'param2' => 'data2',
         ));
@@ -27,7 +29,7 @@ class WorkerTest extends QueueTestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \Exception
      * @expectedExceptionMessage Setup function failed!
      */
     public function testWorkerSetupFails()
@@ -39,7 +41,7 @@ class WorkerTest extends QueueTestCase
     public function testWorkerMissingParameters()
     {
         $runner = new TestRunner(static::$queue, new UnitTestWorker());
-        UnitTestWorker::push(static::$queue, array(
+        UnitTestWorker::pushData(static::$queue, array(
             'param2' => 'data2',
         ));
         $job = $runner->run();
@@ -50,13 +52,13 @@ class WorkerTest extends QueueTestCase
     public function testWorkerProcessingThrowsGenericException()
     {
         $runner = new TestRunner(static::$queue, new UnitTestWorkerProcessGenericException());
-        UnitTestWorkerProcessGenericException::push(static::$queue, array(
+        UnitTestWorkerProcessGenericException::pushData(static::$queue, array(
             'param1' => 'dataA',
             'param2' => 'dataB',
         ));
         $runner->run();
 
-        $tube = static::$queue->tube(UnitTestWorkerProcessGenericException::className());
+        $tube = static::$queue->tube(UnitTestWorkerProcessGenericException::getTubeName());
         $this->assertCount(0, $tube->ready());
         $this->assertCount(1, $tube->buried());
     }
@@ -65,7 +67,7 @@ class WorkerTest extends QueueTestCase
     {
         $runner = new TestRunner(static::$queue, new UnitTestWorkerProcessJobError());
         $runner->run();
-        $tube = static::$queue->tube(UnitTestWorkerProcessJobError::className());
+        $tube = static::$queue->tube(UnitTestWorkerProcessJobError::getTubeName());
         $this->assertTrue($tube->isEmpty());
     }
 }

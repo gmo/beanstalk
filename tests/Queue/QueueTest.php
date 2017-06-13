@@ -1,5 +1,7 @@
 <?php
 
+namespace Gmo\Beanstalk\Tests\Queue;
+
 use GMO\Beanstalk\Queue\Queue;
 use GMO\Beanstalk\Test\ArrayQueue;
 use GMO\Beanstalk\Test\QueueTestCase;
