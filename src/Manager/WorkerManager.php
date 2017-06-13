@@ -198,14 +198,18 @@ class WorkerManager implements LoggerAwareInterface
     protected function spawnWorker(WorkerInfo $worker)
     {
         //TODO: Use actual logger not redirection
+        $outFile = file_exists('/var/log/gmo/beanstalkd') ?
+            "/var/log/gmo/beanstalkd/{$worker->getName()}.log" :
+            '/dev/null'
+        ;
         $cmd = sprintf(
-            'nohup %s "\"%s\"" "%s" %s %d >> /var/log/gmo/beanstalkd/%s.log 2>&1 &',
+            'nohup %s "\"%s\"" "%s" %s %d >> %s 2>&1 &',
             './runner',
             $this->workerDir,
             $worker->getFullyQualifiedName(),
             $this->host,
             $this->port,
-            $worker->getName()
+            $outFile
         );
         $this->processor->executeFromDir($cmd, __DIR__ . '/../../bin');
     }
