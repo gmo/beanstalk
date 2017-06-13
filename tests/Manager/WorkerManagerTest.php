@@ -4,8 +4,9 @@ namespace Gmo\Beanstalk\Tests\Manager;
 
 use GMO\Beanstalk\Manager\WorkerManager;
 use GMO\Beanstalk\Worker\WorkerInterface;
+use PHPUnit\Framework\TestCase;
 
-class WorkerManagerTest extends \PHPUnit_Framework_TestCase
+class WorkerManagerTest extends TestCase
 {
     /** @var WorkerManager */
     private $wm;

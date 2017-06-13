@@ -4,8 +4,9 @@ namespace GMO\Beanstalk\Test;
 
 use GMO\Beanstalk\Job\Job;
 use GMO\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\TestCase;
 
-abstract class QueueTestCase extends \PHPUnit_Framework_TestCase
+abstract class QueueTestCase extends TestCase
 {
     /** @var ArrayQueue */
     protected static $queue;
