@@ -1,10 +1,10 @@
 <?php
 
-namespace workers;
+namespace Gmo\Beanstalk\Tests\Worker\TestWorkers;
 
 use GMO\Beanstalk\Job\Job;
 
-class UnitTestWorkerProcessGenericException extends AbstractTestWorker
+class UnitTestWorker extends AbstractTestWorker
 {
     public static function getRequiredParams()
     {
@@ -13,6 +13,6 @@ class UnitTestWorkerProcessGenericException extends AbstractTestWorker
 
     public function process(Job $job)
     {
-        throw new \Exception("The process fails");
+        $job->setResult($job->getData()->getValues());
     }
 }

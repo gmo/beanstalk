@@ -1,12 +1,14 @@
 <?php
 
+namespace Gmo\Beanstalk\Tests\Worker;
+
 use GMO\Beanstalk\Test\QueueTestCase;
 use GMO\Beanstalk\Test\TestRunner;
+use Gmo\Beanstalk\Tests\Worker\TestWorkers\UnitTestWorker;
+use Gmo\Beanstalk\Tests\Worker\TestWorkers\UnitTestWorkerProcessGenericException;
+use Gmo\Beanstalk\Tests\Worker\TestWorkers\UnitTestWorkerProcessJobError;
+use Gmo\Beanstalk\Tests\Worker\TestWorkers\UnitTestWorkerSetupFailure;
 use GMO\Common\Collections\ArrayCollection;
-use workers\UnitTestWorker;
-use workers\UnitTestWorkerProcessGenericException;
-use workers\UnitTestWorkerProcessJobError;
-use workers\UnitTestWorkerSetupFailure;
 
 class WorkerTest extends QueueTestCase
 {
@@ -27,7 +29,7 @@ class WorkerTest extends QueueTestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \Exception
      * @expectedExceptionMessage Setup function failed!
      */
     public function testWorkerSetupFails()

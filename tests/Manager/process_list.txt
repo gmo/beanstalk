@@ -82,8 +82,8 @@ carson         14739   0.0  0.1  2447544   4620   ??  Ss    9:35AM   0:00.06 /us
 root           14730   0.0  0.0  2442192   2128   ??  Ss    9:26AM   0:00.03 /usr/sbin/ocspd
 carson         14719   0.0  0.0  2465960   3040   ??  S     9:22AM   0:00.02 /System/Library/PrivateFrameworks/TCC.framework/Resources/tccd
 carson         14718   0.0  0.2  2476092  20752   ??  S     9:22AM   0:00.76 /System/Library/PrivateFrameworks/CalendarAgent.framework/Executables/CalendarAgent
-carson         22925   0.0  0.1  2537272   9060 s000  S     5:01PM   0:00.11 php ./runner "{WORKER_DIR}" workers\UnitTestRpcWorker 127.0.0.1 11300
-carson         22923   0.0  0.1  2517816   9032 s000  S     5:01PM   0:00.11 php ./runner "{WORKER_DIR}" workers\NullWorker 127.0.0.1 11300
-carson         22921   0.0  0.1  2518840   9008 s000  S     5:01PM   0:00.12 php ./runner "{WORKER_DIR}" workers\NullWorker 127.0.0.1 11300
+carson         22925   0.0  0.1  2537272   9060 s000  S     5:01PM   0:00.11 php ./runner "{WORKER_DIR}" Gmo\Beanstalk\Tests\Worker\TestWorkers\UnitTestRpcWorker 127.0.0.1 11300
+carson         22923   0.0  0.1  2517816   9032 s000  S     5:01PM   0:00.11 php ./runner "{WORKER_DIR}" Gmo\Beanstalk\Tests\Worker\TestWorkers\NullWorker 127.0.0.1 11300
+carson         22921   0.0  0.1  2518840   9008 s000  S     5:01PM   0:00.12 php ./runner "{WORKER_DIR}" Gmo\Beanstalk\Tests\Worker\TestWorkers\NullWorker 127.0.0.1 11300
 carson         14689   0.0  0.1  2453852  12148   ??  S     9:17AM   0:00.22 php /Users/carson/Repos/communication-channels/src/tests/integration/beanstalkd/workers/UnitTestWorker.php --run
 carson         14682   0.0  0.1  2495332   8312   ??  S     9:15AM   0:00.08 /System/Library/CoreServices/AVRCPAgent.app/Contents/MacOS/AVRCPAgent -BTAutoLaunch -BTType L2CAP -BTObjectID 1064314368

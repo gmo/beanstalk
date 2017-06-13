@@ -1,6 +1,6 @@
 <?php
 
-namespace workers;
+namespace Gmo\Beanstalk\Tests\Worker\TestWorkers;
 
 use GMO\Beanstalk\Worker\AbstractWorker;
 use Psr\Log\NullLogger;

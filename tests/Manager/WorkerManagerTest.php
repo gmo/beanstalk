@@ -1,5 +1,7 @@
 <?php
 
+namespace Gmo\Beanstalk\Tests\Manager;
+
 use GMO\Beanstalk\Helper\Processor;
 use GMO\Beanstalk\Manager\WorkerManager;
 use GMO\Beanstalk\Worker\WorkerInterface;
@@ -15,7 +17,7 @@ class WorkerManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $dir = realpath('workers') . '/';
+        $dir = __DIR__ . '/../Worker/TestWorkers';
         $this->wm = new WorkerManager($dir);
         $this->processor = new TestProcessor($dir);
         $this->wm->setProcessor($this->processor);
