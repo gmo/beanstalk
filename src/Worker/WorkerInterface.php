@@ -2,10 +2,10 @@
 
 namespace GMO\Beanstalk\Worker;
 
+use Bolt\Collection\Bag;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\JobError\JobErrorHandlerInterface;
 use GMO\Beanstalk\Runner\RunnerInterface;
-use GMO\Common\Collections\ArrayCollection;
 
 interface WorkerInterface
 {
@@ -41,14 +41,14 @@ interface WorkerInterface
     /**
      * Return a list of job error handlers
      *
-     * @return JobErrorHandlerInterface[]|ArrayCollection
+     * @return JobErrorHandlerInterface[]|Bag
      */
     public static function getErrorHandlers();
 
     /**
      * Return an array of parameters required for job to continue.
      *
-     * @return array|ArrayCollection
+     * @return string[]|Bag
      */
     public static function getRequiredParams();
 

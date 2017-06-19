@@ -86,15 +86,15 @@ class AbstractWorkerCommand extends AbstractCommand
 
         return $manager
             ->getWorkers($currentWord)
-            ->filter(function (WorkerInfo $info) use ($currentWorkers) {
+            ->filter(function ($i, WorkerInfo $info) use ($currentWorkers) {
                 // filter out workers already defined in input
                 return !in_array(strtolower($info->getName()), $currentWorkers);
             })
-            ->map(function (WorkerInfo $info) use ($currentWord) {
+            ->map(function ($i, WorkerInfo $info) use ($currentWord) {
                 // change case to match current word, else it will be filtered out
                 return $currentWord . substr($info->getName(), strlen($currentWord));
             })
-            ->getValues()
+            ->values()
             ->toArray()
         ;
     }

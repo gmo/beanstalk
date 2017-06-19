@@ -2,12 +2,10 @@
 
 namespace GMO\Beanstalk\Helper;
 
-use GMO\Common\Collections\ArrayCollection;
-
 class ReflectionManager
 {
-    /** @var ArrayCollection */
-    private static $classes;
+    /** @var \ReflectionClass[] */
+    private static $classes = [];
 
     /**
      * @param string $file file path
@@ -17,16 +15,13 @@ class ReflectionManager
     public static function getClass($file)
     {
         $file = (string) $file;
-        if (!static::$classes) {
-            static::$classes = new ArrayCollection();
-        }
 
-        if (!static::$classes->get($file)) {
+        if (!isset(static::$classes[$file])) {
             $name = ReflectionManager::getClassName($file);
-            static::$classes->set($file, new \ReflectionClass($name));
+            static::$classes[$file] = new \ReflectionClass($name);
         }
 
-        return static::$classes->get($file);
+        return static::$classes[$file];
     }
 
     private static function getClassName($file)

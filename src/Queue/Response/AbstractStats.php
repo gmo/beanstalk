@@ -2,17 +2,19 @@
 
 namespace GMO\Beanstalk\Queue\Response;
 
-use GMO\Common\Collections\ArrayCollection;
+use Bolt\Collection\Bag;
 use GMO\Common\Str;
 
-abstract class AbstractStats extends ArrayCollection
+abstract class AbstractStats extends Bag
 {
-    public function __construct($elements = array())
+    public static function from($collection)
     {
-        parent::__construct($elements);
-        foreach ($this as $key => $value) {
-            $this[$key] = static::convertToType($value);
+        $data = [];
+        foreach ($collection as $key => $value) {
+            $data[$key] = static::convertToType($value);
         }
+
+        return new static($data);
     }
 
     protected static function convertToType($value)

@@ -2,13 +2,13 @@
 
 namespace Gmo\Beanstalk\Tests\Worker;
 
+use Bolt\Collection\Bag;
 use GMO\Beanstalk\Test\QueueTestCase;
 use GMO\Beanstalk\Test\TestRunner;
 use Gmo\Beanstalk\Tests\Worker\TestWorkers\UnitTestWorker;
 use Gmo\Beanstalk\Tests\Worker\TestWorkers\UnitTestWorkerProcessGenericException;
 use Gmo\Beanstalk\Tests\Worker\TestWorkers\UnitTestWorkerProcessJobError;
 use Gmo\Beanstalk\Tests\Worker\TestWorkers\UnitTestWorkerSetupFailure;
-use GMO\Common\Collections\ArrayCollection;
 
 class WorkerTest extends QueueTestCase
 {
@@ -24,7 +24,7 @@ class WorkerTest extends QueueTestCase
 
         $job = $runner->run();
 
-        $this->assertEquals(new ArrayCollection(array('data1', 'data2')), $job->getResult());
+        $this->assertEquals(new Bag(array('data1', 'data2')), $job->getResult());
         $this->assertTubeEmpty(UnitTestWorker::getTubeName());
     }
 

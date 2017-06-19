@@ -2,6 +2,7 @@
 
 namespace GMO\Beanstalk\Runner;
 
+use Bolt\Collection\Bag;
 use Exception;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\JobError\Action\JobActionInterface;
@@ -14,7 +15,6 @@ use GMO\Beanstalk\Job\UnserializableJob;
 use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Worker\ContainerAwareWorker;
 use GMO\Beanstalk\Worker\WorkerInterface;
-use GMO\Common\Collections\ArrayCollection;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
@@ -36,7 +36,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
     protected $log;
     /** @var string Tube name cached for performance */
     protected $tubeName;
-    /** @var JobErrorHandlerInterface[]|ArrayCollection Error handlers cached for performance */
+    /** @var JobErrorHandlerInterface[]|Bag Error handlers cached for performance */
     protected $errorHandlers;
 
     public function setup(QueueInterface $queue, WorkerInterface $worker)
@@ -123,7 +123,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
             return true;
         }
         foreach ($this->worker->getRequiredParams() as $reqParam) {
-            if (!$params->containsKey($reqParam)) {
+            if (!isset($params[$reqParam])) {
                 $this->log->error('Job is missing required parameter', array(
                     'missing' => $reqParam,
                 ));

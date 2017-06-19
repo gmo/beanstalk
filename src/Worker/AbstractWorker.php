@@ -2,9 +2,9 @@
 
 namespace GMO\Beanstalk\Worker;
 
+use Bolt\Collection\Bag;
 use GMO\Beanstalk\Job\JobProducerInterface;
 use GMO\Beanstalk\Runner\BaseRunner;
-use GMO\Common\Collections\ArrayCollection;
 use Gmo\Common\Serialization\SerializableInterface;
 use GMO\Common\Str;
 
@@ -50,12 +50,12 @@ abstract class AbstractWorker implements WorkerInterface
 
     public static function getErrorHandlers()
     {
-        return new ArrayCollection();
+        return new Bag();
     }
 
     public static function getRequiredParams()
     {
-        return new ArrayCollection();
+        return new Bag();
     }
 
     public function setup()

@@ -2,13 +2,13 @@
 
 namespace GMO\Beanstalk\Queue;
 
+use Bolt\Collection\ImmutableBag;
 use GMO\Beanstalk\Job\JobControlInterface;
 use GMO\Beanstalk\Queue\Response\ServerStats;
 use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Beanstalk\Tube\Tube;
 use GMO\Beanstalk\Tube\TubeCollection;
 use GMO\Beanstalk\Tube\TubeControlInterface;
-use GMO\Common\Collections\ArrayCollection;
 use Psr\Log\LoggerAwareInterface;
 
 interface QueueInterface extends TubeControlInterface, JobControlInterface, LoggerAwareInterface
@@ -32,7 +32,7 @@ interface QueueInterface extends TubeControlInterface, JobControlInterface, Logg
     /**
      * Gets the stats for all tubes
      *
-     * @return TubeStats[]|ArrayCollection
+     * @return TubeStats[]|ImmutableBag
      */
     public function statsAllTubes();
 

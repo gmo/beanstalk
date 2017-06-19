@@ -2,9 +2,9 @@
 
 namespace GMO\Beanstalk\Manager;
 
+use Bolt\Collection\ImmutableBag;
 use GMO\Beanstalk\Helper\ClassFinder;
 use GMO\Beanstalk\Helper\Processor;
-use GMO\Common\Collections\ArrayCollection;
 use GMO\Common\Str;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -17,7 +17,7 @@ class WorkerManager implements LoggerAwareInterface
 {
     /** @var string Directory containing workers */
     protected $workerDir;
-    /** @var WorkerInfo[]|ArrayCollection */
+    /** @var WorkerInfo[]|ImmutableBag */
     protected $workerInfoList;
     /** @var Processor */
     protected $processor;
@@ -117,9 +117,9 @@ class WorkerManager implements LoggerAwareInterface
             }
         }
 
-        $failed = new ArrayCollection();
+        $failed = [];
         foreach ($workers as $worker) {
-            $failed[$worker->getName()] = new ArrayCollection();
+            $failed[$worker->getName()] = [];
 
             foreach ($worker->getPids() as $pid) {
                 $this->log->debug(sprintf("Waiting for: [%s] %s...", $pid, $worker->getName()));
@@ -143,14 +143,14 @@ class WorkerManager implements LoggerAwareInterface
      *
      * @param null|string|array $filter [optional] worker(s) filter
      *
-     * @return WorkerInfo[]|ArrayCollection
+     * @return WorkerInfo[]|ImmutableBag
      */
     public function getWorkers($filter = null)
     {
         $processes = $this->processor->grepForPids(sprintf('runner \"%s\"', $this->getWorkerDir()));
 
         return $this->getWorkerInfoList()
-            ->map(function (WorkerInfo $worker) use ($processes) {
+            ->map(function ($i, WorkerInfo $worker) use ($processes) {
                 foreach ($processes as $process) {
                     if ($worker->getFullyQualifiedName() === $process[0]) {
                         $worker->addPid($process[1]);
@@ -159,7 +159,7 @@ class WorkerManager implements LoggerAwareInterface
 
                 return $worker;
             })
-            ->filter(function (WorkerInfo $worker) use ($filter) {
+            ->filter(function ($i, WorkerInfo $worker) use ($filter) {
                 if (!$filter) {
                     return true;
                 }
@@ -183,16 +183,17 @@ class WorkerManager implements LoggerAwareInterface
             return $this->workerInfoList;
         }
 
-        return $this->workerInfoList = ArrayCollection::create(
-            ClassFinder::create($this->workerDir)
-                ->isInstantiable()
-                ->isSubclassOf('\GMO\Beanstalk\Worker\WorkerInterface')
-                ->map(function (\ReflectionClass $class) {
-                    return new WorkerInfo($class);
-                })
-            )
-            ->sortKeys()
+        $list = ClassFinder::create($this->workerDir)
+            ->isInstantiable()
+            ->isSubclassOf('\GMO\Beanstalk\Worker\WorkerInterface')
+            ->map(function (\ReflectionClass $class) {
+                return new WorkerInfo($class);
+            })
         ;
+        $list = iterator_to_array($list);
+        ksort($list);
+
+        return $this->workerInfoList = new ImmutableBag($list);
     }
 
     protected function spawnWorker(WorkerInfo $worker)

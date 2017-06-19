@@ -2,9 +2,9 @@
 
 namespace GMO\Beanstalk\Console\Command\Queue;
 
+use Bolt\Collection\ImmutableBag;
 use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Beanstalk\Tube\TubeCollection;
-use GMO\Common\Collections\ArrayCollection;
 use GMO\Console\Helper\AutoHidingTable;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
@@ -57,27 +57,26 @@ class StatsCommand extends AbstractQueueCommand
     {
         $queue = $this->getQueue();
         if (!$tubes = $input->getArgument('tube')) {
-            $stats = $queue->statsAllTubes();
-            $error = false;
-        } else {
-            /** @var $tubes TubeCollection */
-            list($tubes, $error) = $this->matchTubeNames($tubes, $output);
-            $stats = new ArrayCollection();
-            foreach ($tubes as $name => $tube) {
-                $stats->set($name, $tube->stats());
-            }
+            return [$queue->statsAllTubes(), false];
         }
 
-        return array($stats, $error);
+        /** @var $tubes TubeCollection */
+        list($tubes, $error) = $this->matchTubeNames($tubes, $output);
+        $stats = [];
+        foreach ($tubes as $name => $tube) {
+            $stats[$name] = $tube->stats();
+        }
+
+        return [new ImmutableBag($stats), $error];
     }
 
     /**
-     * @param TubeStats[]|ArrayCollection $stats
-     * @param int|null                    $width
+     * @param TubeStats[]|ImmutableBag $stats
+     * @param int|null                 $width
      *
      * @return string
      */
-    private function renderStats(ArrayCollection $stats, $width = null)
+    private function renderStats(ImmutableBag $stats, $width = null)
     {
         if ($stats->isEmpty()) {
             return 'There are no current tubes';
@@ -134,9 +133,9 @@ class StatsCommand extends AbstractQueueCommand
     }
 
     /**
-     * @param TubeStats[]|ArrayCollection $tubes
+     * @param TubeStats[]|ImmutableBag $tubes
      */
-    private function logStats(ArrayCollection $tubes)
+    private function logStats(ImmutableBag $tubes)
     {
         $logger = $this->getService('beanstalk.queue.logger');
         foreach ($tubes as $tube => $stats) {
@@ -157,7 +156,7 @@ class StatsCommand extends AbstractQueueCommand
 
     private function getHelpText()
     {
-        $exampleStats = ArrayCollection::create(array(
+        $exampleStats = new ImmutableBag(array(
             new TubeStats(array('name' => 'TubeA')),
             new TubeStats(array('name' => 'SendApi')),
             new TubeStats(array('name' => 'ReceiveApi')),

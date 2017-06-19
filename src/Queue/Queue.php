@@ -15,7 +15,6 @@ use GMO\Beanstalk\Queue\Response\ServerStats;
 use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Beanstalk\Tube\Tube;
 use GMO\Beanstalk\Tube\TubeCollection;
-use GMO\Common\Collections\ArrayCollection;
 use GMO\Common\Exception\NotSerializableException;
 use Pheanstalk;
 use Psr\Log\LoggerInterface;
@@ -197,7 +196,7 @@ class Queue implements QueueInterface
     {
         /** @var Pheanstalk\Response\ArrayResponse $response */
         $response = $this->pheanstalk->statsTube($tube);
-        $stats = new TubeStats($response);
+        $stats = TubeStats::from($response);
 
         return $stats;
     }
@@ -255,7 +254,7 @@ class Queue implements QueueInterface
             $stats = array('id' => -1);
         }
 
-        return JobStats::create($stats);
+        return JobStats::from($stats);
     }
 
     public function touch(Job $job)
@@ -292,7 +291,7 @@ class Queue implements QueueInterface
     /** @inheritdoc */
     public function statsAllTubes()
     {
-        return $this->tubes()->map(function (Tube $tube) {
+        return $this->tubes()->map(function ($i, Tube $tube) {
             return $tube->stats();
         });
     }
@@ -303,7 +302,7 @@ class Queue implements QueueInterface
         /** @var Pheanstalk\Response\ArrayResponse $stats */
         $stats = $this->pheanstalk->stats();
 
-        return new ServerStats($stats);
+        return ServerStats::from($stats);
     }
 
     public function setLogger(LoggerInterface $logger)

@@ -4,7 +4,6 @@ namespace GMO\Beanstalk\Runner;
 
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\UnserializableJob;
-use GMO\Common\Collections\ArrayCollection;
 
 /**
  * Classes can extend this one to handle jobs with unserializable data
@@ -14,7 +13,7 @@ abstract class JobConverterRunner extends RunnerDecorator
     /**
      * Manually unserialize the job data
      *
-     * @param ArrayCollection|mixed $jobData
+     * @param mixed $jobData
      *
      * @return mixed
      */

@@ -2,8 +2,8 @@
 
 namespace GMO\Beanstalk\Test;
 
+use Bolt\Collection\Bag;
 use GMO\Beanstalk\Job\Job;
-use GMO\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 
 abstract class QueueTestCase extends TestCase
@@ -79,13 +79,12 @@ abstract class QueueTestCase extends TestCase
         $canonicalize = false
     ) {
         $jobs = static::getJobs($tube)
-            ->map(function (Job $job) {
+            ->map(function ($i, Job $job) {
                 return $job->getData();
             })
             ->toArray()
         ;
-        $jobs = new ArrayCollection($jobs);
-        $expected = new ArrayCollection($expected);
+        $expected = Bag::from($expected)->toArray();
         static::assertEquals($expected, $jobs, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
     }
 

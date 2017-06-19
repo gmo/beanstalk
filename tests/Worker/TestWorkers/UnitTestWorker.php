@@ -13,6 +13,6 @@ class UnitTestWorker extends AbstractTestWorker
 
     public function process(Job $job)
     {
-        $job->setResult($job->getData()->getValues());
+        $job->setResult($job->getData()->values());
     }
 }

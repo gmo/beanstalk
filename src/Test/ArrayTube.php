@@ -87,7 +87,7 @@ class ArrayTube extends Tube
 
     public function stats()
     {
-        $urgentJobs = $this->ready()->filter(function (ArrayJob $job) {
+        $urgentJobs = $this->ready()->filter(function ($i, ArrayJob $job) {
             return $job->getPriority() < QueueInterface::DEFAULT_PRIORITY;
         });
 
@@ -130,7 +130,7 @@ class ArrayTube extends Tube
     public function ready()
     {
         $this->moveDelayedJobs();
-        $this->prioritizeJobs();
+        $this->ready->prioritize();
 
         return $this->ready;
     }
@@ -152,26 +152,14 @@ class ArrayTube extends Tube
         return $this->buried;
     }
 
-    protected function prioritizeJobs()
-    {
-        $tube = $this->ready;
-        $this->ready->sortValues(function (ArrayJob $a, ArrayJob $b) use ($tube) {
-            if ($a->getPriority() === $b->getPriority()) {
-                return $tube->indexOf($a) > $tube->indexOf($b) ? 1 : -1;
-            }
-
-            return $a->getPriority() > $b->getPriority() ? 1 : -1;
-        });
-    }
-
     protected function moveDelayedJobs()
     {
-        $nowReady = $this->delayed->filter(function (ArrayJob $job) {
+        $nowReady = $this->delayed->filter(function ($i, ArrayJob $job) {
             return !$job->isDelayed();
         });
-        $this->ready->merge($nowReady);
+        $this->ready = $this->ready->merge($nowReady);
         foreach ($nowReady as $job) {
-            $this->delayed->removeElement($job);
+            $this->delayed->removeItem($job);
         }
     }
 }

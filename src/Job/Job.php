@@ -2,14 +2,14 @@
 
 namespace GMO\Beanstalk\Job;
 
-use GMO\Common\Collections\ArrayCollection;
+use Bolt\Collection\Bag;
 
 class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate
 {
     /**
      * Pheanstalk\Job::data is ignored because it's private and we allow write access
      *
-     * @var ArrayCollection|mixed
+     * @var Bag|mixed
      */
     protected $jobData;
     protected $result;
@@ -20,7 +20,7 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate
     public function __construct($id, $data, JobControlInterface $queue)
     {
         $this->queue = $queue;
-        $this->jobData = is_array($data) ? new ArrayCollection($data) : $data;
+        $this->jobData = is_array($data) ? new Bag($data) : $data;
         parent::__construct($id, $this->jobData);
     }
 
@@ -30,7 +30,7 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * @return ArrayCollection|mixed
+     * @return Bag|mixed
      */
     public function getData()
     {
@@ -125,8 +125,8 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate
     /** @inheritdoc */
     public function getIterator()
     {
-        if ($this->jobData instanceof ArrayCollection) {
-            return $this->jobData->getIterator();
+        if ($this->jobData instanceof \Traversable) {
+            return new \IteratorIterator($this->jobData);
         } elseif (is_array($this->jobData)) {
             return new \ArrayIterator($this->jobData);
         } else {

@@ -457,11 +457,14 @@ class ServerStats extends AbstractStats
 
     public function getOtherStats()
     {
-        return $this->diffKeys(
-            $this->getCurrentStats(),
-            $this->getCmdStats(),
-            $this->getBinLogStats()
+        $other = array_diff_key(
+            $this->items,
+            $this->getCurrentStats()->toArray(),
+            $this->getCmdStats()->toArray(),
+            $this->getBinLogStats()->toArray()
         );
+
+        return $this->createFrom($other);
     }
 
     //region Binlog

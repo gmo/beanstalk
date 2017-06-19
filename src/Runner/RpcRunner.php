@@ -77,7 +77,7 @@ class RpcRunner extends BaseRunner
 
             $tubeList = $this->queue->tubes();
 
-            if ($tubeList->containsKey($tube)) {
+            if ($tubeList->has($tube)) {
                 return true;
             }
             $retry++;

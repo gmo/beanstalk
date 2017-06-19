@@ -2,20 +2,23 @@
 
 namespace GMO\Beanstalk\Manager;
 
-use GMO\Common\Collections\ArrayCollection;
+use Bolt\Collection\Bag;
+use Bolt\Collection\ImmutableBag;
+use GMO\Beanstalk\Worker\WorkerInterface;
 
 class WorkerInfo
 {
     /** @var \ReflectionClass */
     private $refCls;
+    /** @var WorkerInterface */
     private $instance;
-    /** @var ArrayCollection */
+    /** @var Bag */
     private $pids;
 
     public function __construct(\ReflectionClass $reflectionClass)
     {
         $this->refCls = $reflectionClass;
-        $this->pids = new ArrayCollection();
+        $this->pids = new Bag();
     }
 
     /** @return string Fully qualified class name */
@@ -57,10 +60,10 @@ class WorkerInfo
         return $this->instance;
     }
 
-    /** @return int[]|ArrayCollection */
+    /** @return int[]|ImmutableBag */
     public function getPids()
     {
-        return $this->pids;
+        return $this->pids->immutable();
     }
 
     /**
@@ -76,6 +79,6 @@ class WorkerInfo
      */
     public function removePid($pid)
     {
-        $this->pids->removeElement($pid);
+        $this->pids->removeItem($pid);
     }
 }

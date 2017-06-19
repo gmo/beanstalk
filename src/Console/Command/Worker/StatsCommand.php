@@ -4,7 +4,6 @@ namespace GMO\Beanstalk\Console\Command\Worker;
 
 use GMO\Beanstalk\Manager\WorkerInfo;
 use GMO\Beanstalk\Manager\WorkerManager;
-use GMO\Common\Collections\ArrayCollection;
 use GMO\Console\Helper\AutoHidingTable;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -46,7 +45,7 @@ class StatsCommand extends AbstractWorkerCommand
     }
 
     /**
-     * @param WorkerInfo[]|ArrayCollection $workers
+     * @param WorkerInfo[]|iterable $workers
      *
      * @return string
      */

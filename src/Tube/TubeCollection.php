@@ -2,10 +2,10 @@
 
 namespace GMO\Beanstalk\Tube;
 
-use GMO\Common\Collections\ArrayCollection;
+use Bolt\Collection\Bag;
 use GMO\Common\Str;
 
-class TubeCollection extends ArrayCollection
+class TubeCollection extends Bag
 {
     /**
      * Additional functionality:
@@ -15,7 +15,7 @@ class TubeCollection extends ArrayCollection
      *
      * @return static
      */
-    public function filter($p)
+    public function filterNames($p)
     {
         if (is_string($p)) {
             $p = array($p);
@@ -33,7 +33,7 @@ class TubeCollection extends ArrayCollection
             };
         }
 
-        return parent::filter($p);
+        return $this->filter($p);
     }
 
     /**
@@ -65,9 +65,9 @@ class TubeCollection extends ArrayCollection
 
     /**
      * @inheritdoc
-     * @return Tube
+     * @return Tube|null
      */
-    public function offsetGet($offset)
+    public function &offsetGet($offset)
     {
         return parent::offsetGet($offset);
     }
@@ -76,9 +76,9 @@ class TubeCollection extends ArrayCollection
      * @inheritdoc
      * @return Tube|null
      */
-    public function remove($key)
+    public function remove($key, $default = null)
     {
-        return parent::remove($key);
+        return parent::remove($key, $default);
     }
 
     /**

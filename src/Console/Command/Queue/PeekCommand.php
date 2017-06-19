@@ -5,7 +5,6 @@ namespace GMO\Beanstalk\Console\Command\Queue;
 use GMO\Beanstalk\Job\Job;
 use GMO\Beanstalk\Job\NullJob;
 use GMO\Beanstalk\Tube\Tube;
-use GMO\Common\Collections\ArrayCollection;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -79,8 +78,8 @@ class PeekCommand extends ChangeStateCommand
     protected function renderJobData(Job $job)
     {
         $data = $job->getData();
-        if ($data instanceof ArrayCollection) {
-            $data = $data->toArray();
+        if ($data instanceof \Traversable) {
+            $data = iterator_to_array($data);
         }
 
         return $this->dumpVar($data);

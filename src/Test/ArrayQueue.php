@@ -2,6 +2,7 @@
 
 namespace GMO\Beanstalk\Test;
 
+use Bolt\Collection\ImmutableBag;
 use GMO\Beanstalk\Exception\RangeException;
 use GMO\Beanstalk\Helper\JobDataSerializer;
 use GMO\Beanstalk\Job\Job;
@@ -11,7 +12,6 @@ use GMO\Beanstalk\Log\JobProcessor;
 use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Queue\Response\ServerStats;
 use GMO\Beanstalk\Tube\TubeCollection;
-use GMO\Common\Collections\ArrayCollection;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -50,7 +50,7 @@ class ArrayQueue implements QueueInterface
         $job->incrementReleases();
 
         $tube = $this->tube($job->stats()->tube());
-        $tube->reserved()->removeElement($job);
+        $tube->reserved()->removeItem($job);
 
         $job->setDelay($delay);
         $job->setPriority($priority);
@@ -72,7 +72,7 @@ class ArrayQueue implements QueueInterface
         $job->setPriority($priority);
 
         $tube = $this->tube($job->stats()->tube());
-        $tube->reserved()->removeElement($job);
+        $tube->reserved()->removeItem($job);
 
         $job->setState('buried');
         $job->incrementBuries();
@@ -88,7 +88,7 @@ class ArrayQueue implements QueueInterface
         $stats = $job->stats();
 
         $tube = $this->tube($stats->tube());
-        $tube->{$stats->state()}()->removeElement($job);
+        $tube->{$stats->state()}()->removeItem($job);
 
         $this->jobs->remove($job->getId());
         $tube->incrementDeleteCount();
@@ -104,9 +104,9 @@ class ArrayQueue implements QueueInterface
 
         $tube = $this->tube($job->stats()->tube());
         if ($job instanceof ArrayJob && $job->isDelayed()) {
-            $tube->delayed()->removeElement($job);
+            $tube->delayed()->removeItem($job);
         } else {
-            $tube->buried()->removeElement($job);
+            $tube->buried()->removeItem($job);
         }
 
         $job->setState('ready');
@@ -136,12 +136,12 @@ class ArrayQueue implements QueueInterface
 
     public function statsAllTubes()
     {
-        $stats = new ArrayCollection();
+        $stats = [];
         foreach ($this->tubes as $tube) {
-            $stats->set($tube, $this->statsTube($tube));
+            $stats[$tube->name()] = $this->statsTube($tube);
         }
 
-        return $stats;
+        return new ImmutableBag($stats);
     }
 
     public function statsServer()
@@ -185,7 +185,7 @@ class ArrayQueue implements QueueInterface
         }
 
         /** @var ArrayJob|NullJob $job */
-        $job = $tube->ready()->removeFirst() ?: new NullJob();
+        $job = $tube->ready()->removeFirst();
         $this->logProcessor->setCurrentJob($job);
         if ($this->isNullJob($job)) {
             return $job;
@@ -317,13 +317,17 @@ class ArrayQueue implements QueueInterface
     }
 
     /**
-     * @param string $tube
+     * @param ArrayTube|string $tube
      *
      * @return ArrayTube
      */
     public function tube($tube)
     {
-        if (!$this->tubes->containsKey($tube)) {
+        if ($tube instanceof ArrayTube) {
+            return $tube;
+        }
+
+        if (!$this->tubes->has($tube)) {
             $this->tubes[$tube] = new ArrayTube($tube, $this);
         }
 
@@ -343,7 +347,7 @@ class ArrayQueue implements QueueInterface
     protected function removeEmptyTube(ArrayTube $tube)
     {
         if (!$tube->isPaused() && $tube->isEmpty()) {
-            $this->tubes->removeElement($tube);
+            $this->tubes->removeItem($tube);
         }
     }
 

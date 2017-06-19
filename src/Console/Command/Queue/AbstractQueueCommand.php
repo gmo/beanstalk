@@ -5,7 +5,7 @@ namespace GMO\Beanstalk\Console\Command\Queue;
 use GMO\Beanstalk\Console\Command\AbstractCommand;
 use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Tube\Tube;
-use GMO\Common\Collections\ArrayCollection;
+use GMO\Beanstalk\Tube\TubeCollection;
 use GMO\Common\Str;
 use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext;
 use Symfony\Component\Console\Input\InputInterface;
@@ -52,13 +52,13 @@ class AbstractQueueCommand extends AbstractCommand
 
     protected function matchTubeNames($tubesSearch, OutputInterface $output)
     {
-        $matchedTubes = new ArrayCollection();
+        $matchedTubes = new TubeCollection();
         $queue = $this->getQueue();
         $error = false;
         foreach ((array) $tubesSearch as $tubeSearch) {
             $matched = $queue
                 ->tubes()
-                ->filter(function (Tube $tube) use ($tubeSearch) {
+                ->filter(function ($i, Tube $tube) use ($tubeSearch) {
                     return Str::contains($tube->name(), $tubeSearch, false);
                 })
             ;
@@ -66,7 +66,7 @@ class AbstractQueueCommand extends AbstractCommand
                 $output->writeln("<warn>No tubes matched to: $tubeSearch</warn>");
                 $error = true;
             }
-            $matchedTubes->merge($matched);
+            $matchedTubes = $matchedTubes->replace($matched);
         }
 
         return array($matchedTubes, $error);
@@ -122,12 +122,12 @@ class AbstractQueueCommand extends AbstractCommand
         }
 
         return $tubes
-            ->getKeys()
-            ->filter(function ($name) use ($currentTubes) {
+            ->keys()
+            ->filter(function ($i, $name) use ($currentTubes) {
                 // filter out tubes already defined in input
                 return !in_array(strtolower($name), $currentTubes);
             })
-            ->map(function ($name) use ($currentWord) {
+            ->map(function ($i, $name) use ($currentWord) {
                 // change case to match current word, else it will be filtered out
                 return $currentWord . substr($name, strlen($currentWord));
             })

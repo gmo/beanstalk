@@ -2,9 +2,10 @@
 
 namespace GMO\Beanstalk\Job;
 
-use GMO\Common\Collections\ArrayCollection;
+use Bolt\Collection\Bag;
+use GMO\Beanstalk\Test\ArrayJob;
 
-class JobCollection extends ArrayCollection
+class JobCollection extends Bag
 {
     /**
      * @inheritdoc
@@ -37,16 +38,16 @@ class JobCollection extends ArrayCollection
      * @inheritdoc
      * @return Job
      */
-    public function offsetGet($offset)
+    public function &offsetGet($offset)
     {
-        return parent::offsetGet($offset);
+        return parent::offsetGet($offset) ?: new NullJob();
     }
 
     /**
      * @inheritdoc
      * @return Job
      */
-    public function remove($key)
+    public function remove($key, $default = null)
     {
         return parent::remove($key) ?: new NullJob();
     }
@@ -57,7 +58,7 @@ class JobCollection extends ArrayCollection
      */
     public function removeFirst()
     {
-        return parent::removeFirst();
+        return parent::removeFirst() ?: new NullJob();
     }
 
     /**
@@ -66,6 +67,20 @@ class JobCollection extends ArrayCollection
      */
     public function removeLast()
     {
-        return parent::removeLast();
+        return parent::removeLast() ?: new NullJob();
+    }
+
+    /**
+     * Prioritize ArrayJobs.
+     */
+    public function prioritize()
+    {
+        usort($this->items, function (ArrayJob $a, ArrayJob $b) {
+            if ($a->getPriority() === $b->getPriority()) {
+                return $this->indexOf($a) <=> $this->indexOf($b);
+            }
+
+            return $a->getPriority() <=> $b->getPriority();
+        });
     }
 }

@@ -2,7 +2,7 @@
 
 namespace GMO\Beanstalk\Helper;
 
-use GMO\Common\Collections\ArrayCollection;
+use Bolt\Collection\Bag;
 use GMO\Common\Exception\NotSerializableException;
 use GMO\Common\Json;
 use Gmo\Common\Serialization\SerializableInterface;
@@ -35,8 +35,8 @@ class JobDataSerializer
 
     public function unserialize($data)
     {
-        $params = new ArrayCollection(Json::parse($data));
-        if ($params->count() === 1 && $params->containsKey('data')) {
+        $params = Bag::from(Json::parse($data));
+        if ($params->count() === 1 && $params->has('data')) {
             $data = $params['data'];
 
             if ($this->nativeUnserialize($data, $unserialized)) {
@@ -44,7 +44,7 @@ class JobDataSerializer
             }
         }
 
-        if ($params->containsKey('class')) {
+        if ($params->has('class')) {
             /** @var SerializableInterface|string $cls */
             $cls = $params['class'];
             if (!class_exists($cls)) {

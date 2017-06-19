@@ -2,8 +2,8 @@
 
 namespace GMO\Beanstalk\Console\Command\Queue;
 
+use Bolt\Collection\Bag;
 use GMO\Beanstalk\Queue\Response\JobStats;
-use GMO\Common\Collections\ArrayCollection;
 use GMO\Console\Helper\AutoHidingTable;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
@@ -30,7 +30,7 @@ class JobStatsCommand extends AbstractQueueCommand
         parent::execute($input, $output);
 
         $queue = $this->getQueue();
-        $stats = new ArrayCollection();
+        $stats = new Bag();
         foreach ($input->getArgument('id') as $id) {
             $jobStats = $queue->statsJob($id);
             if ($jobStats->id() !== -1) {
@@ -45,7 +45,7 @@ class JobStatsCommand extends AbstractQueueCommand
     }
 
     /**
-     * @param JobStats[]|ArrayCollection $statsList
+     * @param JobStats[]|Bag $statsList
      *
      * @return string
      */

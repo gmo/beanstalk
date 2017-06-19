@@ -2,7 +2,7 @@
 
 namespace GMO\Beanstalk\Console\Command\Queue;
 
-use GMO\Common\Collections\ArrayCollection;
+use Bolt\Collection\Bag;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -35,7 +35,7 @@ class ServerStatsCommand extends AbstractQueueCommand
         $stats = $this->getQueue()->statsServer();
 
         if ($input->getOption('list')) {
-            foreach ($stats->getKeys() as $key) {
+            foreach ($stats->keys() as $key) {
                 $output->writeln($key);
             }
 
@@ -44,7 +44,7 @@ class ServerStatsCommand extends AbstractQueueCommand
 
         if ($input->getOption('stat')) {
             foreach ($input->getOption('stat') as $statName) {
-                if (!$stats->containsKey($statName)) {
+                if (!$stats->has($statName)) {
                     $output->writeln("<error>Stat: \"$statName\" does not exist</error>");
                     continue;
                 }
@@ -54,10 +54,15 @@ class ServerStatsCommand extends AbstractQueueCommand
             return;
         }
 
-        $optionNames = ArrayCollection::create(array('current', 'cmd', 'binlog', 'other'));
-        if ($optionNames->forAll(function ($key, $value) use ($input) {
-            return !$input->getOption($value);
-        })) {
+        $optionNames = new Bag(['current', 'cmd', 'binlog', 'other']);
+
+        $hasNoSpecific = $optionNames
+            ->filter(function ($key, $value) use ($input) {
+                return (bool) $input->getOption($value);
+            })
+            ->isEmpty()
+        ;
+        if ($hasNoSpecific) {
             $input->setOption('current', true);
             $input->setOption('cmd', true);
             $input->setOption('binlog', true);
@@ -72,7 +77,7 @@ class ServerStatsCommand extends AbstractQueueCommand
         }
     }
 
-    private function renderStats(OutputInterface $output, $name, ArrayCollection $stats)
+    private function renderStats(OutputInterface $output, $name, Bag $stats)
     {
         $output->writeln("<comment>" . ucfirst($name) . " Stats:</comment>");
         foreach ($stats as $statName => $value) {
