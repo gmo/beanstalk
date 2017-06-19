@@ -3,6 +3,7 @@
     "license": "MIT",
     "description": "Common beanstalk worker abstraction and queue utilities",
     "require": {
+        "bolt/collection": "^1.0",
         "ext-pcntl": "*",
         "gmo/common": "^1.30",
         "gmo/console": "^2.3",
