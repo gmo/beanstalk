@@ -6,7 +6,7 @@ use GMO\Beanstalk\Console\Command\AbstractCommand;
 use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Tube\Tube;
 use GMO\Beanstalk\Tube\TubeCollection;
-use GMO\Common\Str;
+use Gmo\Common\Str;
 use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;

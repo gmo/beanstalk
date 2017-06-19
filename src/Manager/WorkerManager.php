@@ -5,7 +5,7 @@ namespace GMO\Beanstalk\Manager;
 use Bolt\Collection\ImmutableBag;
 use GMO\Beanstalk\Helper\ClassFinder;
 use GMO\Beanstalk\Helper\Processor;
-use GMO\Common\Str;
+use Gmo\Common\Str;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;

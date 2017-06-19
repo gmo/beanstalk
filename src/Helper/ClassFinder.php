@@ -2,7 +2,7 @@
 
 namespace GMO\Beanstalk\Helper;
 
-use GMO\Common\Str;
+use Gmo\Common\Str;
 use Symfony\Component\Finder\Finder;
 
 /**

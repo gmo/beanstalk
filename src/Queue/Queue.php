@@ -15,7 +15,7 @@ use GMO\Beanstalk\Queue\Response\ServerStats;
 use GMO\Beanstalk\Queue\Response\TubeStats;
 use GMO\Beanstalk\Tube\Tube;
 use GMO\Beanstalk\Tube\TubeCollection;
-use GMO\Common\Exception\NotSerializableException;
+use Gmo\Common\Exception\NotSerializableException;
 use Pheanstalk;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;

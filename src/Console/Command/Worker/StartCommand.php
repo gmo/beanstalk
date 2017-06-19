@@ -3,7 +3,7 @@
 namespace GMO\Beanstalk\Console\Command\Worker;
 
 use GMO\Beanstalk\Manager\WorkerManager;
-use GMO\Common\Str;
+use Gmo\Common\Str;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;

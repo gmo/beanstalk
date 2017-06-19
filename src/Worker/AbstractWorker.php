@@ -6,7 +6,7 @@ use Bolt\Collection\Bag;
 use GMO\Beanstalk\Job\JobProducerInterface;
 use GMO\Beanstalk\Runner\BaseRunner;
 use Gmo\Common\Serialization\SerializableInterface;
-use GMO\Common\Str;
+use Gmo\Common\Str;
 
 /**
  * Sets default values for WorkerInterface

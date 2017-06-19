@@ -3,7 +3,7 @@
 namespace GMO\Beanstalk\Tube;
 
 use Bolt\Collection\Bag;
-use GMO\Common\Str;
+use Gmo\Common\Str;
 
 class TubeCollection extends Bag
 {

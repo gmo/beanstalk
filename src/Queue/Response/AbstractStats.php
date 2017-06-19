@@ -3,7 +3,7 @@
 namespace GMO\Beanstalk\Queue\Response;
 
 use Bolt\Collection\Bag;
-use GMO\Common\Str;
+use Gmo\Common\Str;
 
 abstract class AbstractStats extends Bag
 {

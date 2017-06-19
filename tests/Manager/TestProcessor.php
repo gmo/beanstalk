@@ -4,7 +4,7 @@ namespace Gmo\Beanstalk\Tests\Manager;
 
 use Bolt\Collection\Bag;
 use GMO\Beanstalk\Helper\Processor;
-use GMO\Common\Str;
+use Gmo\Common\Str;
 
 class TestProcessor extends Processor
 {

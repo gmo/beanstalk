@@ -3,8 +3,8 @@
 namespace GMO\Beanstalk\Helper;
 
 use Bolt\Collection\Bag;
-use GMO\Common\Exception\NotSerializableException;
-use GMO\Common\Json;
+use Gmo\Common\Exception\NotSerializableException;
+use Gmo\Common\Json;
 use Gmo\Common\Serialization\SerializableInterface;
 use Traversable;
 

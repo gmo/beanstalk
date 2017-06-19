@@ -2,7 +2,7 @@
 
 namespace GMO\Beanstalk\Queue\Response;
 
-use GMO\Common\Str;
+use Gmo\Common\Str;
 
 class ServerStats extends AbstractStats
 {
