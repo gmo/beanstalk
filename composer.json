@@ -5,7 +5,7 @@
     "require": {
         "bolt/collection": "^1.0",
         "ext-pcntl": "*",
-        "gmo/common": "^1.30",
+        "gmo/common": "^2.0@dev",
         "gmo/console": "^2.3",
         "php": "^7.1",
         "psr/log": "1.0.0",
