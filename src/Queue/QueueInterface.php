@@ -25,18 +25,9 @@ interface QueueInterface extends TubeControlInterface, JobControlInterface, Logg
     /**
      * Gets a list of all the tubes
      *
-     * @return TubeCollection
+     * @return TubeCollection|Tube[]
      */
     public function tubes();
-
-    /**
-     * Returns the names of all the tubes
-     *
-     * @return ArrayCollection
-     *
-     * @deprecated Use {@see tubes} instead
-     */
-    public function listTubes();
 
     /**
      * Gets the stats for all tubes

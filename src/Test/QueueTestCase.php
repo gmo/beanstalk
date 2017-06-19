@@ -40,7 +40,7 @@ abstract class QueueTestCase extends TestCase
 
     protected static function clearAllTubes()
     {
-        foreach (static::$queue->listTubes() as $tube) {
+        foreach (static::$queue->tubes() as $tube) {
             static::clearTube($tube);
         }
     }

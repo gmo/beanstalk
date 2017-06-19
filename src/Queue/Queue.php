@@ -275,20 +275,16 @@ class Queue implements QueueInterface
 
     public function tubes()
     {
+        $tubeNames = $this->pheanstalk->listTubes();
+        sort($tubeNames);
+
         $tubes = new TubeCollection();
-        foreach ($this->listTubes() as $tubeName) {
-            $tubes->set($tubeName, new Tube($tubeName, $this));
+        foreach ($tubeNames as $name) {
+            if ($name === Pheanstalk\PheanstalkInterface::DEFAULT_TUBE) {
+                continue;
+            }
+            $tubes[$name] = new Tube($name, $this);
         }
-
-        return $tubes;
-    }
-
-    public function listTubes()
-    {
-        $tubes = ArrayCollection::create($this->pheanstalk->listTubes())
-            ->sortValues()
-        ;
-        $tubes->removeElement(Pheanstalk\PheanstalkInterface::DEFAULT_TUBE);
 
         return $tubes;
     }

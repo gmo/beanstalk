@@ -134,11 +134,6 @@ class ArrayQueue implements QueueInterface
     {
     }
 
-    public function listTubes()
-    {
-        return $this->tubes->getKeys();
-    }
-
     public function statsAllTubes()
     {
         $stats = new ArrayCollection();
