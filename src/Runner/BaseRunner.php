@@ -184,11 +184,6 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
         $this->log = $logger;
     }
 
-    public static function className()
-    {
-        return get_called_class();
-    }
-
     /**
      * Handled Exception thrown by worker
      *

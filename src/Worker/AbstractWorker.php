@@ -30,7 +30,7 @@ abstract class AbstractWorker implements WorkerInterface
 
     public static function getTubeName()
     {
-        return Str::className(static::className());
+        return Str::className(static::class);
     }
 
     public static function getRunner()
@@ -64,10 +64,5 @@ abstract class AbstractWorker implements WorkerInterface
 
     public function onStop()
     {
-    }
-
-    public static function className()
-    {
-        return get_called_class();
     }
 }

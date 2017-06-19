@@ -216,7 +216,7 @@ class ClassFinder implements \IteratorAggregate, \Countable
             $this->isDefaultSet = true;
         }
         $it = $this->finder->getIterator();
-        $it = new MapIteratorWrapper($it, array(ReflectionManager::className(), 'getClass'));
+        $it = new MapIteratorWrapper($it, [ReflectionManager::class, 'getClass']);
         foreach ($this->maps as $map) {
             $it = new MapIteratorWrapper($it, $map);
         }

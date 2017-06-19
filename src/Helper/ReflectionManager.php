@@ -31,9 +31,4 @@ class ReflectionManager
 
         return $parser->parse($phpCode);
     }
-
-    public static function className()
-    {
-        return get_called_class();
-    }
 }
