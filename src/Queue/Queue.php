@@ -17,6 +17,7 @@ use GMO\Beanstalk\Tube\Tube;
 use GMO\Beanstalk\Tube\TubeCollection;
 use Gmo\Common\Exception\NotSerializableException;
 use Pheanstalk;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -27,6 +28,8 @@ use Psr\Log\NullLogger;
  */
 class Queue implements QueueInterface
 {
+    use LoggerAwareTrait;
+
     /** @var Pheanstalk\Pheanstalk */
     protected $pheanstalk;
     /** @var LoggerInterface */
@@ -303,11 +306,6 @@ class Queue implements QueueInterface
         $stats = $this->pheanstalk->stats();
 
         return ServerStats::from($stats);
-    }
-
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->log = $logger;
     }
 
     /**

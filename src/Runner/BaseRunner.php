@@ -16,7 +16,7 @@ use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Worker\ContainerAwareWorker;
 use GMO\Beanstalk\Worker\WorkerInterface;
 use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareTrait;
 
 /**
  * Abstracts the repetitive worker tasks, such as getting jobs and validating parameters.
@@ -24,6 +24,8 @@ use Psr\Log\LoggerInterface;
  */
 class BaseRunner implements RunnerInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     const JOB_RESERVATION_TIMEOUT = 5;
 
     /** @var WorkerInterface */
@@ -32,8 +34,6 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
     protected $keepRunning = true;
     /** @var QueueInterface */
     protected $queue;
-    /** @var \Psr\Log\LoggerInterface Worker logger */
-    protected $log;
     /** @var string Tube name cached for performance */
     protected $tubeName;
     /** @var JobErrorHandlerInterface[]|Bag Error handlers cached for performance */
@@ -46,9 +46,9 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
         $this->tubeName = $worker->getTubeName();
         $this->errorHandlers = $worker->getErrorHandlers();
 
-        $log = $worker->getLogger();
-        $this->setLogger($log);
-        $queue->setLogger($log);
+        $logger = $worker->getLogger();
+        $this->setLogger($logger);
+        $queue->setLogger($logger);
 
         $this->attachLoggerToErrorHandlers();
 
@@ -61,10 +61,10 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
             throw new \LogicException('Setup method needs to be called before run');
         }
 
-        $this->log->info('Running worker');
+        $this->logger->info('Running worker');
 
         $this->setupWorker($this->worker);
-        $this->log->debug('Finished setting up worker');
+        $this->logger->debug('Finished setting up worker');
 
         $job = new NullJob();
         do {
@@ -73,9 +73,9 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
                 $this->processJob($job);
             }
         } while ($this->shouldKeepRunning());
-        $this->log->debug('Stopping worker...');
+        $this->logger->debug('Stopping worker...');
         $this->worker->onStop();
-        $this->log->info('Worker stopped');
+        $this->logger->info('Worker stopped');
     }
 
     public function processJob(Job $job)
@@ -92,14 +92,14 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
         }
 
         try {
-            $this->log->debug('Processing job');
+            $this->logger->debug('Processing job');
             $this->worker->process($job);
             $this->postProcessJob($job);
         } catch (Exception $ex) {
             try {
                 $this->handleError($job, $ex);
             } catch (Exception $e) {
-                $this->log->warning('Queue command failed', array(
+                $this->logger->warning('Queue command failed', array(
                     'exception' => $e,
                 ));
             }
@@ -109,7 +109,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
     public function preProcessJob(Job $job)
     {
         if ($job instanceof UnserializableJob) {
-            $this->log->error('Burying unserializable job');
+            $this->logger->error('Burying unserializable job');
             $job->bury();
         }
 
@@ -124,7 +124,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
         }
         foreach ($this->worker->getRequiredParams() as $reqParam) {
             if (!isset($params[$reqParam])) {
-                $this->log->error('Job is missing required parameter', array(
+                $this->logger->error('Job is missing required parameter', array(
                     'missing' => $reqParam,
                 ));
 
@@ -140,7 +140,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
         if ($job->isHandled()) {
             return;
         }
-        $this->log->debug('Deleting finished job');
+        $this->logger->debug('Deleting finished job');
         $job->delete();
     }
 
@@ -152,7 +152,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
                 $this->queue = $worker->getService('beanstalk.queue');
             }
         } catch (Exception $e) {
-            $this->log->critical("An error occurred when setting up the worker", array("exception" => $e));
+            $this->logger->critical("An error occurred when setting up the worker", array("exception" => $e));
             throw $e;
         }
     }
@@ -178,12 +178,6 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
         $this->keepRunning = false;
     }
 
-    /** @inheritdoc */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->log = $logger;
-    }
-
     /**
      * Handled Exception thrown by worker
      *
@@ -193,12 +187,12 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
     protected function handleError(Job $job, Exception $ex)
     {
         $numRetries = $this->getNumberOfRetries($job);
-        $this->log->warning($ex->getMessage(), array(
+        $this->logger->warning($ex->getMessage(), array(
             'exception' => $ex,
         ));
 
         if ($job->isHandled()) {
-            $this->log->warning('Worker should not throw an Exception if job has been handled');
+            $this->logger->warning('Worker should not throw an Exception if job has been handled');
 
             return;
         }
@@ -219,7 +213,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
 
     protected function pauseTube($delay)
     {
-        $this->log->notice('Pausing tube', array(
+        $this->logger->notice('Pausing tube', array(
             'delay' => $delay,
         ));
         $this->queue->pause($this->tubeName, $delay);
@@ -227,7 +221,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
 
     protected function buryJob(Job $job, $exception, $numErrors)
     {
-        $this->log->warning('Burying failed job', array(
+        $this->logger->warning('Burying failed job', array(
             'numErrors' => $numErrors,
             'exception' => $exception,
         ));
@@ -236,7 +230,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
 
     protected function deleteJob(Job $job, $exception, $numErrors)
     {
-        $this->log->notice('Deleting failed job', array(
+        $this->logger->notice('Deleting failed job', array(
             'numErrors' => $numErrors,
             'exception' => $exception,
         ));
@@ -246,7 +240,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
     protected function delayJob(Job $job, JobErrorInterface $jobError, $exception, $numErrors)
     {
         $delay = !$jobError->shouldPauseTube() ? $jobError->getDelay($numErrors) : 0;
-        $this->log->notice('Delaying failed job', array(
+        $this->logger->notice('Delaying failed job', array(
             'numErrors' => $numErrors,
             'delay'     => $delay,
             'exception' => $exception,
@@ -299,7 +293,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
     {
         foreach ($this->errorHandlers as $handler) {
             if ($handler instanceof LoggerAwareInterface) {
-                $handler->setLogger($this->log);
+                $handler->setLogger($this->logger);
             }
         }
     }

@@ -12,7 +12,7 @@ use GMO\Beanstalk\Log\JobProcessor;
 use GMO\Beanstalk\Queue\QueueInterface;
 use GMO\Beanstalk\Queue\Response\ServerStats;
 use GMO\Beanstalk\Tube\TubeCollection;
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareTrait;
 
 /**
  * ArrayQueue is an in-memory implementation of the QueueInterface.
@@ -23,6 +23,8 @@ use Psr\Log\LoggerInterface;
  */
 class ArrayQueue implements QueueInterface
 {
+    use LoggerAwareTrait;
+
     /** @var JobCollection|ArrayJob[] */
     protected $jobs;
     /** @var TubeCollection|ArrayTube[] */
@@ -127,10 +129,6 @@ class ArrayQueue implements QueueInterface
     }
 
     public function touch(Job $job)
-    {
-    }
-
-    public function setLogger(LoggerInterface $logger)
     {
     }
 

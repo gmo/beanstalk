@@ -7,6 +7,7 @@ use GMO\Beanstalk\Helper\ClassFinder;
 use GMO\Beanstalk\Helper\Processor;
 use Gmo\Common\Str;
 use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -15,6 +16,8 @@ use Psr\Log\NullLogger;
  */
 class WorkerManager implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /** @var string Directory containing workers */
     protected $workerDir;
     /** @var WorkerInfo[]|ImmutableBag */
@@ -49,12 +52,6 @@ class WorkerManager implements LoggerAwareInterface
     public function getWorkerDir()
     {
         return $this->workerDir;
-    }
-
-    /** @inheritdoc */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->log = $logger;
     }
 
     public function setProcessor($processor)
