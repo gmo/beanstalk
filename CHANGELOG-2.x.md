@@ -8,6 +8,25 @@ https://bitbucket.org/gmodev/beanstalk-library/branches/compare/v2.0.0..v1.0.0
 
 * NEXT
 
+* 2.7.0 (2017-07-26)
+    * Moved ServiceProviders to `Bridge` folder and deprecated old ones. Didn't keep Pimple 3 version since it wasn't in use yet.
+    * Deprecated `BeanstalkKeys`.
+    * Added php requirement to composer.json (>=5.3).
+    * Only redirect worker output to log file if directory exists.
+    * Fix logic in `RunOnceRunnerDecorator`. It's not really "run once" anymore; it's run until there are no more jobs.
+    * Fix `RpcRunner` not returning job from `preProcessJob`.
+    * PSR-2 Formatting.
+    * Replaced deprecated `ISerializable` with `SerializableInterface`.
+    * Replaced deprecated `String` with `Str`.
+    * Removed deprecated `ClassNameResolverInterface`, it was worthless.
+    * Removed remaining .idea files.
+    * Tests
+        * Updated PHPUnit 3.7 -> 4.8.
+        * Added Symfony's PHPUnit Bridge.
+        * Added PHPUnit config. 
+        * Added Travis config.
+        * Updated Tests namespace. Organize structure to match their src files.
+        * Fixed failing tests.
 
 * 2.6.0 (2016-02-18)
     * Updated WebJobProducer to wrap Queue instead of creating it
