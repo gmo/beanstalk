@@ -16,8 +16,6 @@ class WebJobProducer implements JobProducerInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    /** @var LoggerInterface */
-    protected $log;
     /** @var QueueInterface */
     protected $queue;
 
@@ -36,7 +34,7 @@ class WebJobProducer implements JobProducerInterface, LoggerAwareInterface
         try {
             return $this->queue->push($tube, $data, $priority, $delay, $ttr);
         } catch (\Exception $e) {
-            $this->log->error('Error pushing job to queue', $context);
+            $this->logger->error('Error pushing job to queue', $context);
         }
 
         return -1;

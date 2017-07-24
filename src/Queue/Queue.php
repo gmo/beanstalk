@@ -32,8 +32,6 @@ class Queue implements QueueInterface
 
     /** @var Pheanstalk\Pheanstalk */
     protected $pheanstalk;
-    /** @var LoggerInterface */
-    protected $log;
     /** @var JobProcessor */
     protected $logProcessor;
     /** @var JobDataSerializer */
@@ -235,7 +233,7 @@ class Queue implements QueueInterface
         try {
             $this->pheanstalk->delete($job);
         } catch (Pheanstalk\Exception\ServerException $e) {
-            $this->log->notice("Error deleting job", array("exception" => $e));
+            $this->logger->notice("Error deleting job", array("exception" => $e));
         }
     }
 

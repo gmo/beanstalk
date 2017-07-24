@@ -24,8 +24,6 @@ class WorkerManager implements LoggerAwareInterface
     protected $workerInfoList;
     /** @var Processor */
     protected $processor;
-    /** @var LoggerInterface */
-    protected $log;
     /** @var string */
     protected $host;
     /** @var int */
@@ -80,14 +78,14 @@ class WorkerManager implements LoggerAwareInterface
      */
     public function startWorkers($filter = null, $spawnNumber = null)
     {
-        $this->log->info("Starting workers...");
+        $this->logger->info("Starting workers...");
         $workers = $this->getWorkers($filter);
 
         foreach ($workers as $worker) {
             $workersToSpawn = $spawnNumber ?: ($worker->getTotal() - $worker->getNumRunning());
 
             if ($workersToSpawn > 0) {
-                $this->log->info("Starting $workersToSpawn workers: " . $worker->getName());
+                $this->logger->info("Starting $workersToSpawn workers: " . $worker->getName());
             }
             for ($i = 0; $i < $workersToSpawn; $i++) {
                 $this->spawnWorker($worker);
@@ -107,9 +105,9 @@ class WorkerManager implements LoggerAwareInterface
             if (count($worker->getPids()) === 0) {
                 continue;
             }
-            $this->log->info("Stopping workers: " . $worker->getName());
+            $this->logger->info("Stopping workers: " . $worker->getName());
             foreach ($worker->getPids() as $pid) {
-                $this->log->debug(sprintf("Terminating: [%s] %s", $pid, $worker->getName()));
+                $this->logger->debug(sprintf("Terminating: [%s] %s", $pid, $worker->getName()));
                 $this->processor->terminateProcess($pid);
             }
         }
@@ -119,7 +117,7 @@ class WorkerManager implements LoggerAwareInterface
             $failed[$worker->getName()] = [];
 
             foreach ($worker->getPids() as $pid) {
-                $this->log->debug(sprintf("Waiting for: [%s] %s...", $pid, $worker->getName()));
+                $this->logger->debug(sprintf("Waiting for: [%s] %s...", $pid, $worker->getName()));
                 if (!$this->processor->waitForProcess($pid)) {
                     $failed[$worker->getName()][] = $pid;
                 }
@@ -129,7 +127,7 @@ class WorkerManager implements LoggerAwareInterface
 
         foreach ($failed as $worker => $pids) {
             foreach ($pids as $pid) {
-                $this->log->warning(sprintf('Failed to gracefully stop: [%s] %s. Killing it.', $pid, $worker));
+                $this->logger->warning(sprintf('Failed to gracefully stop: [%s] %s. Killing it.', $pid, $worker));
                 $this->processor->terminateProcess($pid, true);
             }
         }
