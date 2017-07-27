@@ -17,7 +17,7 @@ interface JobProducerInterface
     public const DEFAULT_TTR = PheanstalkInterface::DEFAULT_TTR;
 
     /**
-     * Pushes a job to the specified tube
+     * Pushes a job to the specified tube.
      *
      * @param string                               $tube     Tube name
      * @param SerializableInterface|iterable|mixed $data     Job data

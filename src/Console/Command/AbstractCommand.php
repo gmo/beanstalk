@@ -62,6 +62,7 @@ class AbstractCommand extends ContainerAwareCommand implements CompletionAwareIn
 
     /**
      * @inheritdoc
+     *
      * @return $this
      */
     public function setName($name)
@@ -71,6 +72,7 @@ class AbstractCommand extends ContainerAwareCommand implements CompletionAwareIn
 
     /**
      * @inheritdoc
+     *
      * @return $this
      */
     public function setDescription($description)
@@ -80,6 +82,7 @@ class AbstractCommand extends ContainerAwareCommand implements CompletionAwareIn
 
     /**
      * @inheritdoc
+     *
      * @return $this
      */
     public function addArgument($name, $mode = null, $description = '', $default = null)
@@ -89,6 +92,7 @@ class AbstractCommand extends ContainerAwareCommand implements CompletionAwareIn
 
     /**
      * @inheritdoc
+     *
      * @return $this
      */
     public function addOption($name, $shortcut = null, $mode = null, $description = '', $default = null)

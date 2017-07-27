@@ -7,7 +7,7 @@ namespace Gmo\Beanstalk\Exception;
 use Exception;
 
 /**
- * Exceptions when failing to push jobs to Queue
+ * Exceptions when failing to push jobs to Queue.
  */
 class JobPushException extends QueueException
 {

@@ -11,12 +11,12 @@ use Gmo\Common\Serialization\SerializableInterface;
 use Gmo\Common\Str;
 
 /**
- * Sets default values for WorkerInterface
+ * Sets default values for WorkerInterface.
  */
 abstract class AbstractWorker implements WorkerInterface
 {
     /**
-     * Shortcut for {@see JobProducerInterface::push} that uses the worker's tube name and ttr
+     * Shortcut for {@see JobProducerInterface::push} that uses the worker's tube name and ttr.
      *
      * @param JobProducerInterface                 $queue
      * @param SerializableInterface|iterable|mixed $data     Job data

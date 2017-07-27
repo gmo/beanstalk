@@ -11,7 +11,7 @@ use PHPParser\Node\Stmt\Namespace_ as NamespaceNode;
 use PhpParser\Parser;
 
 /**
- * This wraps PHP Parser logic to account for both 0.9.x and 1.x versions
+ * This wraps PHP Parser logic to account for both 0.9.x and 1.x versions.
  */
 class NamespaceParser
 {

@@ -7,7 +7,7 @@ namespace Gmo\Beanstalk\Queue\Response;
 class JobStats extends AbstractStats
 {
     /**
-     * The job id
+     * The job id.
      *
      * @return int
      */
@@ -17,7 +17,7 @@ class JobStats extends AbstractStats
     }
 
     /**
-     * The name of the tube that contains this job
+     * The name of the tube that contains this job.
      *
      * @return string
      */
@@ -27,7 +27,7 @@ class JobStats extends AbstractStats
     }
 
     /**
-     * "ready" or "delayed" or "reserved" or "buried"
+     * "ready" or "delayed" or "reserved" or "buried".
      *
      * @return string
      */
@@ -37,7 +37,7 @@ class JobStats extends AbstractStats
     }
 
     /**
-     * The priority value set by the put, release, or bury commands
+     * The priority value set by the put, release, or bury commands.
      *
      * @return int
      */
@@ -47,7 +47,7 @@ class JobStats extends AbstractStats
     }
 
     /**
-     * The time in seconds since the put command that created this job
+     * The time in seconds since the put command that created this job.
      *
      * @return int
      */
@@ -81,7 +81,7 @@ class JobStats extends AbstractStats
     }
 
     /**
-     * The number of times this job has been reserved
+     * The number of times this job has been reserved.
      *
      * @return int
      */
@@ -91,7 +91,7 @@ class JobStats extends AbstractStats
     }
 
     /**
-     * The number of times this job has timed out during a reservation
+     * The number of times this job has timed out during a reservation.
      *
      * @return int
      */
@@ -101,7 +101,7 @@ class JobStats extends AbstractStats
     }
 
     /**
-     * The number of times a client has released this job from a reservation
+     * The number of times a client has released this job from a reservation.
      *
      * @return int
      */
@@ -111,7 +111,7 @@ class JobStats extends AbstractStats
     }
 
     /**
-     * The number of times this job has been buried
+     * The number of times this job has been buried.
      *
      * @return int
      */
@@ -121,7 +121,7 @@ class JobStats extends AbstractStats
     }
 
     /**
-     * The number of times this job has been kicked
+     * The number of times this job has been kicked.
      *
      * @return int
      */

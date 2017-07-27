@@ -11,7 +11,7 @@ use Gmo\Beanstalk\Queue\Response\JobStats;
 
 /**
  * ArrayJob is used by {@see ArrayQueue} to
- * determine if the job is still delayed and the priority
+ * determine if the job is still delayed and the priority.
  *
  * @see ArrayQueue
  */

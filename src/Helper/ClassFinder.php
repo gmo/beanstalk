@@ -9,8 +9,6 @@ use Symfony\Component\Finder\Finder;
 
 /**
  * ClassFinder extends Symfony Finder to find classes within a PSR-0 namespace.
- *
- * @package Service\Finder
  */
 class ClassFinder implements \IteratorAggregate, \Countable
 {
@@ -43,7 +41,8 @@ class ClassFinder implements \IteratorAggregate, \Countable
      * @param string $pattern A pattern (a glob or a string)
      *
      * @return $this
-     * @see Symfony\Component\Finder\Finder::path
+     *
+     * @see \Symfony\Component\Finder\Finder::path
      */
     public function inNamespace($pattern)
     {
@@ -63,7 +62,8 @@ class ClassFinder implements \IteratorAggregate, \Countable
      * @param string $pattern A pattern (a glob or a string)
      *
      * @return $this
-     * @see Symfony\Component\Finder\Finder::notPath
+     *
+     * @see \Symfony\Component\Finder\Finder::notPath
      */
     public function notNamespace($pattern)
     {
@@ -86,7 +86,8 @@ class ClassFinder implements \IteratorAggregate, \Countable
      * @param string $pattern A pattern (a regexp, a glob, or a string)
      *
      * @return $this
-     * @see Symfony\Component\Finder\Finder::name
+     *
+     * @see \Symfony\Component\Finder\Finder::name
      */
     public function name($pattern)
     {
@@ -110,7 +111,8 @@ class ClassFinder implements \IteratorAggregate, \Countable
      * @param string $pattern A pattern (a regexp, a glob, or a string)
      *
      * @return $this
-     * @see Symfony\Component\Finder\Finder::notName
+     *
+     * @see \Symfony\Component\Finder\Finder::notName
      */
     public function notName($pattern)
     {
@@ -132,7 +134,8 @@ class ClassFinder implements \IteratorAggregate, \Countable
      * @param int $level The depth level expression
      *
      * @return $this
-     * @see Symfony\Component\Finder\Finder::depth
+     *
+     * @see \Symfony\Component\Finder\Finder::depth
      */
     public function depth($level)
     {
@@ -237,7 +240,7 @@ class ClassFinder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Returns the classes for the current ClassFinder configuration
+     * Returns the classes for the current ClassFinder configuration.
      *
      * @return \ReflectionClass[]
      */

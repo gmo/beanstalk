@@ -16,7 +16,7 @@ use Psr\Log\LoggerAwareInterface;
 interface QueueInterface extends TubeControlInterface, JobControlInterface, LoggerAwareInterface
 {
     /**
-     * Gets a tube by name
+     * Gets a tube by name.
      *
      * @param string $name
      *
@@ -25,28 +25,28 @@ interface QueueInterface extends TubeControlInterface, JobControlInterface, Logg
     public function tube($name);
 
     /**
-     * Gets a list of all the tubes
+     * Gets a list of all the tubes.
      *
      * @return TubeCollection|Tube[]
      */
     public function tubes();
 
     /**
-     * Gets the stats for all tubes
+     * Gets the stats for all tubes.
      *
      * @return TubeStats[]|ImmutableBag
      */
     public function statsAllTubes();
 
     /**
-     * Returns the stats about the server
+     * Returns the stats about the server.
      *
      * @return ServerStats
      */
     public function statsServer();
 
     /**
-     * Inspect a job in the system by ID
+     * Inspect a job in the system by ID.
      *
      * @param int $jobId
      *

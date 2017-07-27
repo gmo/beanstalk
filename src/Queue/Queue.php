@@ -24,9 +24,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
- * Queue manages jobs in tubes and provides stats about jobs
- *
- * @package Gmo\Beanstalk
+ * Queue manages jobs in tubes and provides stats about jobs.
  */
 class Queue implements QueueInterface
 {
@@ -40,7 +38,7 @@ class Queue implements QueueInterface
     protected $serializer;
 
     /**
-     * Sets up a new Queue
+     * Sets up a new Queue.
      *
      * @param string          $host
      * @param int             $port

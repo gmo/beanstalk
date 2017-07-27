@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Gmo\Beanstalk\Queue;
 
 /**
- * Implementation of {@see QueueAwareInterface}
+ * Implementation of {@see QueueAwareInterface}.
  *
  * @see QueueAwareInterface
  */
@@ -15,7 +15,7 @@ trait QueueAwareTrait
     protected $queue;
 
     /**
-     * Sets the queue instance
+     * Sets the queue instance.
      *
      * @param QueueInterface $queue
      */

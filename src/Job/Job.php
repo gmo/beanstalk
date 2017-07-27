@@ -9,7 +9,7 @@ use Bolt\Collection\Bag;
 class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate
 {
     /**
-     * Pheanstalk\Job::data is ignored because it's private and we allow write access
+     * Pheanstalk\Job::data is ignored because it's private and we allow write access.
      *
      * @var Bag|mixed
      */
@@ -50,7 +50,7 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Returns whether the job has been handled (released, buried, deleted)
+     * Returns whether the job has been handled (released, buried, deleted).
      *
      * @return bool
      */
@@ -97,9 +97,11 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate
     {
         return $this->queue->statsJob($this);
     }
+
     //endregion
 
     //region Array and Iterator Methods
+
     /** @inheritdoc */
     public function offsetExists($offset)
     {

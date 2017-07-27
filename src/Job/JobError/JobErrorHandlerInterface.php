@@ -14,7 +14,7 @@ interface JobErrorHandlerInterface
 {
     /**
      * Tell the worker how to handle the exception
-     * by returning a JobErrorInterface
+     * by returning a JobErrorInterface.
      *
      * @param Exception $ex
      *

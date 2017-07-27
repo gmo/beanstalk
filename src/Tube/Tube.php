@@ -28,7 +28,7 @@ class Tube
     }
 
     /**
-     * Pushes a job to this tube
+     * Pushes a job to this tube.
      *
      * @param SerializableInterface|iterable|mixed $data     Job data
      * @param int|null                             $priority From 0 (most urgent) to 4294967295 (least urgent)
@@ -43,7 +43,7 @@ class Tube
     }
 
     /**
-     * Reserves a job
+     * Reserves a job.
      *
      * @param int|null $timeout
      * @param bool     $stopWatching Stop watching the tube after reserving the job
@@ -57,7 +57,7 @@ class Tube
 
     /**
      * Kicks jobs
-     * Buried jobs will be kicked before delayed jobs
+     * Buried jobs will be kicked before delayed jobs.
      *
      * @param int $num Number of jobs to kick, -1 is all
      *
@@ -69,7 +69,7 @@ class Tube
     }
 
     /**
-     * Inspect the next ready job
+     * Inspect the next ready job.
      *
      * @return Job
      */
@@ -79,7 +79,7 @@ class Tube
     }
 
     /**
-     * Inspect the next buried job
+     * Inspect the next buried job.
      *
      * @return Job
      */
@@ -89,7 +89,7 @@ class Tube
     }
 
     /**
-     * Inspect the next delayed job
+     * Inspect the next delayed job.
      *
      * @return Job
      */
@@ -99,7 +99,7 @@ class Tube
     }
 
     /**
-     * Delete jobs in the ready state
+     * Delete jobs in the ready state.
      *
      * @param int $num Number of jobs to delete, -1 is all
      *
@@ -111,7 +111,7 @@ class Tube
     }
 
     /**
-     * Delete jobs in the buried state
+     * Delete jobs in the buried state.
      *
      * @param int $num Number of jobs to delete, -1 is all
      *
@@ -123,7 +123,7 @@ class Tube
     }
 
     /**
-     * Delete jobs in the delayed state
+     * Delete jobs in the delayed state.
      *
      * @param int $num Number of jobs to delete, -1 is all
      *
@@ -135,7 +135,7 @@ class Tube
     }
 
     /**
-     * Temporarily prevent jobs being reserved
+     * Temporarily prevent jobs being reserved.
      *
      * @param int $delay Seconds before jobs may be reserved
      */
@@ -170,7 +170,7 @@ class Tube
     }
 
     /**
-     * Gets the tube's stats
+     * Gets the tube's stats.
      *
      * @return TubeStats
      */
@@ -180,7 +180,7 @@ class Tube
     }
 
     /**
-     * Gets the name of this tube
+     * Gets the name of this tube.
      *
      * @return string
      */

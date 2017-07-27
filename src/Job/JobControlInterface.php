@@ -16,7 +16,7 @@ interface JobControlInterface
     public function release(Job $job, $priority = null, $delay = null);
 
     /**
-     * Buries a job
+     * Buries a job.
      *
      * @param Job $job
      * @param int $priority
@@ -24,7 +24,7 @@ interface JobControlInterface
     public function bury(Job $job, $priority = null);
 
     /**
-     * Deletes a job
+     * Deletes a job.
      *
      * @param Job $job
      */

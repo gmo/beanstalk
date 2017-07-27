@@ -8,12 +8,12 @@ use Gmo\Beanstalk\Job\Job;
 use Gmo\Beanstalk\Job\UnserializableJob;
 
 /**
- * Classes can extend this one to handle jobs with unserializable data
+ * Classes can extend this one to handle jobs with unserializable data.
  */
 abstract class JobConverterRunner extends RunnerDecorator
 {
     /**
-     * Manually unserialize the job data
+     * Manually unserialize the job data.
      *
      * @param mixed $jobData
      *

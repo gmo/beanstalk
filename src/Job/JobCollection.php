@@ -11,6 +11,7 @@ class JobCollection extends Bag
 {
     /**
      * @inheritdoc
+     *
      * @return Job
      */
     public function get($key, $default = null)
@@ -20,6 +21,7 @@ class JobCollection extends Bag
 
     /**
      * @inheritdoc
+     *
      * @return Job
      */
     public function first()
@@ -29,6 +31,7 @@ class JobCollection extends Bag
 
     /**
      * @inheritdoc
+     *
      * @return Job
      */
     public function last()
@@ -38,6 +41,7 @@ class JobCollection extends Bag
 
     /**
      * @inheritdoc
+     *
      * @return Job
      */
     public function &offsetGet($offset)
@@ -47,6 +51,7 @@ class JobCollection extends Bag
 
     /**
      * @inheritdoc
+     *
      * @return Job
      */
     public function remove($key, $default = null)
@@ -56,6 +61,7 @@ class JobCollection extends Bag
 
     /**
      * @inheritdoc
+     *
      * @return Job
      */
     public function removeFirst()
@@ -65,6 +71,7 @@ class JobCollection extends Bag
 
     /**
      * @inheritdoc
+     *
      * @return Job
      */
     public function removeLast()

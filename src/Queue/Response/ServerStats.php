@@ -26,7 +26,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The number of ready jobs with priority < 1024
+     * The number of ready jobs with priority < 1024.
      *
      * @return int
      */
@@ -36,7 +36,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The number of jobs in the ready queue
+     * The number of jobs in the ready queue.
      *
      * @return int
      */
@@ -46,7 +46,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The number of jobs reserved by all clients
+     * The number of jobs reserved by all clients.
      *
      * @return int
      */
@@ -56,7 +56,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The number of delayed jobs
+     * The number of delayed jobs.
      *
      * @return int
      */
@@ -66,7 +66,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The number of buried jobs
+     * The number of buried jobs.
      *
      * @return int
      */
@@ -76,7 +76,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The number of currently existing tubes
+     * The number of currently existing tubes.
      *
      * @return int
      */
@@ -86,7 +86,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The number of currently open connections
+     * The number of currently open connections.
      *
      * @return int
      */
@@ -97,7 +97,7 @@ class ServerStats extends AbstractStats
 
     /**
      * The number of open connections that have each
-     * issued at least one put command
+     * issued at least one put command.
      *
      * @return int
      */
@@ -108,7 +108,7 @@ class ServerStats extends AbstractStats
 
     /**
      * The number of open connections that have each
-     * issued at least one reserve command
+     * issued at least one reserve command.
      *
      * @return int
      */
@@ -119,7 +119,7 @@ class ServerStats extends AbstractStats
 
     /**
      * The number of open connections that have issued
-     * a reserve command but not yet received a response
+     * a reserve command but not yet received a response.
      *
      * @return int
      */
@@ -138,7 +138,7 @@ class ServerStats extends AbstractStats
     //region Command Counts
 
     /**
-     * The cumulative number of put commands
+     * The cumulative number of put commands.
      *
      * @return int
      */
@@ -148,7 +148,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of peek commands
+     * The cumulative number of peek commands.
      *
      * @return int
      */
@@ -158,7 +158,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of peek ready commands
+     * The cumulative number of peek ready commands.
      *
      * @return int
      */
@@ -168,7 +168,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of peek delayed commands
+     * The cumulative number of peek delayed commands.
      *
      * @return int
      */
@@ -178,7 +178,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of peek buried commands
+     * The cumulative number of peek buried commands.
      *
      * @return int
      */
@@ -188,7 +188,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of reserve commands
+     * The cumulative number of reserve commands.
      *
      * @return int
      */
@@ -198,7 +198,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of use commands
+     * The cumulative number of use commands.
      *
      * @return int
      */
@@ -208,7 +208,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of watch commands
+     * The cumulative number of watch commands.
      *
      * @return int
      */
@@ -218,7 +218,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of ignore commands
+     * The cumulative number of ignore commands.
      *
      * @return int
      */
@@ -228,7 +228,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of delete commands
+     * The cumulative number of delete commands.
      *
      * @return int
      */
@@ -238,7 +238,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of release commands
+     * The cumulative number of release commands.
      *
      * @return int
      */
@@ -248,7 +248,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of bury commands
+     * The cumulative number of bury commands.
      *
      * @return int
      */
@@ -258,7 +258,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of kick commands
+     * The cumulative number of kick commands.
      *
      * @return int
      */
@@ -268,7 +268,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of stats commands
+     * The cumulative number of stats commands.
      *
      * @return int
      */
@@ -278,7 +278,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of stats job commands
+     * The cumulative number of stats job commands.
      *
      * @return int
      */
@@ -288,7 +288,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of stats tube commands
+     * The cumulative number of stats tube commands.
      *
      * @return int
      */
@@ -298,7 +298,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of list tubes commands
+     * The cumulative number of list tubes commands.
      *
      * @return int
      */
@@ -308,7 +308,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of list tubes used commands
+     * The cumulative number of list tubes used commands.
      *
      * @return int
      */
@@ -318,7 +318,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of list tubes watched commands
+     * The cumulative number of list tubes watched commands.
      *
      * @return int
      */
@@ -328,7 +328,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of pause tube commands
+     * The cumulative number of pause tube commands.
      *
      * @return int
      */
@@ -345,7 +345,7 @@ class ServerStats extends AbstractStats
     //endregion
 
     /**
-     * The cumulative count of times a job has timed out
+     * The cumulative count of times a job has timed out.
      *
      * @return int
      */
@@ -355,7 +355,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative count of jobs created
+     * The cumulative count of jobs created.
      *
      * @return int
      */
@@ -365,7 +365,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The maximum number of bytes in a job
+     * The maximum number of bytes in a job.
      *
      * @return int
      */
@@ -375,7 +375,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative count of connections
+     * The cumulative count of connections.
      *
      * @return int
      */
@@ -386,7 +386,7 @@ class ServerStats extends AbstractStats
 
     /**
      * A random id string for this server process,
-     * generated when each beanstalkd process starts
+     * generated when each beanstalkd process starts.
      *
      * @return string
      */
@@ -396,7 +396,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The process id of the server
+     * The process id of the server.
      *
      * @return int
      */
@@ -406,7 +406,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The version string of the server
+     * The version string of the server.
      *
      * @return string
      */
@@ -416,7 +416,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The hostname of the machine as determined by uname
+     * The hostname of the machine as determined by uname.
      *
      * @return string
      */
@@ -427,7 +427,7 @@ class ServerStats extends AbstractStats
 
     /**
      * The cumulative user CPU time of this process
-     * in seconds and microseconds
+     * in seconds and microseconds.
      *
      * @return float
      */
@@ -438,7 +438,7 @@ class ServerStats extends AbstractStats
 
     /**
      * The cumulative system CPU time of this process
-     * in seconds and microseconds
+     * in seconds and microseconds.
      *
      * @return float
      */
@@ -448,7 +448,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The number of seconds since this server process started running
+     * The number of seconds since this server process started running.
      *
      * @return int
      */
@@ -472,7 +472,7 @@ class ServerStats extends AbstractStats
     //region Binlog
 
     /**
-     * The index of the oldest binlog file needed to store the current jobs
+     * The index of the oldest binlog file needed to store the current jobs.
      *
      * @return int
      */
@@ -493,7 +493,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The maximum size in bytes a binlog file is allowed to get before a new binlog file is opened
+     * The maximum size in bytes a binlog file is allowed to get before a new binlog file is opened.
      *
      * @return int
      */
@@ -503,7 +503,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of records written to the binlog
+     * The cumulative number of records written to the binlog.
      *
      * @return int
      */
@@ -513,7 +513,7 @@ class ServerStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of records written as part of compaction
+     * The cumulative number of records written as part of compaction.
      *
      * @return int
      */

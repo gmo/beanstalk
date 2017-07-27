@@ -181,7 +181,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
     }
 
     /**
-     * Handled Exception thrown by worker
+     * Handled Exception thrown by worker.
      *
      * @param Job       $job
      * @param Exception $ex
@@ -266,7 +266,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
     }
 
     /**
-     * Determine job error from error handlers or exception
+     * Determine job error from error handlers or exception.
      *
      * @param Exception $ex
      *

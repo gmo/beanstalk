@@ -10,7 +10,7 @@ class LinearJobDelay implements JobDelayInterface
     protected $pause;
 
     /**
-     * @param int  $delay in seconds
+     * @param int  $delay     in seconds
      * @param bool $pauseTube
      */
     public function __construct($delay, $pauseTube = false)

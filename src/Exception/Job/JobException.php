@@ -15,7 +15,7 @@ use Gmo\Beanstalk\Job\JobError\Retry\NoJobRetry;
 
 /**
  * Exceptions can be wrapped in this class or extend this class
- * to tell the Runner/Worker what to do with the job
+ * to tell the Runner/Worker what to do with the job.
  */
 class JobException extends QueueException implements JobErrorInterface
 {

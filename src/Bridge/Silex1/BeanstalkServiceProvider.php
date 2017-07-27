@@ -9,7 +9,7 @@ use Silex\Application;
 use Silex\ServiceProviderInterface;
 
 /**
- * Service provider for Silex v1
+ * Service provider for Silex v1.
  */
 class BeanstalkServiceProvider implements ServiceProviderInterface
 {

@@ -47,10 +47,11 @@ class ArrayQueue implements QueueInterface
 
     public function release(Job $job, $priority = null, $delay = null)
     {
+        /** @var ArrayJob $job */
         if ($this->isNullJob($job)) {
             return;
         }
-        /** @var ArrayJob $job */
+
         $job->incrementReleases();
 
         $tube = $this->tube($job->stats()->tube());
@@ -69,10 +70,11 @@ class ArrayQueue implements QueueInterface
 
     public function bury(Job $job, $priority = null)
     {
+        /** @var ArrayJob $job */
         if ($this->isNullJob($job)) {
             return;
         }
-        /** @var ArrayJob $job */
+
         $job->setPriority($priority);
 
         $tube = $this->tube($job->stats()->tube());
@@ -101,10 +103,10 @@ class ArrayQueue implements QueueInterface
 
     public function kickJob($job)
     {
+        /** @var ArrayJob $job */
         if ($this->isNullJob($job)) {
             return;
         }
-        /** @var ArrayJob $job */
 
         $tube = $this->tube($job->stats()->tube());
         if ($job instanceof ArrayJob && $job->isDelayed()) {

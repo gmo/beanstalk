@@ -11,7 +11,7 @@ class TubeCollection extends Bag
 {
     /**
      * Additional functionality:
-     * One or more strings can be passed in to match to tube name
+     * One or more strings can be passed in to match to tube name.
      *
      * @param string|string[]|callable|null $p
      *
@@ -40,6 +40,7 @@ class TubeCollection extends Bag
 
     /**
      * @inheritdoc
+     *
      * @return Tube|null
      */
     public function get($key, $default = null)
@@ -49,6 +50,7 @@ class TubeCollection extends Bag
 
     /**
      * @inheritdoc
+     *
      * @return Tube|false
      */
     public function first()
@@ -58,6 +60,7 @@ class TubeCollection extends Bag
 
     /**
      * @inheritdoc
+     *
      * @return Tube|false
      */
     public function last()
@@ -67,6 +70,7 @@ class TubeCollection extends Bag
 
     /**
      * @inheritdoc
+     *
      * @return Tube|null
      */
     public function &offsetGet($offset)
@@ -76,6 +80,7 @@ class TubeCollection extends Bag
 
     /**
      * @inheritdoc
+     *
      * @return Tube|null
      */
     public function remove($key, $default = null)
@@ -85,6 +90,7 @@ class TubeCollection extends Bag
 
     /**
      * @inheritdoc
+     *
      * @return Tube|null
      */
     public function removeFirst()
@@ -94,6 +100,7 @@ class TubeCollection extends Bag
 
     /**
      * @inheritdoc
+     *
      * @return Tube|null
      */
     public function removeLast()

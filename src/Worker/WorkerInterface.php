@@ -19,7 +19,7 @@ interface WorkerInterface
     public static function getTubeName();
 
     /**
-     * Returns the runner
+     * Returns the runner.
      *
      * @return RunnerInterface
      */
@@ -41,7 +41,7 @@ interface WorkerInterface
     public static function getTimeToRun();
 
     /**
-     * Return a list of job error handlers
+     * Return a list of job error handlers.
      *
      * @return JobErrorHandlerInterface[]|Bag
      */
@@ -55,7 +55,7 @@ interface WorkerInterface
     public static function getRequiredParams();
 
     /**
-     * Returns a logger instance for worker
+     * Returns a logger instance for worker.
      *
      * @return \Psr\Log\LoggerInterface
      */
@@ -67,14 +67,14 @@ interface WorkerInterface
     public function setup();
 
     /**
-     * Process each job
+     * Process each job.
      *
      * @param Job $job
      */
     public function process(Job $job);
 
     /**
-     * Called when the worker is stopped
+     * Called when the worker is stopped.
      */
     public function onStop();
 }

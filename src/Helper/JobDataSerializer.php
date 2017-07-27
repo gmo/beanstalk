@@ -82,7 +82,7 @@ class JobDataSerializer
      * @param string $value serialized data
      * @param mixed  $data  Pass variable to set unserialized data to (if successful)
      *
-     * @return bool Whether the unserialization was successful.
+     * @return bool whether the unserialization was successful
      */
     private function nativeUnserialize($value, &$data)
     {

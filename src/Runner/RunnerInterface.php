@@ -24,7 +24,7 @@ interface RunnerInterface
     public function preProcessJob(Job $job);
 
     /**
-     * Validates current job
+     * Validates current job.
      *
      * @param Job $job
      *
@@ -51,7 +51,7 @@ interface RunnerInterface
     public function shouldKeepRunning();
 
     /**
-     * Tell the runner to stop running
+     * Tell the runner to stop running.
      */
     public function stopRunning();
 }

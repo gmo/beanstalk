@@ -46,7 +46,7 @@ class RpcRunner extends BaseRunner
     }
 
     /**
-     * Returns true if the tube has at least one watcher
+     * Returns true if the tube has at least one watcher.
      *
      * @param string $tube
      *
@@ -62,7 +62,7 @@ class RpcRunner extends BaseRunner
     }
 
     /**
-     * Returns true if the tube exists
+     * Returns true if the tube exists.
      *
      * @param string $tube
      *

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Gmo\Beanstalk\Log;
 
 /**
- * Adds worker name to Monolog Logger
+ * Adds worker name to Monolog Logger.
  */
 class WorkerProcessor
 {

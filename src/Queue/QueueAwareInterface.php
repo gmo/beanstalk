@@ -7,7 +7,7 @@ namespace Gmo\Beanstalk\Queue;
 interface QueueAwareInterface
 {
     /**
-     * Sets the queue instance
+     * Sets the queue instance.
      *
      * @param QueueInterface $queue
      */

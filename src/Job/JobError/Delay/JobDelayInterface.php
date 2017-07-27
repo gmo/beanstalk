@@ -7,7 +7,7 @@ namespace Gmo\Beanstalk\Job\JobError\Delay;
 interface JobDelayInterface
 {
     /**
-     * Returns the number of seconds the job should be delayed before being retried
+     * Returns the number of seconds the job should be delayed before being retried.
      *
      * @param $numRetries
      *
@@ -16,7 +16,7 @@ interface JobDelayInterface
     public function getDelay($numRetries);
 
     /**
-     * Returns whether to pause the tube or just the job
+     * Returns whether to pause the tube or just the job.
      *
      * @return bool
      */

@@ -60,7 +60,7 @@ class WorkerManager implements LoggerAwareInterface
     }
 
     /**
-     * Restarts all beanstalk workers
+     * Restarts all beanstalk workers.
      *
      * @param null|string|array $filter [optional] worker(s) filter
      */
@@ -96,7 +96,7 @@ class WorkerManager implements LoggerAwareInterface
     }
 
     /**
-     * Stops all beanstalk workers
+     * Stops all beanstalk workers.
      *
      * @param null|string|array $filter [optional] worker(s) filter
      */
@@ -136,7 +136,7 @@ class WorkerManager implements LoggerAwareInterface
     }
 
     /**
-     * Get a collection of {@see WorkerInfo}'s that implement {@see WorkerInterface}
+     * Get a collection of {@see WorkerInfo}'s that implement {@see WorkerInterface}.
      *
      * @param null|string|array $filter [optional] worker(s) filter
      *

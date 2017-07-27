@@ -10,7 +10,7 @@ interface JobActionInterface
     public const DELETE = 'delete';
 
     /**
-     * Returns the action to take on the job
+     * Returns the action to take on the job.
      *
      * @return int
      */

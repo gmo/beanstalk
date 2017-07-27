@@ -7,7 +7,7 @@ namespace Gmo\Beanstalk\Queue\Response;
 class TubeStats extends AbstractStats
 {
     /**
-     * The tube's name
+     * The tube's name.
      *
      * @return string
      */
@@ -34,7 +34,7 @@ class TubeStats extends AbstractStats
     }
 
     /**
-     * The number of ready jobs with priority < 1024 in this tube
+     * The number of ready jobs with priority < 1024 in this tube.
      *
      * @return int
      */
@@ -44,7 +44,7 @@ class TubeStats extends AbstractStats
     }
 
     /**
-     * The number of jobs in the ready queue in this tube
+     * The number of jobs in the ready queue in this tube.
      *
      * @return int
      */
@@ -54,7 +54,7 @@ class TubeStats extends AbstractStats
     }
 
     /**
-     * the number of jobs reserved by all clients in this tube
+     * the number of jobs reserved by all clients in this tube.
      *
      * @return int
      */
@@ -64,7 +64,7 @@ class TubeStats extends AbstractStats
     }
 
     /**
-     * The number of delayed jobs in this tube
+     * The number of delayed jobs in this tube.
      *
      * @return int
      */
@@ -74,7 +74,7 @@ class TubeStats extends AbstractStats
     }
 
     /**
-     * The number of buried jobs in this tube
+     * The number of buried jobs in this tube.
      *
      * @return int
      */
@@ -85,7 +85,7 @@ class TubeStats extends AbstractStats
 
     /**
      * The cumulative count of jobs created in this tube
-     * in the current beanstalkd process
+     * in the current beanstalkd process.
      *
      * @return int
      */
@@ -95,7 +95,7 @@ class TubeStats extends AbstractStats
     }
 
     /**
-     * The number of open connections that are currently using this tube
+     * The number of open connections that are currently using this tube.
      *
      * @return int
      */
@@ -106,7 +106,7 @@ class TubeStats extends AbstractStats
 
     /**
      * The number of open connections that have issued a reserve command
-     * while watching this tube but not yet received a response
+     * while watching this tube but not yet received a response.
      *
      * @return int
      */
@@ -116,7 +116,7 @@ class TubeStats extends AbstractStats
     }
 
     /**
-     * The number of open connections that are currently watching this tube
+     * The number of open connections that are currently watching this tube.
      *
      * @return int
      */
@@ -126,7 +126,7 @@ class TubeStats extends AbstractStats
     }
 
     /**
-     * The number of seconds the tube has been paused for
+     * The number of seconds the tube has been paused for.
      *
      * @return int
      */
@@ -136,7 +136,7 @@ class TubeStats extends AbstractStats
     }
 
     /**
-     * The number of seconds until the tube is un-paused
+     * The number of seconds until the tube is un-paused.
      *
      * @return int
      */
@@ -146,7 +146,7 @@ class TubeStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of delete commands for this tube
+     * The cumulative number of delete commands for this tube.
      *
      * @return int
      */
@@ -156,7 +156,7 @@ class TubeStats extends AbstractStats
     }
 
     /**
-     * The cumulative number of pause-tube commands for this tube
+     * The cumulative number of pause-tube commands for this tube.
      *
      * @return int
      */

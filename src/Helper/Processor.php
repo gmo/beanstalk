@@ -34,7 +34,7 @@ class Processor
     }
 
     /**
-     * Checks if pid is running
+     * Checks if pid is running.
      *
      * @param $pid
      *

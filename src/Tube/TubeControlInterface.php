@@ -12,7 +12,7 @@ use Gmo\Beanstalk\Queue\Response\TubeStats;
 interface TubeControlInterface extends JobProducerInterface
 {
     /**
-     * Reserves a job from the specified tube
+     * Reserves a job from the specified tube.
      *
      * @param string   $tube
      * @param int|null $timeout
@@ -24,17 +24,17 @@ interface TubeControlInterface extends JobProducerInterface
 
     /**
      * Kicks all jobs in a given tube.
-     * Buried jobs will be kicked before delayed jobs
+     * Buried jobs will be kicked before delayed jobs.
      *
      * @param string $tube
-     * @param int    $num Number of jobs to kick, -1 is all
+     * @param int    $num  Number of jobs to kick, -1 is all
      *
      * @return int number of jobs deleted
      */
     public function kickTube($tube, $num = -1);
 
     /**
-     * Inspect the next ready job in the specified tube
+     * Inspect the next ready job in the specified tube.
      *
      * @param string $tube
      *
@@ -43,7 +43,7 @@ interface TubeControlInterface extends JobProducerInterface
     public function peekReady($tube);
 
     /**
-     * Inspect the next buried job in the specified tube
+     * Inspect the next buried job in the specified tube.
      *
      * @param string $tube
      *
@@ -52,7 +52,7 @@ interface TubeControlInterface extends JobProducerInterface
     public function peekBuried($tube);
 
     /**
-     * Inspect the next delayed job in the specified tube
+     * Inspect the next delayed job in the specified tube.
      *
      * @param string $tube
      *
@@ -61,45 +61,45 @@ interface TubeControlInterface extends JobProducerInterface
     public function peekDelayed($tube);
 
     /**
-     * Deletes all ready jobs in a given tube
+     * Deletes all ready jobs in a given tube.
      *
      * @param string $tube
-     * @param int    $num Number of jobs to delete, -1 is all
+     * @param int    $num  Number of jobs to delete, -1 is all
      *
      * @return int number of jobs deleted
      */
     public function deleteReadyJobs($tube, $num = -1);
 
     /**
-     * Deletes all buried jobs in a given tube
+     * Deletes all buried jobs in a given tube.
      *
      * @param string $tube
-     * @param int    $num Number of jobs to delete, -1 is all
+     * @param int    $num  Number of jobs to delete, -1 is all
      *
      * @return int number of jobs deleted
      */
     public function deleteBuriedJobs($tube, $num = -1);
 
     /**
-     * Deletes all delayed jobs in a given tube
+     * Deletes all delayed jobs in a given tube.
      *
      * @param string $tube
-     * @param int    $num Number of jobs to delete, -1 is all
+     * @param int    $num  Number of jobs to delete, -1 is all
      *
      * @return int number of jobs deleted
      */
     public function deleteDelayedJobs($tube, $num = -1);
 
     /**
-     * Temporarily prevent jobs being reserved from the given tube
+     * Temporarily prevent jobs being reserved from the given tube.
      *
      * @param string $tube  The tube to pause
-     * @param int    $delay Seconds before jobs may be reserved from this queue.
+     * @param int    $delay seconds before jobs may be reserved from this queue
      */
     public function pause($tube, $delay);
 
     /**
-     * Gets the stats for the given tube
+     * Gets the stats for the given tube.
      *
      * @param string $tube
      *
