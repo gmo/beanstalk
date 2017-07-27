@@ -4,6 +4,7 @@
     "description": "Common beanstalk worker abstraction and queue utilities",
     "require": {
         "bolt/collection": "^1.0",
+        "bolt/common": "^1.0@dev",
         "ext-pcntl": "*",
         "gmo/common": "^2.0@dev",
         "gmo/console": "^2.3",
