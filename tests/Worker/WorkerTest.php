@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Tests\Worker;
 
-use Bolt\Collection\Bag;
 use Gmo\Beanstalk\Test\QueueTestCase;
 use Gmo\Beanstalk\Test\TestRunner;
 use Gmo\Beanstalk\Tests\Worker\TestWorkers\UnitTestWorker;
@@ -26,7 +25,7 @@ class WorkerTest extends QueueTestCase
 
         $job = $runner->run();
 
-        $this->assertEquals(new Bag(['data1', 'data2']), $job->getResult());
+        $this->assertEquals(['data1', 'data2'], $job->getResult());
         $this->assertTubeEmpty(UnitTestWorker::getTubeName());
     }
 

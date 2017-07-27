@@ -4,32 +4,31 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Job;
 
-use Gmo\Common\Exception\NotSerializableException;
+use Bolt\Common\Exception\ParseException;
 
 /**
- * A Job whose data is unable to be unserialized via {@see \Gmo\Common\Serialization\SerializableInterface}.
+ * A Job whose data is unable to be parsed.
  */
 class UnserializableJob extends Job
 {
-    /** @var NotSerializableException */
+    /** @var ParseException */
     protected $exception;
 
     /**
-     * @param int                      $id
-     * @param string                   $data
-     * @param JobControlInterface      $queue
-     * @param NotSerializableException $exception
+     * Constructor.
+     *
+     * @param int                 $id
+     * @param string              $data
+     * @param JobControlInterface $queue
+     * @param ParseException      $exception
      */
-    public function __construct($id, $data, JobControlInterface $queue, NotSerializableException $exception)
+    public function __construct($id, $data, JobControlInterface $queue, ParseException $exception)
     {
         parent::__construct($id, $data, $queue);
         $this->exception = $exception;
     }
 
-    /**
-     * @return NotSerializableException
-     */
-    public function getException()
+    public function getException(): ParseException
     {
         return $this->exception;
     }

@@ -7,7 +7,6 @@ namespace Gmo\Beanstalk\Worker;
 use Bolt\Collection\Bag;
 use Gmo\Beanstalk\Job\JobProducerInterface;
 use Gmo\Beanstalk\Runner\BaseRunner;
-use Gmo\Common\Serialization\SerializableInterface;
 use Gmo\Common\Str;
 
 /**
@@ -18,10 +17,10 @@ abstract class AbstractWorker implements WorkerInterface
     /**
      * Shortcut for {@see JobProducerInterface::push} that uses the worker's tube name and ttr.
      *
-     * @param JobProducerInterface                 $queue
-     * @param SerializableInterface|iterable|mixed $data     Job data
-     * @param int|null                             $priority From 0 (most urgent) to 4294967295 (least urgent)
-     * @param int|null                             $delay    Seconds to wait before job becomes ready
+     * @param JobProducerInterface $queue
+     * @param mixed                $data     Job data (needs to be serializable)
+     * @param int|null             $priority From 0 (most urgent) to 4294967295 (least urgent)
+     * @param int|null             $delay    Seconds to wait before job becomes ready
      *
      * @return int The new job ID
      */

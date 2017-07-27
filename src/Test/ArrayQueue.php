@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Gmo\Beanstalk\Test;
 
 use Bolt\Collection\ImmutableBag;
+use Bolt\Common\Serialization;
 use Gmo\Beanstalk\Exception\RangeException;
-use Gmo\Beanstalk\Helper\JobDataSerializer;
 use Gmo\Beanstalk\Job\Job;
 use Gmo\Beanstalk\Job\JobCollection;
 use Gmo\Beanstalk\Job\NullJob;
@@ -34,15 +34,12 @@ class ArrayQueue implements QueueInterface
     protected $jobCounter = 0;
     /** @var JobProcessor */
     protected $logProcessor;
-    /** @var JobDataSerializer */
-    protected $serializer;
 
     public function __construct()
     {
         $this->jobs = new JobCollection();
         $this->tubes = new TubeCollection();
         $this->logProcessor = new JobProcessor();
-        $this->serializer = new JobDataSerializer();
     }
 
     public function release(Job $job, $priority = null, $delay = null)
@@ -159,7 +156,7 @@ class ArrayQueue implements QueueInterface
         }
         $delay = $delay ?: static::DEFAULT_DELAY;
 
-        $data = $this->serializer->serialize($data);
+        $data = Serialization::dump($data);
         $job = new ArrayJob($this->jobCounter++, $data, $priority, $delay, $tube, $this);
         $job->setState($delay > 0 ? 'delayed' : 'ready');
 
@@ -198,7 +195,7 @@ class ArrayQueue implements QueueInterface
 
         $tube->reserved()->add($job);
 
-        $job->setData($this->serializer->unserialize($job->getData()));
+        $job->setData(Serialization::parse($job->getData()));
         $job->resetHandled();
 
         return $job;

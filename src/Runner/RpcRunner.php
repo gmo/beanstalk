@@ -21,8 +21,13 @@ class RpcRunner extends BaseRunner
     public function preProcessJob(Job $job)
     {
         $job = parent::preProcessJob($job);
-        $this->replyTo = $job->getData()->remove(static::RPC_REPLY_TO_FIELD);
-        $job->setData($job->getData()->get('data'));
+
+        $data = $job->getData();
+
+        $this->replyTo = $data[static::RPC_REPLY_TO_FIELD];
+        unset($data[static::RPC_REPLY_TO_FIELD]);
+
+        $job->setData($data['data']);
 
         return $job;
     }
@@ -36,7 +41,7 @@ class RpcRunner extends BaseRunner
         }
 
         if (!$this->isTubeWatched($this->replyTo)) {
-            $this->log->debug('No one is listening, not pushing to return queue');
+            $this->logger->debug('No one is listening, not pushing to return queue');
 
             return;
         }

@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Queue;
 
+use Bolt\Common\Exception\ParseException;
+use Bolt\Common\Serialization;
 use Gmo\Beanstalk\Exception\JobPushException;
 use Gmo\Beanstalk\Exception\JobTooBigException;
 use Gmo\Beanstalk\Exception\RangeException;
-use Gmo\Beanstalk\Helper\JobDataSerializer;
 use Gmo\Beanstalk\Job\Job;
 use Gmo\Beanstalk\Job\NullJob;
 use Gmo\Beanstalk\Job\UnserializableJob;
@@ -17,7 +18,6 @@ use Gmo\Beanstalk\Queue\Response\ServerStats;
 use Gmo\Beanstalk\Queue\Response\TubeStats;
 use Gmo\Beanstalk\Tube\Tube;
 use Gmo\Beanstalk\Tube\TubeCollection;
-use Gmo\Common\Exception\NotSerializableException;
 use Pheanstalk;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
@@ -34,8 +34,6 @@ class Queue implements QueueInterface
     protected $pheanstalk;
     /** @var JobProcessor */
     protected $logProcessor;
-    /** @var JobDataSerializer */
-    protected $serializer;
 
     /**
      * Sets up a new Queue.
@@ -49,7 +47,6 @@ class Queue implements QueueInterface
         $this->setLogger($logger ?: new NullLogger());
         $this->pheanstalk = new Pheanstalk\Pheanstalk($host, $port);
         $this->logProcessor = new JobProcessor();
-        $this->serializer = new JobDataSerializer();
     }
 
     //region Tube Control
@@ -61,7 +58,7 @@ class Queue implements QueueInterface
             throw new RangeException("Priority must be between 0 and 4294967295. Given: $priority");
         }
         try {
-            $data = $this->serializer->serialize($data);
+            $data = Serialization::dump($data);
 
             return $this->pheanstalk->putInTube(
                 $tube,
@@ -320,9 +317,9 @@ class Queue implements QueueInterface
     protected function createJob(Pheanstalk\Job $job)
     {
         try {
-            $data = $this->serializer->unserialize($job->getData());
+            $data = Serialization::parse($job->getData());
             $job = new Job($job->getId(), $data, $this);
-        } catch (NotSerializableException $e) {
+        } catch (ParseException $e) {
             $job = new UnserializableJob($job->getId(), $job->getData(), $this, $e);
         }
         $this->logProcessor->setCurrentJob($job);

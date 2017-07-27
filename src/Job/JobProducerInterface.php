@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Job;
 
-use Gmo\Common\Serialization\SerializableInterface;
 use Pheanstalk\PheanstalkInterface;
 
 interface JobProducerInterface
@@ -19,11 +18,11 @@ interface JobProducerInterface
     /**
      * Pushes a job to the specified tube.
      *
-     * @param string                               $tube     Tube name
-     * @param SerializableInterface|iterable|mixed $data     Job data
-     * @param int|null                             $priority From 0 (most urgent) to 4294967295 (least urgent)
-     * @param int|null                             $delay    Seconds to wait before job becomes ready
-     * @param int|null                             $ttr      Time To Run: seconds a job can be reserved for
+     * @param string   $tube     Tube name
+     * @param mixed    $data     Job data (needs to be serializable)
+     * @param int|null $priority From 0 (most urgent) to 4294967295 (least urgent)
+     * @param int|null $delay    Seconds to wait before job becomes ready
+     * @param int|null $ttr      Time To Run: seconds a job can be reserved for
      *
      * @return int The new job ID
      */

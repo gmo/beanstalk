@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Job;
 
-use Bolt\Collection\Bag;
-
 class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate
 {
     /**
      * Pheanstalk\Job::data is ignored because it's private and we allow write access.
      *
-     * @var Bag|mixed
+     * @var mixed
      */
     protected $jobData;
     protected $result;
@@ -22,7 +20,7 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate
     public function __construct($id, $data, JobControlInterface $queue)
     {
         $this->queue = $queue;
-        $this->jobData = is_array($data) ? new Bag($data) : $data;
+        $this->jobData = $data;
         parent::__construct($id, $this->jobData);
     }
 
@@ -32,7 +30,7 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * @return Bag|mixed
+     * @return mixed
      */
     public function getData()
     {

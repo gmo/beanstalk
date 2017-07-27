@@ -6,7 +6,6 @@ namespace Gmo\Beanstalk\Tube;
 
 use Gmo\Beanstalk\Job\Job;
 use Gmo\Beanstalk\Queue\Response\TubeStats;
-use Gmo\Common\Serialization\SerializableInterface;
 
 class Tube
 {
@@ -30,10 +29,10 @@ class Tube
     /**
      * Pushes a job to this tube.
      *
-     * @param SerializableInterface|iterable|mixed $data     Job data
-     * @param int|null                             $priority From 0 (most urgent) to 4294967295 (least urgent)
-     * @param int|null                             $delay    Seconds to wait before job becomes ready
-     * @param int|null                             $ttr      Time To Run: seconds a job can be reserved for
+     * @param mixed    $data     Job data (needs to be serializable)
+     * @param int|null $priority From 0 (most urgent) to 4294967295 (least urgent)
+     * @param int|null $delay    Seconds to wait before job becomes ready
+     * @param int|null $ttr      Time To Run: seconds a job can be reserved for
      *
      * @return int The new job ID
      */
