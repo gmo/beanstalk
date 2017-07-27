@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gmo\Beanstalk\Console\Command\Worker;
 
 use Gmo\Beanstalk\Manager\WorkerManager;

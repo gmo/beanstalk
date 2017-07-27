@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gmo\Beanstalk\Job\JobError\Traits;
 
 use Gmo\Beanstalk\Job\JobError\Action\DeleteJobAction;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gmo\Beanstalk\Bridge\Pimple3;
 
 use Gmo\Beanstalk\Console\Command;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gmo\Beanstalk\Test;
 
 use Bolt\Collection\ImmutableBag;
