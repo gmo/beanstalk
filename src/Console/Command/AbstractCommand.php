@@ -112,21 +112,15 @@ class AbstractCommand extends ContainerAwareCommand implements CompletionAwareIn
     /**
      * Returns a string representation of the variable.
      *
-     * Symfony VarDumper is used if installed, else print_r is used.
-     *
      * @param mixed $var
      *
      * @return string
      */
     protected function dumpVar($var)
     {
-        if (!class_exists('\Symfony\Component\VarDumper\VarDumper')) {
-            return print_r($var, true);
-        }
-
         $data = $this->getCloner()->cloneVar($var);
 
-        $res = fopen('php://temp', 'r+');
+        $res = fopen('php://memory', 'r+b');
         $dumper = new CliDumper($res);
         $dumper->setColors($this->output->isDecorated());
         $dumper->dump($data);
