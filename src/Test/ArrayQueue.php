@@ -124,7 +124,7 @@ class ArrayQueue implements QueueInterface
     public function statsJob($job)
     {
         if (is_numeric($job)) {
-            $job = $this->jobs[intval($job)];
+            $job = $this->jobs[(int) $job];
         }
 
         return $job->stats();

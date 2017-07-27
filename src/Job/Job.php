@@ -129,13 +129,15 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate
     {
         if ($this->jobData instanceof \Traversable) {
             return new \IteratorIterator($this->jobData);
-        } elseif (is_array($this->jobData)) {
-            return new \ArrayIterator($this->jobData);
-        } else {
-            return new \ArrayIterator(array(
-                'data' => $this->jobData,
-            ));
         }
+        if (is_array($this->jobData)) {
+            return new \ArrayIterator($this->jobData);
+        }
+
+        return new \ArrayIterator([
+            'data' => $this->jobData,
+        ]);
     }
+
     //endregion
 }

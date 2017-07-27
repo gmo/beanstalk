@@ -23,10 +23,10 @@ abstract class AbstractStats extends Bag
     {
         if (is_numeric($value)) {
             if (Str::contains($value, '.')) {
-                return floatval($value);
+                return (float) $value;
             }
 
-            return intval($value);
+            return (int) $value;
         }
 
         return $value;

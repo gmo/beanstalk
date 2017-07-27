@@ -11,9 +11,9 @@ use Gmo\Beanstalk\Tests\Worker\TestWorkers\UnitTestRpcWorker;
 
 class RpcTest extends QueueTestCase
 {
-    public function test_rpc()
+    public function testRpc()
     {
-        $data = array('a' => 2, 'b' => 2);
+        $data = ['a' => 2, 'b' => 2];
         $manager = new WorkerManager(__DIR__ . '/TestWorkers');
         $manager->startWorkers('UnitTestRpcWorker');
         $result = UnitTestRpcWorker::runRpc(new Queue(), $data);
@@ -23,7 +23,7 @@ class RpcTest extends QueueTestCase
     /**
      * @expectedException \Gmo\Beanstalk\Exception\RpcTimeoutException
      */
-    public function test_rpc_call_timeout()
+    public function testRpcCallTimeout()
     {
         UnitTestRpcWorker::runRpc(static::$queue, 'asdf');
     }

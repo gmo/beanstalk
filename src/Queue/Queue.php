@@ -160,17 +160,17 @@ class Queue implements QueueInterface
 
     public function deleteReadyJobs($tube, $num = -1)
     {
-        return $this->deleteJobs("Ready", $tube, $num);
+        return $this->deleteJobs('Ready', $tube, $num);
     }
 
     public function deleteBuriedJobs($tube, $num = -1)
     {
-        return $this->deleteJobs("Buried", $tube, $num);
+        return $this->deleteJobs('Buried', $tube, $num);
     }
 
     public function deleteDelayedJobs($tube, $num = -1)
     {
-        return $this->deleteJobs("Delayed", $tube, $num);
+        return $this->deleteJobs('Delayed', $tube, $num);
     }
 
     private function deleteJobs($state, $tube, $numberToDelete)
@@ -182,8 +182,8 @@ class Queue implements QueueInterface
                 break;
             }
             $this->delete($job);
-            $numberDeleted++;
-            $numberToDelete--;
+            ++$numberDeleted;
+            --$numberToDelete;
         }
 
         return $numberDeleted;
@@ -235,7 +235,7 @@ class Queue implements QueueInterface
         try {
             $this->pheanstalk->delete($job);
         } catch (Pheanstalk\Exception\ServerException $e) {
-            $this->logger->notice("Error deleting job", array("exception" => $e));
+            $this->logger->notice('Error deleting job', ['exception' => $e]);
         }
     }
 
@@ -254,7 +254,7 @@ class Queue implements QueueInterface
             /** @var Pheanstalk\Response\ArrayResponse $stats */
             $stats = $this->pheanstalk->statsJob($job);
         } catch (Pheanstalk\Exception\ServerException $e) {
-            $stats = array('id' => -1);
+            $stats = ['id' => -1];
         }
 
         return JobStats::from($stats);

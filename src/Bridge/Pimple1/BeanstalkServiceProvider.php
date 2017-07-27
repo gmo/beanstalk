@@ -28,11 +28,12 @@ class BeanstalkServiceProvider
             function ($app) {
                 if (isset($app['logger.new'])) {
                     return $app['logger.new']('Queue');
-                } elseif (isset($app['logger'])) {
-                    return $app['logger'];
-                } else {
-                    return new NullLogger();
                 }
+                if (isset($app['logger'])) {
+                    return $app['logger'];
+                }
+
+                return new NullLogger();
             }
         );
 
@@ -71,7 +72,7 @@ class BeanstalkServiceProvider
             function ($app) {
                 $prefix = $app['beanstalk.console_commands.queue_prefix'];
 
-                return array(
+                return [
                     new Command\Queue\ListCommand($prefix),
                     new Command\Queue\KickCommand($prefix),
                     new Command\Queue\DeleteCommand($prefix),
@@ -85,7 +86,7 @@ class BeanstalkServiceProvider
                     new Command\Worker\StopCommand(),
                     new Command\Worker\RestartCommand(),
                     new Command\Worker\StatsCommand(),
-                );
+                ];
             }
         );
 

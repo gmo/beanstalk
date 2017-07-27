@@ -58,19 +58,19 @@ class StatsCommand extends AbstractWorkerCommand
 
         $width = $this->getConsoleWidth();
         $table = $width ? new AutoHidingTable($buffer, $width) : new Table($buffer);
-        $table->setHeaders(array(
+        $table->setHeaders([
             'Worker',
             'Running',
             'Total',
             'PIDs',
-        ));
+        ]);
         foreach ($workers as $worker) {
-            $table->addRow(array(
+            $table->addRow([
                 $worker->getName(),
                 $worker->getNumRunning(),
                 $worker->getTotal(),
                 $worker->getPids()->join(', '),
-            ));
+            ]);
         }
         $table->render();
 

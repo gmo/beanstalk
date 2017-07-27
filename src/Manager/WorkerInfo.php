@@ -44,7 +44,7 @@ class WorkerInfo
     /** @return int total number of workers */
     public function getTotal()
     {
-        return $this->getInstance()->getNumberOfWorkers();
+        return $this->getInstance()::getNumberOfWorkers();
     }
 
     public function getReflectionClass()

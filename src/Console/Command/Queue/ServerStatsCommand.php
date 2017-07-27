@@ -81,7 +81,7 @@ class ServerStatsCommand extends AbstractQueueCommand
 
     private function renderStats(OutputInterface $output, $name, Bag $stats)
     {
-        $output->writeln("<comment>" . ucfirst($name) . " Stats:</comment>");
+        $output->writeln('<comment>' . ucfirst($name) . ' Stats:</comment>');
         foreach ($stats as $statName => $value) {
             $output->writeln("<info>$statName</info>: $value");
         }

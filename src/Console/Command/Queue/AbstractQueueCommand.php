@@ -71,7 +71,7 @@ class AbstractQueueCommand extends AbstractCommand
             $matchedTubes = $matchedTubes->replace($matched);
         }
 
-        return array($matchedTubes, $error);
+        return [$matchedTubes, $error];
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -120,14 +120,14 @@ class AbstractQueueCommand extends AbstractCommand
         if (empty($currentWord)) {
             $tubes = $this->getQueue()->tubes();
         } else {
-            list($tubes, $error) = $this->matchTubeNames($currentWord, new NullOutput());
+            [$tubes, $error] = $this->matchTubeNames($currentWord, new NullOutput());
         }
 
         return $tubes
             ->keys()
             ->filter(function ($i, $name) use ($currentTubes) {
                 // filter out tubes already defined in input
-                return !in_array(strtolower($name), $currentTubes);
+                return !in_array(strtolower($name), $currentTubes, true);
             })
             ->map(function ($i, $name) use ($currentWord) {
                 // change case to match current word, else it will be filtered out

@@ -46,10 +46,10 @@ class NamespaceParser
         }
         foreach ($stmts as $stmt) {
             if ($stmt instanceof \PHPParser_Node_Stmt_Namespace) {
-                $namespace = implode("\\", $stmt->name->parts);
+                $namespace = implode('\\', $stmt->name->parts);
                 foreach ($stmt->stmts as $subStmt) {
                     if ($subStmt instanceof \PHPParser_Node_Stmt_Class) {
-                        return $namespace . "\\" . $subStmt->name;
+                        return $namespace . '\\' . $subStmt->name;
                     }
                 }
             }
@@ -67,10 +67,10 @@ class NamespaceParser
         }
         foreach ($stmts as $stmt) {
             if ($stmt instanceof NamespaceNode) {
-                $namespace = implode("\\", $stmt->name->parts);
+                $namespace = implode('\\', $stmt->name->parts);
                 foreach ($stmt->stmts as $subStmt) {
                     if ($subStmt instanceof ClassNode) {
-                        return $namespace . "\\" . $subStmt->name;
+                        return $namespace . '\\' . $subStmt->name;
                     }
                 }
             }

@@ -10,12 +10,12 @@ class UnitTestWorkerSetupFailure extends AbstractTestWorker
 {
     public static function tubeName()
     {
-        return "UnitTestWorker";
+        return 'UnitTestWorker';
     }
 
     public function setup()
     {
-        throw new \Exception("Setup function failed!");
+        throw new \Exception('Setup function failed!');
     }
 
     public function process(Job $job)

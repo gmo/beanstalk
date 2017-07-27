@@ -80,7 +80,7 @@ class WorkerManager implements LoggerAwareInterface
      */
     public function startWorkers($filter = null, $spawnNumber = null)
     {
-        $this->logger->info("Starting workers...");
+        $this->logger->info('Starting workers...');
         $workers = $this->getWorkers($filter);
 
         foreach ($workers as $worker) {
@@ -89,7 +89,7 @@ class WorkerManager implements LoggerAwareInterface
             if ($workersToSpawn > 0) {
                 $this->logger->info("Starting $workersToSpawn workers: " . $worker->getName());
             }
-            for ($i = 0; $i < $workersToSpawn; $i++) {
+            for ($i = 0; $i < $workersToSpawn; ++$i) {
                 $this->spawnWorker($worker);
             }
         }
@@ -107,9 +107,9 @@ class WorkerManager implements LoggerAwareInterface
             if (count($worker->getPids()) === 0) {
                 continue;
             }
-            $this->logger->info("Stopping workers: " . $worker->getName());
+            $this->logger->info('Stopping workers: ' . $worker->getName());
             foreach ($worker->getPids() as $pid) {
-                $this->logger->debug(sprintf("Terminating: [%s] %s", $pid, $worker->getName()));
+                $this->logger->debug(sprintf('Terminating: [%s] %s', $pid, $worker->getName()));
                 $this->processor->terminateProcess($pid);
             }
         }
@@ -119,7 +119,7 @@ class WorkerManager implements LoggerAwareInterface
             $failed[$worker->getName()] = [];
 
             foreach ($worker->getPids() as $pid) {
-                $this->logger->debug(sprintf("Waiting for: [%s] %s...", $pid, $worker->getName()));
+                $this->logger->debug(sprintf('Waiting for: [%s] %s...', $pid, $worker->getName()));
                 if (!$this->processor->waitForProcess($pid)) {
                     $failed[$worker->getName()][] = $pid;
                 }
@@ -161,7 +161,7 @@ class WorkerManager implements LoggerAwareInterface
                     return true;
                 }
                 if (!is_array($filter)) {
-                    $filter = array($filter);
+                    $filter = [$filter];
                 }
                 foreach ($filter as $f) {
                     if (Str::contains($worker->getName(), $f, false)) {

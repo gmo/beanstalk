@@ -90,7 +90,7 @@ class AbstractWorkerCommand extends AbstractCommand
             ->getWorkers($currentWord)
             ->filter(function ($i, WorkerInfo $info) use ($currentWorkers) {
                 // filter out workers already defined in input
-                return !in_array(strtolower($info->getName()), $currentWorkers);
+                return !in_array(strtolower($info->getName()), $currentWorkers, true);
             })
             ->map(function ($i, WorkerInfo $info) use ($currentWord) {
                 // change case to match current word, else it will be filtered out

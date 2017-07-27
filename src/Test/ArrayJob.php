@@ -37,10 +37,10 @@ class ArrayJob extends Job
     public function __construct($id, $data, $priority, $delay, $tubeName, JobControlInterface $queue)
     {
         parent::__construct($id, $data, $queue);
-        $this->stats = new JobStats(array(
+        $this->stats = new JobStats([
             'id'   => $id,
             'tube' => $tubeName,
-        ));
+        ]);
         $this->setPriority($priority);
         $this->setDelay($delay);
         $this->created = new Carbon();
@@ -61,16 +61,15 @@ class ArrayJob extends Job
 
         if ($this->delayTime > new Carbon("-{$this->delay} sec")) {
             return true;
-        } else {
-            $this->delay = 0;
-
-            return false;
         }
+        $this->delay = 0;
+
+        return false;
     }
 
     public function setDelay($delay)
     {
-        $this->delay = intval($delay);
+        $this->delay = (int) $delay;
         $this->delayTime = new Carbon();
     }
 
@@ -84,7 +83,7 @@ class ArrayJob extends Job
      */
     public function setPriority($priority)
     {
-        $this->priority = intval($priority);
+        $this->priority = (int) $priority;
         $this->stats->set('pri', $this->priority);
     }
 

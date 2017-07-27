@@ -13,7 +13,7 @@ class JobRetry implements JobRetryInterface
      */
     public function __construct($retry)
     {
-        $this->retry = intval($retry);
+        $this->retry = (int) $retry;
     }
 
     public function getMaxRetries()

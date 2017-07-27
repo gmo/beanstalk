@@ -18,7 +18,7 @@ class ClassFinder implements \IteratorAggregate, \Countable
     private $finder;
     private $useDefaultName = true;
     private $isDefaultSet = false;
-    private $maps = array();
+    private $maps = [];
 
     public function __construct($in)
     {
@@ -253,7 +253,7 @@ class ClassFinder implements \IteratorAggregate, \Countable
             if ($pos === false) {
                 return $pattern;
             }
-            list ($str1, $str2) = $this->splitStringAt($pattern, $pos);
+            [$str1, $str2] = $this->splitStringAt($pattern, $pos);
             $pattern = $str1 . '\.php$' . $str2;
         } else {
             $pattern .= '.php';
@@ -279,9 +279,9 @@ class ClassFinder implements \IteratorAggregate, \Countable
 
     private function splitStringAt($str, $pos)
     {
-        return array(
+        return [
             substr($str, 0, $pos),
             substr($str, $pos + 1) ?: '',
-        );
+        ];
     }
 }

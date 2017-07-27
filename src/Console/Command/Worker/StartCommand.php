@@ -28,7 +28,7 @@ class StartCommand extends AbstractWorkerCommand
 
     protected function executeManagerFunction(InputInterface $input, OutputInterface $output, WorkerManager $manager, $workers)
     {
-        $number = intval(Str::removeFirst($input->getOption('number'), '='));
+        $number = (int) (Str::removeFirst($input->getOption('number'), '='));
         $manager->startWorkers($workers, $number);
     }
 }

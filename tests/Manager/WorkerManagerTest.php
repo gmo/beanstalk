@@ -25,18 +25,18 @@ class WorkerManagerTest extends TestCase
 
     public function testWorkerListAndCounts()
     {
-        $actual = array();
+        $actual = [];
         foreach ($this->wm->getWorkers() as $worker) {
-            $actual[$worker->getName()] = array($worker->getNumRunning(), $worker->getTotal());
+            $actual[$worker->getName()] = [$worker->getNumRunning(), $worker->getTotal()];
         }
-        $expected = array(
-            'NullWorker'                            => array(2, 3),
-            'UnitTestRpcWorker'                     => array(1, 1),
-            'UnitTestWorker'                        => array(0, 0),
-            'UnitTestWorkerProcessGenericException' => array(0, 0),
-            'UnitTestWorkerProcessJobError'         => array(0, 0),
-            'UnitTestWorkerSetupFailure'            => array(0, 0),
-        );
+        $expected = [
+            'NullWorker'                            => [2, 3],
+            'UnitTestRpcWorker'                     => [1, 1],
+            'UnitTestWorker'                        => [0, 0],
+            'UnitTestWorkerProcessGenericException' => [0, 0],
+            'UnitTestWorkerProcessJobError'         => [0, 0],
+            'UnitTestWorkerSetupFailure'            => [0, 0],
+        ];
         $this->assertSame($expected, $actual);
     }
 
@@ -57,11 +57,11 @@ class WorkerManagerTest extends TestCase
     public function testStopWorkers()
     {
         $this->wm->stopWorkers();
-        $expectedPids = array(
+        $expectedPids = [
             22923,
             22921,
             22925,
-        );
+        ];
         $this->assertSame($expectedPids, $this->processor->terminatedProcesses->toArray());
         $this->assertSame($expectedPids, $this->processor->waitedForProcesses->toArray());
         $this->assertSame($expectedPids, $this->processor->terminatedForcefullyProcesses->toArray());

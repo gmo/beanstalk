@@ -28,7 +28,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    const JOB_RESERVATION_TIMEOUT = 5;
+    public const JOB_RESERVATION_TIMEOUT = 5;
 
     /** @var WorkerInterface */
     protected $worker;
@@ -45,10 +45,10 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
     {
         $this->queue = $queue;
         $this->worker = $worker;
-        $this->tubeName = $worker->getTubeName();
-        $this->errorHandlers = $worker->getErrorHandlers();
+        $this->tubeName = $worker::getTubeName();
+        $this->errorHandlers = $worker::getErrorHandlers();
 
-        $logger = $worker->getLogger();
+        $logger = $worker::getLogger();
         $this->setLogger($logger);
         $queue->setLogger($logger);
 
@@ -101,9 +101,9 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
             try {
                 $this->handleError($job, $ex);
             } catch (Exception $e) {
-                $this->logger->warning('Queue command failed', array(
+                $this->logger->warning('Queue command failed', [
                     'exception' => $e,
-                ));
+                ]);
             }
         }
     }
@@ -124,11 +124,11 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
         if (is_scalar($params)) {
             return true;
         }
-        foreach ($this->worker->getRequiredParams() as $reqParam) {
+        foreach ($this->worker::getRequiredParams() as $reqParam) {
             if (!isset($params[$reqParam])) {
-                $this->logger->error('Job is missing required parameter', array(
+                $this->logger->error('Job is missing required parameter', [
                     'missing' => $reqParam,
-                ));
+                ]);
 
                 return false;
             }
@@ -154,7 +154,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
                 $this->queue = $worker->getService('beanstalk.queue');
             }
         } catch (Exception $e) {
-            $this->logger->critical("An error occurred when setting up the worker", array("exception" => $e));
+            $this->logger->critical('An error occurred when setting up the worker', ['exception' => $e]);
             throw $e;
         }
     }
@@ -189,9 +189,9 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
     protected function handleError(Job $job, Exception $ex)
     {
         $numRetries = $this->getNumberOfRetries($job);
-        $this->logger->warning($ex->getMessage(), array(
+        $this->logger->warning($ex->getMessage(), [
             'exception' => $ex,
-        ));
+        ]);
 
         if ($job->isHandled()) {
             $this->logger->warning('Worker should not throw an Exception if job has been handled');
@@ -215,38 +215,38 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
 
     protected function pauseTube($delay)
     {
-        $this->logger->notice('Pausing tube', array(
+        $this->logger->notice('Pausing tube', [
             'delay' => $delay,
-        ));
+        ]);
         $this->queue->pause($this->tubeName, $delay);
     }
 
     protected function buryJob(Job $job, $exception, $numErrors)
     {
-        $this->logger->warning('Burying failed job', array(
+        $this->logger->warning('Burying failed job', [
             'numErrors' => $numErrors,
             'exception' => $exception,
-        ));
+        ]);
         $job->bury();
     }
 
     protected function deleteJob(Job $job, $exception, $numErrors)
     {
-        $this->logger->notice('Deleting failed job', array(
+        $this->logger->notice('Deleting failed job', [
             'numErrors' => $numErrors,
             'exception' => $exception,
-        ));
+        ]);
         $job->delete();
     }
 
     protected function delayJob(Job $job, JobErrorInterface $jobError, $exception, $numErrors)
     {
         $delay = !$jobError->shouldPauseTube() ? $jobError->getDelay($numErrors) : 0;
-        $this->logger->notice('Delaying failed job', array(
+        $this->logger->notice('Delaying failed job', [
             'numErrors' => $numErrors,
             'delay'     => $delay,
             'exception' => $exception,
-        ));
+        ]);
         $job->release($delay);
     }
 
@@ -257,7 +257,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
 
     protected function attachSignalHandler()
     {
-        pcntl_signal(SIGTERM, array($this, 'stopRunning'));
+        pcntl_signal(SIGTERM, [$this, 'stopRunning']);
     }
 
     protected function checkForTerminationSignal()
@@ -299,5 +299,4 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
             }
         }
     }
-
 }

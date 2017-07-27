@@ -10,7 +10,7 @@ class UnitTestWorker extends AbstractTestWorker
 {
     public static function getRequiredParams()
     {
-        return array("param1", "param2");
+        return ['param1', 'param2'];
     }
 
     public function process(Job $job)

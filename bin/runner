@@ -11,13 +11,13 @@ if (file_exists(__DIR__ . '/../vendor')) {
     require_once __DIR__ . '/../../../../vendor/autoload.php';
 }
 
-list(
+[
     $cmd,
     $workerDir,
     $workerName,
     $host,
     $port,
-) = $argv;
+] = $argv;
 
 /** @var Gmo\Beanstalk\Worker\WorkerInterface $worker */
 $worker = new $workerName();

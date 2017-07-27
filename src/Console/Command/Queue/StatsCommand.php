@@ -39,7 +39,7 @@ class StatsCommand extends AbstractQueueCommand
 
         $refresh = $input->getOption('refresh');
         do {
-            list($stats, $error) = $this->getStats($input, $output);
+            [$stats, $error] = $this->getStats($input, $output);
             if ($input->getOption('cron')) {
                 $this->logStats($stats);
 
@@ -63,7 +63,7 @@ class StatsCommand extends AbstractQueueCommand
         }
 
         /** @var $tubes TubeCollection */
-        list($tubes, $error) = $this->matchTubeNames($tubes, $output);
+        [$tubes, $error] = $this->matchTubeNames($tubes, $output);
         $stats = [];
         foreach ($tubes as $name => $tube) {
             $stats[$name] = $tube->stats();
@@ -89,7 +89,7 @@ class StatsCommand extends AbstractQueueCommand
 
         $width = $width ?: $this->getConsoleWidth();
         $table = $width ? new AutoHidingTable($buffer, $width) : new Table($buffer);
-        $table->setHeaders(array(
+        $table->setHeaders([
             'Tube',
             'Ready',
             'Buried',
@@ -107,9 +107,9 @@ class StatsCommand extends AbstractQueueCommand
             '',
             'Delete Count',
             'Pause Count',
-        ));
+        ]);
         foreach ($stats as $tubeStats) {
-            $table->addRow(array(
+            $table->addRow([
                 $tubeStats->name(),
                 $tubeStats->readyJobs(),
                 $tubeStats->buriedJobs(),
@@ -127,7 +127,7 @@ class StatsCommand extends AbstractQueueCommand
                 '',
                 $tubeStats->cmdDeleteCount(),
                 $tubeStats->cmdPauseTubeCount(),
-            ));
+            ]);
         }
         $table->render();
 
@@ -141,7 +141,7 @@ class StatsCommand extends AbstractQueueCommand
     {
         $logger = $this->getService('beanstalk.queue.logger');
         foreach ($tubes as $tube => $stats) {
-            $logger->info('Tube stats', array(
+            $logger->info('Tube stats', [
                 'tube'          => $tube,
                 'ready'         => $stats->readyJobs(),
                 'buried'        => $stats->buriedJobs(),
@@ -152,17 +152,17 @@ class StatsCommand extends AbstractQueueCommand
                 'workers'       => $stats->watchingCount(),
                 'deleted_count' => $stats->cmdDeleteCount(),
                 'pause_count'   => $stats->cmdPauseTubeCount(),
-            ));
+            ]);
         }
     }
 
     private function getHelpText()
     {
-        $exampleStats = new ImmutableBag(array(
-            new TubeStats(array('name' => 'TubeA')),
-            new TubeStats(array('name' => 'SendApi')),
-            new TubeStats(array('name' => 'ReceiveApi')),
-        ));
+        $exampleStats = new ImmutableBag([
+            new TubeStats(['name' => 'TubeA']),
+            new TubeStats(['name' => 'SendApi']),
+            new TubeStats(['name' => 'ReceiveApi']),
+        ]);
         $stats = preg_replace("#\n#", "\n      ", $this->renderStats($exampleStats, 78));
 
         return <<<EOF

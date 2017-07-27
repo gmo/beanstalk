@@ -13,7 +13,7 @@ use Gmo\Beanstalk\Job\Job;
  */
 class RpcRunner extends BaseRunner
 {
-    const RPC_REPLY_TO_FIELD = 'rpcReplyTo';
+    public const RPC_REPLY_TO_FIELD = 'rpcReplyTo';
 
     /** @var string The tube to send the reply back to */
     private $replyTo;
@@ -36,12 +36,12 @@ class RpcRunner extends BaseRunner
         }
 
         if (!$this->isTubeWatched($this->replyTo)) {
-            $this->log->debug("No one is listening, not pushing to return queue");
+            $this->log->debug('No one is listening, not pushing to return queue');
 
             return;
         }
 
-        $data = array('result' => $job->getResult());
+        $data = ['result' => $job->getResult()];
         $this->queue->push($this->replyTo, $data);
     }
 
@@ -82,7 +82,7 @@ class RpcRunner extends BaseRunner
             if ($tubeList->has($tube)) {
                 return true;
             }
-            $retry++;
+            ++$retry;
         } while ($retry < $maxRetry);
 
         return false;

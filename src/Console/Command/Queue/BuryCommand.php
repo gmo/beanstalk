@@ -23,7 +23,7 @@ class BuryCommand extends ChangeStateCommand
 
     protected function forEachTube(Tube $tube, InputInterface $input, OutputInterface $output)
     {
-        $number = intval($input->getOption('number'));
+        $number = (int) $input->getOption('number');
 
         $numberBuried = 0;
         do {
@@ -32,7 +32,7 @@ class BuryCommand extends ChangeStateCommand
                 break;
             }
             $job->bury();
-            $numberBuried++;
+            ++$numberBuried;
         } while (--$number !== 0);
 
         if ($numberBuried === 0) {

@@ -23,7 +23,7 @@ class DeleteCommand extends ChangeStateCommand
 
     protected function forEachTube(Tube $tube, InputInterface $input, OutputInterface $output)
     {
-        $number = intval($input->getOption('number'));
+        $number = (int) $input->getOption('number');
         if ($input->getOption('ready')) {
             $num = $tube->deleteReadyJobs($number);
             $output->writeln("Deleted <info>$num ready</info> jobs in <info>$tube</info>");

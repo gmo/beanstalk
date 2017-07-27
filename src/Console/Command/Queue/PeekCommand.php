@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class PeekCommand extends ChangeStateCommand
 {
-    protected $ids = array();
+    protected $ids = [];
 
     protected function configure()
     {
@@ -29,7 +29,7 @@ class PeekCommand extends ChangeStateCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->ids = array();
+        $this->ids = [];
         if ($id = $input->getOption('id')) {
             $this->ids[] = $id;
             $this->validateState(false);
@@ -39,7 +39,7 @@ class PeekCommand extends ChangeStateCommand
         parent::execute($input, $output);
 
         if ($id) {
-            $job = $this->getQueue()->peekJob(intval($id));
+            $job = $this->getQueue()->peekJob((int) $id);
             $output->writeln("Peeking at job <info>#{$job->getId()}</info>");
             $output->writeln($this->renderJobData($job));
         }
@@ -89,6 +89,6 @@ class PeekCommand extends ChangeStateCommand
 
     protected function renderStats(OutputInterface $output, array $ids)
     {
-        $this->callCommand($output, JobStatsCommand::NAME, array('id' => $ids));
+        $this->callCommand($output, JobStatsCommand::NAME, ['id' => $ids]);
     }
 }

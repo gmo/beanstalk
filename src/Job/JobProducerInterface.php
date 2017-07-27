@@ -9,12 +9,12 @@ use Pheanstalk\PheanstalkInterface;
 
 interface JobProducerInterface
 {
-    const HIGH_PRIORITY = 512;
-    const DEFAULT_PRIORITY = 1024;
-    const LOW_PRIORITY = 1536;
+    public const HIGH_PRIORITY = 512;
+    public const DEFAULT_PRIORITY = 1024;
+    public const LOW_PRIORITY = 1536;
 
-    const DEFAULT_DELAY = PheanstalkInterface::DEFAULT_DELAY;
-    const DEFAULT_TTR = PheanstalkInterface::DEFAULT_TTR;
+    public const DEFAULT_DELAY = PheanstalkInterface::DEFAULT_DELAY;
+    public const DEFAULT_TTR = PheanstalkInterface::DEFAULT_TTR;
 
     /**
      * Pushes a job to the specified tube

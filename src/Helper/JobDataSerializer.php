@@ -21,7 +21,7 @@ class JobDataSerializer
             $data = iterator_to_array($data, true);
         }
         if (is_scalar($data)) {
-            $data = array('data' => $data);
+            $data = ['data' => $data];
         }
         if (is_array($data)) {
             foreach ($data as $key => &$value) {

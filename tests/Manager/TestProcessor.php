@@ -33,7 +33,7 @@ class TestProcessor extends Processor
     public function isProcessRunning($pid)
     {
         foreach ($this->getProcesses() as $process) {
-            if ($process[1] == $pid) {
+            if ($process[1] === $pid) {
                 return true;
             }
         }
@@ -58,14 +58,14 @@ class TestProcessor extends Processor
             ->filter(function ($i, $line) use ($grep) {
                 return Str::contains($line, $grep, false);
             })
-            ->map(array($this, 'parseLines'))
+            ->map([$this, 'parseLines'])
             ->map(function ($i, $line) {
-                return array($line[13], $line[1]);
+                return [$line[13], $line[1]];
             })
         ;
     }
 
-    public function execute($command, array &$output = null, &$return_var = null)
+    public function execute($command, array &$output = null, &$exitCode = null)
     {
         $this->executeCalls->add($command);
     }

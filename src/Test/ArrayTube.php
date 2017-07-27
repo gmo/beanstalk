@@ -55,18 +55,17 @@ class ArrayTube extends Tube
 
         if ($this->pauseTime > new Carbon("-{$this->pauseDelay} sec")) {
             return true;
-        } else {
-            $this->pauseDelay = 0;
-
-            return false;
         }
+        $this->pauseDelay = 0;
+
+        return false;
     }
 
     public function pause($delay)
     {
         $this->pauseDelay = $delay;
         $this->pauseTime = new Carbon();
-        $this->cmdPauseCount++;
+        ++$this->cmdPauseCount;
     }
 
     public function getPauseSeconds()
@@ -93,7 +92,7 @@ class ArrayTube extends Tube
             return $job->getPriority() < QueueInterface::DEFAULT_PRIORITY;
         });
 
-        return new TubeStats(array(
+        return new TubeStats([
             'name'                  => $this->name,
             'current-jobs-urgent'   => $urgentJobs->count(),
             'current-jobs-ready'    => $this->ready()->count(),
@@ -108,7 +107,7 @@ class ArrayTube extends Tube
             'pause-time-left'       => $this->getPauseTimeLeft(),
             'cmd-delete'            => $this->cmdDeleteCount,
             'cmd-pause-tube'        => $this->cmdPauseCount,
-        ));
+        ]);
     }
 
     public function isEmpty()

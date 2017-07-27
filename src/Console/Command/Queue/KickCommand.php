@@ -22,7 +22,7 @@ class KickCommand extends ChangeStateCommand
 
     protected function forEachTube(Tube $tube, InputInterface $input, OutputInterface $output)
     {
-        $number = intval($input->getOption('number'));
+        $number = (int) $input->getOption('number');
         $kicked = $tube->kick($number);
         $output->writeln("Kicked <info>$kicked</info> jobs in <info>$tube</info>");
     }

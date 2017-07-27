@@ -20,7 +20,7 @@ class TubeCollection extends Bag
     public function filterNames($p)
     {
         if (is_string($p)) {
-            $p = array($p);
+            $p = [$p];
         }
         if (is_array($p)) {
             $terms = $p;

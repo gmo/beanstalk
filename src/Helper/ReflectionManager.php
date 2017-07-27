@@ -19,7 +19,7 @@ class ReflectionManager
         $file = (string) $file;
 
         if (!isset(static::$classes[$file])) {
-            $name = ReflectionManager::getClassName($file);
+            $name = static::getClassName($file);
             static::$classes[$file] = new \ReflectionClass($name);
         }
 

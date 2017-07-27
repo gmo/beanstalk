@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ListCommand extends AbstractQueueCommand
 {
-    const NAME = 'tubes';
+    public const NAME = 'tubes';
 
     protected function configure()
     {
@@ -25,12 +25,12 @@ class ListCommand extends AbstractQueueCommand
 
         $tubes = $this->getQueue()->tubes();
         if ($tubes->isEmpty()) {
-            $output->writeln("There are no current tubes");
+            $output->writeln('There are no current tubes');
 
             return;
         }
 
-        $output->writeln("Current tubes:");
+        $output->writeln('Current tubes:');
         foreach ($tubes as $tube) {
             $output->writeln(' - ' . $tube->name());
         }

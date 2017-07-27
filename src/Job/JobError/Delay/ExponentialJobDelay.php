@@ -8,6 +8,6 @@ class ExponentialJobDelay extends LinearJobDelay
 {
     public function getDelay($numRetries)
     {
-        return pow($this->delay, $numRetries + 1);
+        return $this->delay ** ($numRetries + 1);
     }
 }

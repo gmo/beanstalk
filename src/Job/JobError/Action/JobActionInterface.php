@@ -6,8 +6,8 @@ namespace Gmo\Beanstalk\Job\JobError\Action;
 
 interface JobActionInterface
 {
-    const BURY = 'bury';
-    const DELETE = 'delete';
+    public const BURY = 'bury';
+    public const DELETE = 'delete';
 
     /**
      * Returns the action to take on the job

@@ -17,16 +17,16 @@ class WorkerTest extends QueueTestCase
     public function testWorkerPushesAndProcessesAJob()
     {
         $runner = new TestRunner(static::$queue, new UnitTestWorker());
-        UnitTestWorker::pushData(static::$queue, array(
+        UnitTestWorker::pushData(static::$queue, [
             'param1' => 'data1',
             'param2' => 'data2',
-        ));
+        ]);
 
         $this->assertTubeCount(1, UnitTestWorker::getTubeName());
 
         $job = $runner->run();
 
-        $this->assertEquals(new Bag(array('data1', 'data2')), $job->getResult());
+        $this->assertEquals(new Bag(['data1', 'data2']), $job->getResult());
         $this->assertTubeEmpty(UnitTestWorker::getTubeName());
     }
 
@@ -43,9 +43,9 @@ class WorkerTest extends QueueTestCase
     public function testWorkerMissingParameters()
     {
         $runner = new TestRunner(static::$queue, new UnitTestWorker());
-        UnitTestWorker::pushData(static::$queue, array(
+        UnitTestWorker::pushData(static::$queue, [
             'param2' => 'data2',
-        ));
+        ]);
         $job = $runner->run();
         $this->assertNull($job->getResult());
         $this->assertTubeEmpty(UnitTestWorker::getTubeName());
@@ -54,10 +54,10 @@ class WorkerTest extends QueueTestCase
     public function testWorkerProcessingThrowsGenericException()
     {
         $runner = new TestRunner(static::$queue, new UnitTestWorkerProcessGenericException());
-        UnitTestWorkerProcessGenericException::pushData(static::$queue, array(
+        UnitTestWorkerProcessGenericException::pushData(static::$queue, [
             'param1' => 'dataA',
             'param2' => 'dataB',
-        ));
+        ]);
         $runner->run();
 
         $tube = static::$queue->tube(UnitTestWorkerProcessGenericException::getTubeName());

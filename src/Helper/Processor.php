@@ -49,14 +49,14 @@ class Processor
 
     public function grepForPids($grep)
     {
-        $results = array();
+        $results = [];
         $this->execute("ps ax -o pid,command | grep -v grep | grep \"$grep\"", $processes);
         foreach ($processes as $process) {
             if (!preg_match_all('/"[^"]+"|\S+/', $process, $matches)) {
                 continue;
             }
             $parts = $matches[0];
-            $results[] = array($parts[4], $parts[0]);
+            $results[] = [$parts[4], $parts[0]];
         }
 
         return $results;
@@ -70,8 +70,8 @@ class Processor
         chdir($cwd);
     }
 
-    public function execute($command, array &$output = null, &$return_var = null)
+    public function execute($command, array &$output = null, &$exitCode = null)
     {
-        exec($command, $output, $return_var);
+        exec($command, $output, $exitCode);
     }
 }

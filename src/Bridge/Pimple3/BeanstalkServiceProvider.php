@@ -31,11 +31,12 @@ class BeanstalkServiceProvider implements ServiceProviderInterface
         $app['beanstalk.worker_manager.logger'] = function ($app) {
             if (isset($app['logger.new'])) {
                 return $app['logger.new']('Queue');
-            } elseif (isset($app['logger'])) {
-                return $app['logger'];
-            } else {
-                return new NullLogger();
             }
+            if (isset($app['logger'])) {
+                return $app['logger'];
+            }
+
+            return new NullLogger();
         };
 
         $app['beanstalk.queue'] = function ($app) {
@@ -66,7 +67,7 @@ class BeanstalkServiceProvider implements ServiceProviderInterface
         $app['beanstalk.console_commands'] = function ($app) {
             $prefix = $app['beanstalk.console_commands.queue_prefix'];
 
-            return array(
+            return [
                 new Command\Queue\ListCommand($prefix),
                 new Command\Queue\KickCommand($prefix),
                 new Command\Queue\DeleteCommand($prefix),
@@ -80,7 +81,7 @@ class BeanstalkServiceProvider implements ServiceProviderInterface
                 new Command\Worker\StopCommand(),
                 new Command\Worker\RestartCommand(),
                 new Command\Worker\StatsCommand(),
-            );
+            ];
         };
 
         $app['beanstalk.console_commands.auto_add'] = true;

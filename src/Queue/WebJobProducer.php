@@ -29,10 +29,10 @@ class WebJobProducer implements JobProducerInterface, LoggerAwareInterface
 
     public function push($tube, $data, $priority = null, $delay = null, $ttr = null)
     {
-        $context = array(
+        $context = [
             'tube' => $tube,
             'data' => $data,
-        );
+        ];
         try {
             return $this->queue->push($tube, $data, $priority, $delay, $ttr);
         } catch (\Exception $e) {

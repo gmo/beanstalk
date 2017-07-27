@@ -23,6 +23,6 @@ class UnitTestRpcWorker extends RpcWorker
 
     public function process(Job $job)
     {
-        $job->setResult(intval($job['a']) * intval($job['b']));
+        $job->setResult(((int) $job['a']) * ((int) $job['b']));
     }
 }

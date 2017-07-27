@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class JobStatsCommand extends AbstractQueueCommand
 {
-    const NAME = 'job-stats';
+    public const NAME = 'job-stats';
 
     protected function configure()
     {
@@ -58,7 +58,7 @@ class JobStatsCommand extends AbstractQueueCommand
 
         $width = $this->getConsoleWidth();
         $table = $width ? new AutoHidingTable($buffer, $width) : new Table($buffer);
-        $table->setHeaders(array(
+        $table->setHeaders([
             'ID',
             'Tube',
             'State',
@@ -71,9 +71,9 @@ class JobStatsCommand extends AbstractQueueCommand
             '# Timeouts',
             'Age (secs)',
             'File',
-        ));
+        ]);
         foreach ($statsList as $stats) {
-            $table->addRow(array(
+            $table->addRow([
                 $stats->id(),
                 $stats->tube(),
                 $stats->state(),
@@ -82,11 +82,11 @@ class JobStatsCommand extends AbstractQueueCommand
                 $stats->buries(),
                 $stats->kicks(),
                 $stats->priority(),
-                in_array($stats->state(), array('reserved', 'delayed')) ? $stats->timeLeft() : 'N/A',
+                in_array($stats->state(), ['reserved', 'delayed'], true) ? $stats->timeLeft() : 'N/A',
                 $stats->timeouts(),
                 $stats->age(),
                 $stats->file() === 0 ? 'N/A' : $stats->file(),
-            ));
+            ]);
         }
 
         $table->render();
@@ -96,7 +96,7 @@ class JobStatsCommand extends AbstractQueueCommand
 
     private function getHelpText()
     {
-        return <<<EOF
+        return <<<'EOF'
 <comment>Header Explanation:</comment>
    <info>ID</info>          The job's ID
    <info>Tube</info>        The tube the job is located

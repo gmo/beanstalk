@@ -27,10 +27,10 @@ abstract class RpcWorker extends AbstractWorker
         $replyToTube = static::makeReplyTube();
         static::pushData(
             $queue,
-            array(
+            [
                 RpcRunner::RPC_REPLY_TO_FIELD => $replyToTube,
                 'data'                        => $data,
-            ),
+            ],
             $priority
         );
 

@@ -29,11 +29,11 @@ class JobProcessor
             return $record;
         }
 
-        $params = array(
+        $params = [
             'id'     => $this->currentJob->getId(),
             'data'   => $this->currentJob->getData(),
             'result' => $this->currentJob->getResult(),
-        );
+        ];
         $record['extra'][$this->prefix . 'job'] = $params;
 
         return $record;
