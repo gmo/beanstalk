@@ -4,29 +4,37 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Job;
 
-class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate
+class Job implements \ArrayAccess, \IteratorAggregate
 {
-    /**
-     * Pheanstalk\Job::data is ignored because it's private and we allow write access.
-     *
-     * @var mixed
-     */
-    protected $jobData;
-    protected $result;
+    /** @var int */
+    protected $id;
+    /** @var mixed */
+    protected $data;
     /** @var JobControlInterface */
     protected $queue;
+    /** @var bool */
     protected $handled = false;
+    /** @var mixed|null */
+    protected $result;
 
     public function __construct($id, $data, JobControlInterface $queue)
     {
+        $this->id = $id;
+        $this->data = $data;
         $this->queue = $queue;
-        $this->jobData = $data;
-        parent::__construct($id, $this->jobData);
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 
     public function setData($data)
     {
-        $this->jobData = $data;
+        $this->data = $data;
     }
 
     /**
@@ -34,7 +42,7 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate
      */
     public function getData()
     {
-        return $this->jobData;
+        return $this->data;
     }
 
     public function setResult($result)
@@ -103,39 +111,39 @@ class Job extends \Pheanstalk\Job implements \ArrayAccess, \IteratorAggregate
     /** @inheritdoc */
     public function offsetExists($offset)
     {
-        return isset($this->jobData[$offset]);
+        return isset($this->data[$offset]);
     }
 
     /** @inheritdoc */
     public function offsetGet($offset)
     {
-        return $this->jobData[$offset];
+        return $this->data[$offset];
     }
 
     /** @inheritdoc */
     public function offsetSet($offset, $value)
     {
-        $this->jobData[$offset] = $value;
+        $this->data[$offset] = $value;
     }
 
     /** @inheritdoc */
     public function offsetUnset($offset)
     {
-        unset($this->jobData[$offset]);
+        unset($this->data[$offset]);
     }
 
     /** @inheritdoc */
     public function getIterator()
     {
-        if ($this->jobData instanceof \Traversable) {
-            return new \IteratorIterator($this->jobData);
+        if ($this->data instanceof \Traversable) {
+            return new \IteratorIterator($this->data);
         }
-        if (is_array($this->jobData)) {
-            return new \ArrayIterator($this->jobData);
+        if (is_array($this->data)) {
+            return new \ArrayIterator($this->data);
         }
 
         return new \ArrayIterator([
-            'data' => $this->jobData,
+            'data' => $this->data,
         ]);
     }
 
