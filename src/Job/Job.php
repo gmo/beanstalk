@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Job;
 
+use Bolt\Common\Assert;
+
 class Job implements \ArrayAccess, \IteratorAggregate
 {
     /** @var int */
@@ -111,25 +113,42 @@ class Job implements \ArrayAccess, \IteratorAggregate
     /** @inheritdoc */
     public function offsetExists($offset)
     {
+        $this->assertArrayAccess();
+
         return isset($this->data[$offset]);
     }
 
     /** @inheritdoc */
     public function offsetGet($offset)
     {
-        return $this->data[$offset];
+        $this->assertArrayAccess();
+
+        return $this->data[$offset] ?? null;
     }
 
     /** @inheritdoc */
     public function offsetSet($offset, $value)
     {
+        $this->assertArrayAccess();
+
         $this->data[$offset] = $value;
     }
 
     /** @inheritdoc */
     public function offsetUnset($offset)
     {
+        $this->assertArrayAccess();
+
         unset($this->data[$offset]);
+    }
+
+    protected function assertArrayAccess()
+    {
+        try {
+            Assert::isArrayAccessible($this->data, 'Cannot use Array Access methods with type %s');
+        } catch (\InvalidArgumentException $e) {
+            throw new \LogicException($e->getMessage());
+        }
     }
 
     /** @inheritdoc */
