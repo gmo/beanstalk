@@ -1,9 +1,9 @@
 <?php
 
-namespace GMO\Beanstalk\Console\Command\Worker;
+namespace Gmo\Beanstalk\Console\Command\Worker;
 
-use GMO\Beanstalk\Manager\WorkerInfo;
-use GMO\Beanstalk\Manager\WorkerManager;
+use Gmo\Beanstalk\Manager\WorkerInfo;
+use Gmo\Beanstalk\Manager\WorkerManager;
 use GMO\Console\Helper\AutoHidingTable;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;

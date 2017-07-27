@@ -1,10 +1,10 @@
 <?php
 
-namespace GMO\Beanstalk\Exception\Job;
+namespace Gmo\Beanstalk\Exception\Job;
 
-use GMO\Beanstalk\Job\JobError\Action\DeleteJobAction;
-use GMO\Beanstalk\Job\JobError\Delay\NoJobDelay;
-use GMO\Beanstalk\Job\JobError\Retry\NoJobRetry;
+use Gmo\Beanstalk\Job\JobError\Action\DeleteJobAction;
+use Gmo\Beanstalk\Job\JobError\Delay\NoJobDelay;
+use Gmo\Beanstalk\Job\JobError\Retry\NoJobRetry;
 
 class DeleteJobImmediatelyException extends JobException
 {

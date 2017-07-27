@@ -1,9 +1,9 @@
 <?php
 
-namespace GMO\Beanstalk\Runner;
+namespace Gmo\Beanstalk\Runner;
 
-use GMO\Beanstalk\Job\Job;
-use GMO\Beanstalk\Job\NullJob;
+use Gmo\Beanstalk\Job\Job;
+use Gmo\Beanstalk\Job\NullJob;
 
 /**
  * Modifies the runner to process jobs until there are no more and then stop.

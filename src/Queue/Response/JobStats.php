@@ -1,6 +1,6 @@
 <?php
 
-namespace GMO\Beanstalk\Queue\Response;
+namespace Gmo\Beanstalk\Queue\Response;
 
 class JobStats extends AbstractStats
 {

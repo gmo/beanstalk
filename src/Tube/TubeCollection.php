@@ -1,6 +1,6 @@
 <?php
 
-namespace GMO\Beanstalk\Tube;
+namespace Gmo\Beanstalk\Tube;
 
 use Bolt\Collection\Bag;
 use Gmo\Common\Str;

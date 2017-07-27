@@ -1,6 +1,6 @@
 <?php
 
-namespace GMO\Beanstalk\Helper;
+namespace Gmo\Beanstalk\Helper;
 
 class MapIteratorWrapper implements \Iterator
 {

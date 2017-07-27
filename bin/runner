@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-use GMO\Beanstalk\Queue\Queue;
+use Gmo\Beanstalk\Queue\Queue;
 
 if (file_exists(__DIR__ . '/../vendor')) {
     /** @noinspection PhpIncludeInspection */
@@ -19,7 +19,7 @@ list(
     $port,
 ) = $argv;
 
-/** @var GMO\Beanstalk\Worker\WorkerInterface $worker */
+/** @var Gmo\Beanstalk\Worker\WorkerInterface $worker */
 $worker = new $workerName();
 $runner = $worker->getRunner();
 $runner->setup(new Queue($host, $port), $worker);

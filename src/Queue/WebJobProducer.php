@@ -1,8 +1,8 @@
 <?php
 
-namespace GMO\Beanstalk\Queue;
+namespace Gmo\Beanstalk\Queue;
 
-use GMO\Beanstalk\Job\JobProducerInterface;
+use Gmo\Beanstalk\Job\JobProducerInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;

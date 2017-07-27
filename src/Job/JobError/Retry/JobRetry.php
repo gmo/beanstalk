@@ -1,6 +1,6 @@
 <?php
 
-namespace GMO\Beanstalk\Job\JobError\Retry;
+namespace Gmo\Beanstalk\Job\JobError\Retry;
 
 class JobRetry implements JobRetryInterface
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace GMO\Beanstalk\Job;
+namespace Gmo\Beanstalk\Job;
 
 use Bolt\Collection\Bag;
-use GMO\Beanstalk\Test\ArrayJob;
+use Gmo\Beanstalk\Test\ArrayJob;
 
 class JobCollection extends Bag
 {

@@ -1,17 +1,17 @@
 <?php
 
-namespace GMO\Beanstalk\Test;
+namespace Gmo\Beanstalk\Test;
 
 use Bolt\Collection\ImmutableBag;
-use GMO\Beanstalk\Exception\RangeException;
-use GMO\Beanstalk\Helper\JobDataSerializer;
-use GMO\Beanstalk\Job\Job;
-use GMO\Beanstalk\Job\JobCollection;
-use GMO\Beanstalk\Job\NullJob;
-use GMO\Beanstalk\Log\JobProcessor;
-use GMO\Beanstalk\Queue\QueueInterface;
-use GMO\Beanstalk\Queue\Response\ServerStats;
-use GMO\Beanstalk\Tube\TubeCollection;
+use Gmo\Beanstalk\Exception\RangeException;
+use Gmo\Beanstalk\Helper\JobDataSerializer;
+use Gmo\Beanstalk\Job\Job;
+use Gmo\Beanstalk\Job\JobCollection;
+use Gmo\Beanstalk\Job\NullJob;
+use Gmo\Beanstalk\Log\JobProcessor;
+use Gmo\Beanstalk\Queue\QueueInterface;
+use Gmo\Beanstalk\Queue\Response\ServerStats;
+use Gmo\Beanstalk\Tube\TubeCollection;
 use Psr\Log\LoggerAwareTrait;
 
 /**

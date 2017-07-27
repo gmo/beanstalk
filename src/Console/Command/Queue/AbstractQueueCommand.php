@@ -1,11 +1,11 @@
 <?php
 
-namespace GMO\Beanstalk\Console\Command\Queue;
+namespace Gmo\Beanstalk\Console\Command\Queue;
 
-use GMO\Beanstalk\Console\Command\AbstractCommand;
-use GMO\Beanstalk\Queue\QueueInterface;
-use GMO\Beanstalk\Tube\Tube;
-use GMO\Beanstalk\Tube\TubeCollection;
+use Gmo\Beanstalk\Console\Command\AbstractCommand;
+use Gmo\Beanstalk\Queue\QueueInterface;
+use Gmo\Beanstalk\Tube\Tube;
+use Gmo\Beanstalk\Tube\TubeCollection;
 use Gmo\Common\Str;
 use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext;
 use Symfony\Component\Console\Input\InputInterface;

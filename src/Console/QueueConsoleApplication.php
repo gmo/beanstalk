@@ -1,6 +1,6 @@
 <?php
 
-namespace GMO\Beanstalk\Console;
+namespace Gmo\Beanstalk\Console;
 
 use Gmo\Beanstalk\Bridge;
 use GMO\Console\ConsoleApplication;

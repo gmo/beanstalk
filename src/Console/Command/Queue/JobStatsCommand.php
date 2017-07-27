@@ -1,9 +1,9 @@
 <?php
 
-namespace GMO\Beanstalk\Console\Command\Queue;
+namespace Gmo\Beanstalk\Console\Command\Queue;
 
 use Bolt\Collection\Bag;
-use GMO\Beanstalk\Queue\Response\JobStats;
+use Gmo\Beanstalk\Queue\Response\JobStats;
 use GMO\Console\Helper\AutoHidingTable;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;

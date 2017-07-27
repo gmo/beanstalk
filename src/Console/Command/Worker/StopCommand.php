@@ -1,8 +1,8 @@
 <?php
 
-namespace GMO\Beanstalk\Console\Command\Worker;
+namespace Gmo\Beanstalk\Console\Command\Worker;
 
-use GMO\Beanstalk\Manager\WorkerManager;
+use Gmo\Beanstalk\Manager\WorkerManager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 

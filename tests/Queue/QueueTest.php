@@ -2,9 +2,9 @@
 
 namespace Gmo\Beanstalk\Tests\Queue;
 
-use GMO\Beanstalk\Queue\Queue;
-use GMO\Beanstalk\Test\ArrayQueue;
-use GMO\Beanstalk\Test\QueueTestCase;
+use Gmo\Beanstalk\Queue\Queue;
+use Gmo\Beanstalk\Test\ArrayQueue;
+use Gmo\Beanstalk\Test\QueueTestCase;
 
 class QueueTest extends QueueTestCase
 {

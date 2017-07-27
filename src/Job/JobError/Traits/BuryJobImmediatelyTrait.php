@@ -1,10 +1,10 @@
 <?php
 
-namespace GMO\Beanstalk\Job\JobError\Traits;
+namespace Gmo\Beanstalk\Job\JobError\Traits;
 
-use GMO\Beanstalk\Job\JobError\Action\BuryJobAction;
-use GMO\Beanstalk\Job\JobError\Delay\NoJobDelay;
-use GMO\Beanstalk\Job\JobError\Retry\NoJobRetry;
+use Gmo\Beanstalk\Job\JobError\Action\BuryJobAction;
+use Gmo\Beanstalk\Job\JobError\Delay\NoJobDelay;
+use Gmo\Beanstalk\Job\JobError\Retry\NoJobRetry;
 
 trait BuryJobImmediatelyTrait
 {

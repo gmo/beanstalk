@@ -1,11 +1,11 @@
 <?php
 
-namespace GMO\Beanstalk\Worker;
+namespace Gmo\Beanstalk\Worker;
 
 use Bolt\Collection\Bag;
-use GMO\Beanstalk\Job\Job;
-use GMO\Beanstalk\Job\JobError\JobErrorHandlerInterface;
-use GMO\Beanstalk\Runner\RunnerInterface;
+use Gmo\Beanstalk\Job\Job;
+use Gmo\Beanstalk\Job\JobError\JobErrorHandlerInterface;
+use Gmo\Beanstalk\Runner\RunnerInterface;
 
 interface WorkerInterface
 {

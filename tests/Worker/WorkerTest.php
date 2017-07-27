@@ -3,8 +3,8 @@
 namespace Gmo\Beanstalk\Tests\Worker;
 
 use Bolt\Collection\Bag;
-use GMO\Beanstalk\Test\QueueTestCase;
-use GMO\Beanstalk\Test\TestRunner;
+use Gmo\Beanstalk\Test\QueueTestCase;
+use Gmo\Beanstalk\Test\TestRunner;
 use Gmo\Beanstalk\Tests\Worker\TestWorkers\UnitTestWorker;
 use Gmo\Beanstalk\Tests\Worker\TestWorkers\UnitTestWorkerProcessGenericException;
 use Gmo\Beanstalk\Tests\Worker\TestWorkers\UnitTestWorkerProcessJobError;

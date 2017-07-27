@@ -1,14 +1,14 @@
 <?php
 
-namespace GMO\Beanstalk\Queue;
+namespace Gmo\Beanstalk\Queue;
 
 use Bolt\Collection\ImmutableBag;
-use GMO\Beanstalk\Job\JobControlInterface;
-use GMO\Beanstalk\Queue\Response\ServerStats;
-use GMO\Beanstalk\Queue\Response\TubeStats;
-use GMO\Beanstalk\Tube\Tube;
-use GMO\Beanstalk\Tube\TubeCollection;
-use GMO\Beanstalk\Tube\TubeControlInterface;
+use Gmo\Beanstalk\Job\JobControlInterface;
+use Gmo\Beanstalk\Queue\Response\ServerStats;
+use Gmo\Beanstalk\Queue\Response\TubeStats;
+use Gmo\Beanstalk\Tube\Tube;
+use Gmo\Beanstalk\Tube\TubeCollection;
+use Gmo\Beanstalk\Tube\TubeControlInterface;
 use Psr\Log\LoggerAwareInterface;
 
 interface QueueInterface extends TubeControlInterface, JobControlInterface, LoggerAwareInterface
@@ -48,7 +48,7 @@ interface QueueInterface extends TubeControlInterface, JobControlInterface, Logg
      *
      * @param int $jobId
      *
-     * @return \GMO\Beanstalk\Job\Job
+     * @return \Gmo\Beanstalk\Job\Job
      */
     public function peekJob($jobId);
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace GMO\Beanstalk\Log;
+namespace Gmo\Beanstalk\Log;
 
 /**
  * Adds worker name to Monolog Logger

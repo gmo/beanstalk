@@ -1,6 +1,6 @@
 <?php
 
-namespace GMO\Beanstalk\Job\JobError;
+namespace Gmo\Beanstalk\Job\JobError;
 
 use Exception;
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace GMO\Beanstalk\Worker;
+namespace Gmo\Beanstalk\Worker;
 
 use Bolt\Collection\Bag;
-use GMO\Beanstalk\Job\JobProducerInterface;
-use GMO\Beanstalk\Runner\BaseRunner;
+use Gmo\Beanstalk\Job\JobProducerInterface;
+use Gmo\Beanstalk\Runner\BaseRunner;
 use Gmo\Common\Serialization\SerializableInterface;
 use Gmo\Common\Str;
 

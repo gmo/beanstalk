@@ -1,8 +1,8 @@
 <?php
 
-namespace GMO\Beanstalk\Console\Command\Queue;
+namespace Gmo\Beanstalk\Console\Command\Queue;
 
-use GMO\Beanstalk\Tube\Tube;
+use Gmo\Beanstalk\Tube\Tube;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;

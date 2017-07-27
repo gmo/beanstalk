@@ -1,6 +1,6 @@
 <?php
 
-namespace GMO\Beanstalk\Worker;
+namespace Gmo\Beanstalk\Worker;
 
 /**
  * @property \Pimple $container

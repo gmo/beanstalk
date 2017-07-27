@@ -2,9 +2,9 @@
 
 namespace Gmo\Beanstalk\Tests\Worker;
 
-use GMO\Beanstalk\Manager\WorkerManager;
-use GMO\Beanstalk\Queue\Queue;
-use GMO\Beanstalk\Test\QueueTestCase;
+use Gmo\Beanstalk\Manager\WorkerManager;
+use Gmo\Beanstalk\Queue\Queue;
+use Gmo\Beanstalk\Test\QueueTestCase;
 use Gmo\Beanstalk\Tests\Worker\TestWorkers\UnitTestRpcWorker;
 
 class RpcTest extends QueueTestCase
@@ -19,7 +19,7 @@ class RpcTest extends QueueTestCase
     }
 
     /**
-     * @expectedException \GMO\Beanstalk\Exception\RpcTimeoutException
+     * @expectedException \Gmo\Beanstalk\Exception\RpcTimeoutException
      */
     public function test_rpc_call_timeout()
     {

@@ -1,9 +1,9 @@
 <?php
 
-namespace GMO\Beanstalk\Job\JobError\Traits;
+namespace Gmo\Beanstalk\Job\JobError\Traits;
 
-use GMO\Beanstalk\Job\JobError\Action\BuryJobAction;
-use GMO\Beanstalk\Job\JobError\Retry\InfiniteJobRetry;
+use Gmo\Beanstalk\Job\JobError\Action\BuryJobAction;
+use Gmo\Beanstalk\Job\JobError\Retry\InfiniteJobRetry;
 
 trait RetryJobForeverTrait
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace GMO\Beanstalk\Console\Command\Worker;
+namespace Gmo\Beanstalk\Console\Command\Worker;
 
-use GMO\Beanstalk\Console\Command\AbstractCommand;
-use GMO\Beanstalk\Manager\WorkerInfo;
-use GMO\Beanstalk\Manager\WorkerManager;
+use Gmo\Beanstalk\Console\Command\AbstractCommand;
+use Gmo\Beanstalk\Manager\WorkerInfo;
+use Gmo\Beanstalk\Manager\WorkerManager;
 use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

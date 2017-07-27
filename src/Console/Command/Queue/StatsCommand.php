@@ -1,10 +1,10 @@
 <?php
 
-namespace GMO\Beanstalk\Console\Command\Queue;
+namespace Gmo\Beanstalk\Console\Command\Queue;
 
 use Bolt\Collection\ImmutableBag;
-use GMO\Beanstalk\Queue\Response\TubeStats;
-use GMO\Beanstalk\Tube\TubeCollection;
+use Gmo\Beanstalk\Queue\Response\TubeStats;
+use Gmo\Beanstalk\Tube\TubeCollection;
 use GMO\Console\Helper\AutoHidingTable;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;

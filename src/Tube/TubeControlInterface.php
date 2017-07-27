@@ -1,11 +1,11 @@
 <?php
 
-namespace GMO\Beanstalk\Tube;
+namespace Gmo\Beanstalk\Tube;
 
-use GMO\Beanstalk\Job\Job;
-use GMO\Beanstalk\Job\JobProducerInterface;
-use GMO\Beanstalk\Job\NullJob;
-use GMO\Beanstalk\Queue\Response\TubeStats;
+use Gmo\Beanstalk\Job\Job;
+use Gmo\Beanstalk\Job\JobProducerInterface;
+use Gmo\Beanstalk\Job\NullJob;
+use Gmo\Beanstalk\Queue\Response\TubeStats;
 
 interface TubeControlInterface extends JobProducerInterface
 {

@@ -2,10 +2,10 @@
 
 namespace Gmo\Beanstalk\Bridge\Pimple1;
 
-use GMO\Beanstalk\Console\Command;
-use GMO\Beanstalk\Manager\WorkerManager;
-use GMO\Beanstalk\Queue\Queue;
-use GMO\Beanstalk\Queue\WebJobProducer;
+use Gmo\Beanstalk\Console\Command;
+use Gmo\Beanstalk\Manager\WorkerManager;
+use Gmo\Beanstalk\Queue\Queue;
+use Gmo\Beanstalk\Queue\WebJobProducer;
 use Pimple;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console;

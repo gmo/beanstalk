@@ -1,9 +1,9 @@
 <?php
 
-namespace GMO\Beanstalk\Console\Command\Queue;
+namespace Gmo\Beanstalk\Console\Command\Queue;
 
-use GMO\Beanstalk\Job\NullJob;
-use GMO\Beanstalk\Tube\Tube;
+use Gmo\Beanstalk\Job\NullJob;
+use Gmo\Beanstalk\Tube\Tube;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 

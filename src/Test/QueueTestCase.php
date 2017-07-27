@@ -1,9 +1,9 @@
 <?php
 
-namespace GMO\Beanstalk\Test;
+namespace Gmo\Beanstalk\Test;
 
 use Bolt\Collection\Bag;
-use GMO\Beanstalk\Job\Job;
+use Gmo\Beanstalk\Job\Job;
 use PHPUnit\Framework\TestCase;
 
 abstract class QueueTestCase extends TestCase

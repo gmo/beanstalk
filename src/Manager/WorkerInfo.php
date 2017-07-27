@@ -1,10 +1,10 @@
 <?php
 
-namespace GMO\Beanstalk\Manager;
+namespace Gmo\Beanstalk\Manager;
 
 use Bolt\Collection\Bag;
 use Bolt\Collection\ImmutableBag;
-use GMO\Beanstalk\Worker\WorkerInterface;
+use Gmo\Beanstalk\Worker\WorkerInterface;
 
 class WorkerInfo
 {
@@ -50,7 +50,7 @@ class WorkerInfo
         return $this->refCls;
     }
 
-    /** @return \GMO\Beanstalk\Worker\WorkerInterface */
+    /** @return \Gmo\Beanstalk\Worker\WorkerInterface */
     public function getInstance()
     {
         if (!$this->instance) {

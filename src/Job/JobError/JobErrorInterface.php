@@ -1,10 +1,10 @@
 <?php
 
-namespace GMO\Beanstalk\Job\JobError;
+namespace Gmo\Beanstalk\Job\JobError;
 
-use GMO\Beanstalk\Job\JobError\Action\JobActionInterface;
-use GMO\Beanstalk\Job\JobError\Delay\JobDelayInterface;
-use GMO\Beanstalk\Job\JobError\Retry\JobRetryInterface;
+use Gmo\Beanstalk\Job\JobError\Action\JobActionInterface;
+use Gmo\Beanstalk\Job\JobError\Delay\JobDelayInterface;
+use Gmo\Beanstalk\Job\JobError\Retry\JobRetryInterface;
 
 /**
  * This interface tells the Runner/Worker what to

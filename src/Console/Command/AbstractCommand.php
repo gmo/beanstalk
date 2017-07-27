@@ -1,6 +1,6 @@
 <?php
 
-namespace GMO\Beanstalk\Console\Command;
+namespace Gmo\Beanstalk\Console\Command;
 
 use GMO\Console\ContainerAwareCommand;
 use Psr\Log\LoggerInterface;

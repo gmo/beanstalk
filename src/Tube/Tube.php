@@ -1,9 +1,9 @@
 <?php
 
-namespace GMO\Beanstalk\Tube;
+namespace Gmo\Beanstalk\Tube;
 
-use GMO\Beanstalk\Job\Job;
-use GMO\Beanstalk\Queue\Response\TubeStats;
+use Gmo\Beanstalk\Job\Job;
+use Gmo\Beanstalk\Queue\Response\TubeStats;
 use Gmo\Common\Serialization\SerializableInterface;
 
 class Tube

@@ -1,6 +1,6 @@
 <?php
 
-namespace GMO\Beanstalk\Helper;
+namespace Gmo\Beanstalk\Helper;
 
 use Gmo\Common\Str;
 use Symfony\Component\Finder\Finder;

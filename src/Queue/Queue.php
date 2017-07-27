@@ -1,20 +1,20 @@
 <?php
 
-namespace GMO\Beanstalk\Queue;
+namespace Gmo\Beanstalk\Queue;
 
-use GMO\Beanstalk\Exception\JobPushException;
-use GMO\Beanstalk\Exception\JobTooBigException;
-use GMO\Beanstalk\Exception\RangeException;
-use GMO\Beanstalk\Helper\JobDataSerializer;
-use GMO\Beanstalk\Job\Job;
-use GMO\Beanstalk\Job\NullJob;
-use GMO\Beanstalk\Job\UnserializableJob;
-use GMO\Beanstalk\Log\JobProcessor;
-use GMO\Beanstalk\Queue\Response\JobStats;
-use GMO\Beanstalk\Queue\Response\ServerStats;
-use GMO\Beanstalk\Queue\Response\TubeStats;
-use GMO\Beanstalk\Tube\Tube;
-use GMO\Beanstalk\Tube\TubeCollection;
+use Gmo\Beanstalk\Exception\JobPushException;
+use Gmo\Beanstalk\Exception\JobTooBigException;
+use Gmo\Beanstalk\Exception\RangeException;
+use Gmo\Beanstalk\Helper\JobDataSerializer;
+use Gmo\Beanstalk\Job\Job;
+use Gmo\Beanstalk\Job\NullJob;
+use Gmo\Beanstalk\Job\UnserializableJob;
+use Gmo\Beanstalk\Log\JobProcessor;
+use Gmo\Beanstalk\Queue\Response\JobStats;
+use Gmo\Beanstalk\Queue\Response\ServerStats;
+use Gmo\Beanstalk\Queue\Response\TubeStats;
+use Gmo\Beanstalk\Tube\Tube;
+use Gmo\Beanstalk\Tube\TubeCollection;
 use Gmo\Common\Exception\NotSerializableException;
 use Pheanstalk;
 use Psr\Log\LoggerAwareTrait;
@@ -24,7 +24,7 @@ use Psr\Log\NullLogger;
 /**
  * Queue manages jobs in tubes and provides stats about jobs
  *
- * @package GMO\Beanstalk
+ * @package Gmo\Beanstalk
  */
 class Queue implements QueueInterface
 {

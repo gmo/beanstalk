@@ -1,20 +1,20 @@
 <?php
 
-namespace GMO\Beanstalk\Runner;
+namespace Gmo\Beanstalk\Runner;
 
 use Bolt\Collection\Bag;
 use Exception;
-use GMO\Beanstalk\Job\Job;
-use GMO\Beanstalk\Job\JobError\Action\JobActionInterface;
-use GMO\Beanstalk\Job\JobError\HasJobErrorInterface;
-use GMO\Beanstalk\Job\JobError\JobError;
-use GMO\Beanstalk\Job\JobError\JobErrorHandlerInterface;
-use GMO\Beanstalk\Job\JobError\JobErrorInterface;
-use GMO\Beanstalk\Job\NullJob;
-use GMO\Beanstalk\Job\UnserializableJob;
-use GMO\Beanstalk\Queue\QueueInterface;
-use GMO\Beanstalk\Worker\ContainerAwareWorker;
-use GMO\Beanstalk\Worker\WorkerInterface;
+use Gmo\Beanstalk\Job\Job;
+use Gmo\Beanstalk\Job\JobError\Action\JobActionInterface;
+use Gmo\Beanstalk\Job\JobError\HasJobErrorInterface;
+use Gmo\Beanstalk\Job\JobError\JobError;
+use Gmo\Beanstalk\Job\JobError\JobErrorHandlerInterface;
+use Gmo\Beanstalk\Job\JobError\JobErrorInterface;
+use Gmo\Beanstalk\Job\NullJob;
+use Gmo\Beanstalk\Job\UnserializableJob;
+use Gmo\Beanstalk\Queue\QueueInterface;
+use Gmo\Beanstalk\Worker\ContainerAwareWorker;
+use Gmo\Beanstalk\Worker\WorkerInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 

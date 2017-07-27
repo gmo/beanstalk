@@ -1,11 +1,11 @@
 <?php
 
-namespace GMO\Beanstalk\Test;
+namespace Gmo\Beanstalk\Test;
 
-use GMO\Beanstalk\Job\Job;
-use GMO\Beanstalk\Queue\QueueInterface;
-use GMO\Beanstalk\Runner\BaseRunner;
-use GMO\Beanstalk\Worker\WorkerInterface;
+use Gmo\Beanstalk\Job\Job;
+use Gmo\Beanstalk\Queue\QueueInterface;
+use Gmo\Beanstalk\Runner\BaseRunner;
+use Gmo\Beanstalk\Worker\WorkerInterface;
 
 class TestRunner extends BaseRunner
 {

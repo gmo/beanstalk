@@ -1,6 +1,6 @@
 <?php
 
-namespace GMO\Beanstalk\Job;
+namespace Gmo\Beanstalk\Job;
 
 use Gmo\Common\Exception\NotSerializableException;
 

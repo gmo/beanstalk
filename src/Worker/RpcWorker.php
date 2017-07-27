@@ -1,12 +1,12 @@
 <?php
 
-namespace GMO\Beanstalk\Worker;
+namespace Gmo\Beanstalk\Worker;
 
-use GMO\Beanstalk\Exception\RpcInvalidResponseException;
-use GMO\Beanstalk\Exception\RpcTimeoutException;
-use GMO\Beanstalk\Job\NullJob;
-use GMO\Beanstalk\Runner\RpcRunner;
-use GMO\Beanstalk\Tube\TubeControlInterface;
+use Gmo\Beanstalk\Exception\RpcInvalidResponseException;
+use Gmo\Beanstalk\Exception\RpcTimeoutException;
+use Gmo\Beanstalk\Job\NullJob;
+use Gmo\Beanstalk\Runner\RpcRunner;
+use Gmo\Beanstalk\Tube\TubeControlInterface;
 
 abstract class RpcWorker extends AbstractWorker
 {

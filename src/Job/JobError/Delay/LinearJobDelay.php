@@ -1,6 +1,6 @@
 <?php
 
-namespace GMO\Beanstalk\Job\JobError\Delay;
+namespace Gmo\Beanstalk\Job\JobError\Delay;
 
 class LinearJobDelay implements JobDelayInterface
 {

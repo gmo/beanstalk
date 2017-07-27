@@ -1,16 +1,16 @@
 <?php
 
-namespace GMO\Beanstalk\Job\JobError;
+namespace Gmo\Beanstalk\Job\JobError;
 
-use GMO\Beanstalk\Job\JobError\Action\BuryJobAction;
-use GMO\Beanstalk\Job\JobError\Action\DeleteJobAction;
-use GMO\Beanstalk\Job\JobError\Delay\ExponentialJobDelay;
-use GMO\Beanstalk\Job\JobError\Delay\HourlyJobDelay;
-use GMO\Beanstalk\Job\JobError\Delay\LinearJobDelay;
-use GMO\Beanstalk\Job\JobError\Delay\NoJobDelay;
-use GMO\Beanstalk\Job\JobError\Retry\InfiniteJobRetry;
-use GMO\Beanstalk\Job\JobError\Retry\JobRetry;
-use GMO\Beanstalk\Job\JobError\Retry\NoJobRetry;
+use Gmo\Beanstalk\Job\JobError\Action\BuryJobAction;
+use Gmo\Beanstalk\Job\JobError\Action\DeleteJobAction;
+use Gmo\Beanstalk\Job\JobError\Delay\ExponentialJobDelay;
+use Gmo\Beanstalk\Job\JobError\Delay\HourlyJobDelay;
+use Gmo\Beanstalk\Job\JobError\Delay\LinearJobDelay;
+use Gmo\Beanstalk\Job\JobError\Delay\NoJobDelay;
+use Gmo\Beanstalk\Job\JobError\Retry\InfiniteJobRetry;
+use Gmo\Beanstalk\Job\JobError\Retry\JobRetry;
+use Gmo\Beanstalk\Job\JobError\Retry\NoJobRetry;
 
 /**
  * While JobError allows flexibility with the components used, it has verbose syntax.

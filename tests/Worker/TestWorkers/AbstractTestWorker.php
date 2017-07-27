@@ -2,7 +2,7 @@
 
 namespace Gmo\Beanstalk\Tests\Worker\TestWorkers;
 
-use GMO\Beanstalk\Worker\AbstractWorker;
+use Gmo\Beanstalk\Worker\AbstractWorker;
 use Psr\Log\NullLogger;
 
 abstract class AbstractTestWorker extends AbstractWorker

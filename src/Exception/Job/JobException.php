@@ -1,15 +1,15 @@
 <?php
 
-namespace GMO\Beanstalk\Exception\Job;
+namespace Gmo\Beanstalk\Exception\Job;
 
-use GMO\Beanstalk\Exception\QueueException;
-use GMO\Beanstalk\Job\JobError\Action\BuryJobAction;
-use GMO\Beanstalk\Job\JobError\Action\JobActionInterface;
-use GMO\Beanstalk\Job\JobError\Delay\JobDelayInterface;
-use GMO\Beanstalk\Job\JobError\Delay\NoJobDelay;
-use GMO\Beanstalk\Job\JobError\JobErrorInterface;
-use GMO\Beanstalk\Job\JobError\Retry\JobRetryInterface;
-use GMO\Beanstalk\Job\JobError\Retry\NoJobRetry;
+use Gmo\Beanstalk\Exception\QueueException;
+use Gmo\Beanstalk\Job\JobError\Action\BuryJobAction;
+use Gmo\Beanstalk\Job\JobError\Action\JobActionInterface;
+use Gmo\Beanstalk\Job\JobError\Delay\JobDelayInterface;
+use Gmo\Beanstalk\Job\JobError\Delay\NoJobDelay;
+use Gmo\Beanstalk\Job\JobError\JobErrorInterface;
+use Gmo\Beanstalk\Job\JobError\Retry\JobRetryInterface;
+use Gmo\Beanstalk\Job\JobError\Retry\NoJobRetry;
 
 /**
  * Exceptions can be wrapped in this class or extend this class

@@ -1,6 +1,6 @@
 <?php
 
-namespace GMO\Beanstalk\Queue\Response;
+namespace Gmo\Beanstalk\Queue\Response;
 
 use Bolt\Collection\Bag;
 use Gmo\Common\Str;

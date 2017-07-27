@@ -1,10 +1,10 @@
 <?php
 
-namespace GMO\Beanstalk\Manager;
+namespace Gmo\Beanstalk\Manager;
 
 use Bolt\Collection\ImmutableBag;
-use GMO\Beanstalk\Helper\ClassFinder;
-use GMO\Beanstalk\Helper\Processor;
+use Gmo\Beanstalk\Helper\ClassFinder;
+use Gmo\Beanstalk\Helper\Processor;
 use Gmo\Common\Str;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -180,7 +180,7 @@ class WorkerManager implements LoggerAwareInterface
 
         $list = ClassFinder::create($this->workerDir)
             ->isInstantiable()
-            ->isSubclassOf('\GMO\Beanstalk\Worker\WorkerInterface')
+            ->isSubclassOf('\Gmo\Beanstalk\Worker\WorkerInterface')
             ->map(function (\ReflectionClass $class) {
                 return new WorkerInfo($class);
             })

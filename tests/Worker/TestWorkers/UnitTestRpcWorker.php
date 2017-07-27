@@ -2,9 +2,9 @@
 
 namespace Gmo\Beanstalk\Tests\Worker\TestWorkers;
 
-use GMO\Beanstalk\Job\Job;
-use GMO\Beanstalk\Runner\RunOnceRunnerDecorator;
-use GMO\Beanstalk\Worker\RpcWorker;
+use Gmo\Beanstalk\Job\Job;
+use Gmo\Beanstalk\Runner\RunOnceRunnerDecorator;
+use Gmo\Beanstalk\Worker\RpcWorker;
 use Psr\Log\NullLogger;
 
 class UnitTestRpcWorker extends RpcWorker

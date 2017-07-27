@@ -1,6 +1,6 @@
 <?php
 
-namespace GMO\Beanstalk\Exception;
+namespace Gmo\Beanstalk\Exception;
 
 class JobTooBigException extends JobPushException
 {

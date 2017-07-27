@@ -1,8 +1,8 @@
 <?php
 
-namespace GMO\Beanstalk\Log;
+namespace Gmo\Beanstalk\Log;
 
-use GMO\Beanstalk\Job\Job;
+use Gmo\Beanstalk\Job\Job;
 
 class JobProcessor
 {

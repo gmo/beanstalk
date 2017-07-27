@@ -1,6 +1,6 @@
 <?php
 
-namespace GMO\Beanstalk\Console\Command\Queue;
+namespace Gmo\Beanstalk\Console\Command\Queue;
 
 use Bolt\Collection\Bag;
 use Symfony\Component\Console\Input\InputInterface;

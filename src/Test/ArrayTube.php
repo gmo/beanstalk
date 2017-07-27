@@ -1,18 +1,18 @@
 <?php
 
-namespace GMO\Beanstalk\Test;
+namespace Gmo\Beanstalk\Test;
 
 use Carbon\Carbon;
-use GMO\Beanstalk\Job\JobCollection;
-use GMO\Beanstalk\Queue\QueueInterface;
-use GMO\Beanstalk\Queue\Response\TubeStats;
-use GMO\Beanstalk\Tube\Tube;
-use GMO\Beanstalk\Tube\TubeControlInterface;
+use Gmo\Beanstalk\Job\JobCollection;
+use Gmo\Beanstalk\Queue\QueueInterface;
+use Gmo\Beanstalk\Queue\Response\TubeStats;
+use Gmo\Beanstalk\Tube\Tube;
+use Gmo\Beanstalk\Tube\TubeControlInterface;
 
 /**
  * ArrayTube is an in-memory representation of a beanstalk tube. Used with ArrayQueue.
  *
- * @see \GMO\Beanstalk\Test\ArrayQueue
+ * @see \Gmo\Beanstalk\Test\ArrayQueue
  */
 class ArrayTube extends Tube
 {

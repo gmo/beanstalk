@@ -1,11 +1,11 @@
 <?php
 
-namespace GMO\Beanstalk\Test;
+namespace Gmo\Beanstalk\Test;
 
 use Carbon\Carbon;
-use GMO\Beanstalk\Job\Job;
-use GMO\Beanstalk\Job\JobControlInterface;
-use GMO\Beanstalk\Queue\Response\JobStats;
+use Gmo\Beanstalk\Job\Job;
+use Gmo\Beanstalk\Job\JobControlInterface;
+use Gmo\Beanstalk\Queue\Response\JobStats;
 
 /**
  * ArrayJob is used by {@see ArrayQueue} to

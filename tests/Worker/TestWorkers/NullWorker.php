@@ -2,7 +2,7 @@
 
 namespace Gmo\Beanstalk\Tests\Worker\TestWorkers;
 
-use GMO\Beanstalk\Job\Job;
+use Gmo\Beanstalk\Job\Job;
 
 class NullWorker extends AbstractTestWorker
 {

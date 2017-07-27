@@ -2,8 +2,8 @@
 
 namespace Gmo\Beanstalk\Tests\Worker\TestWorkers;
 
-use GMO\Beanstalk\Exception\Job\DeleteJobImmediatelyException;
-use GMO\Beanstalk\Job\Job;
+use Gmo\Beanstalk\Exception\Job\DeleteJobImmediatelyException;
+use Gmo\Beanstalk\Job\Job;
 
 class UnitTestWorkerProcessJobError extends AbstractTestWorker
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace GMO\Beanstalk\Runner;
+namespace Gmo\Beanstalk\Runner;
 
-use GMO\Beanstalk\Job\Job;
+use Gmo\Beanstalk\Job\Job;
 
 /**
  * Abstracts the repetitive worker tasks for Remote Procedure Call (RPC).

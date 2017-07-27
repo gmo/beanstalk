@@ -1,6 +1,6 @@
 <?php
 
-namespace GMO\Beanstalk\Queue;
+namespace Gmo\Beanstalk\Queue;
 
 interface QueueAwareInterface
 {

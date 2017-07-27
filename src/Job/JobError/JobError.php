@@ -1,13 +1,13 @@
 <?php
 
-namespace GMO\Beanstalk\Job\JobError;
+namespace Gmo\Beanstalk\Job\JobError;
 
-use GMO\Beanstalk\Job\JobError\Action\BuryJobAction;
-use GMO\Beanstalk\Job\JobError\Action\JobActionInterface;
-use GMO\Beanstalk\Job\JobError\Delay\JobDelayInterface;
-use GMO\Beanstalk\Job\JobError\Delay\NoJobDelay;
-use GMO\Beanstalk\Job\JobError\Retry\JobRetryInterface;
-use GMO\Beanstalk\Job\JobError\Retry\NoJobRetry;
+use Gmo\Beanstalk\Job\JobError\Action\BuryJobAction;
+use Gmo\Beanstalk\Job\JobError\Action\JobActionInterface;
+use Gmo\Beanstalk\Job\JobError\Delay\JobDelayInterface;
+use Gmo\Beanstalk\Job\JobError\Delay\NoJobDelay;
+use Gmo\Beanstalk\Job\JobError\Retry\JobRetryInterface;
+use Gmo\Beanstalk\Job\JobError\Retry\NoJobRetry;
 
 class JobError implements JobErrorInterface
 {

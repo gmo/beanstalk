@@ -1,6 +1,6 @@
 <?php
 
-namespace GMO\Beanstalk\Job\JobError\Action;
+namespace Gmo\Beanstalk\Job\JobError\Action;
 
 interface JobActionInterface
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace GMO\Beanstalk\Runner;
+namespace Gmo\Beanstalk\Runner;
 
-use GMO\Beanstalk\Job\Job;
-use GMO\Beanstalk\Queue\QueueInterface;
-use GMO\Beanstalk\Worker\WorkerInterface;
+use Gmo\Beanstalk\Job\Job;
+use Gmo\Beanstalk\Queue\QueueInterface;
+use Gmo\Beanstalk\Worker\WorkerInterface;
 
 interface RunnerInterface
 {
