@@ -14,6 +14,7 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Terminal;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
@@ -51,13 +52,7 @@ class AbstractCommand extends ContainerAwareCommand implements CompletionAwareIn
 
     public function getConsoleWidth()
     {
-        $app = $this->getApplication();
-        if (!$app) {
-            return null;
-        }
-        $dimensions = $app->getTerminalDimensions();
-
-        return $dimensions[0];
+        return (new Terminal())->getWidth();
     }
 
     /**
