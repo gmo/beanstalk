@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Console\Command\Worker;
 
+use Gmo\Beanstalk\Console\Helper\AutoHidingTable;
 use Gmo\Beanstalk\Manager\WorkerInfo;
-use GMO\Console\Helper\AutoHidingTable;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;

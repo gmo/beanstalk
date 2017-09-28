@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Gmo\Beanstalk\Console\Command\Queue;
 
 use Bolt\Collection\Bag;
+use Gmo\Beanstalk\Console\Helper\AutoHidingTable;
 use Gmo\Beanstalk\Queue\Response\JobStats;
-use GMO\Console\Helper\AutoHidingTable;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
