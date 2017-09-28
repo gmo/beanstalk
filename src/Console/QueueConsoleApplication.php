@@ -35,9 +35,9 @@ class QueueConsoleApplication extends Application
         return new InputDefinition([
             new InputArgument('command', InputArgument::REQUIRED, 'The command to execute'),
 
-            new InputOption('host', null, InputOption::VALUE_REQUIRED, 'Override beanstalk host'),
-            new InputOption('port', null, InputOption::VALUE_REQUIRED, 'Override beanstalk port'),
-            new InputOption('dir', null, InputOption::VALUE_REQUIRED, 'Override worker directory'),
+            new InputOption('host', null, InputOption::VALUE_REQUIRED, 'Beanstalk host', 'localhost'),
+            new InputOption('port', null, InputOption::VALUE_REQUIRED, 'Beanstalk port', 11300),
+            new InputOption('dir', null, InputOption::VALUE_REQUIRED, 'Worker directory'),
             new InputOption('help', '-h', InputOption::VALUE_NONE, 'Display this help message.'),
             new InputOption(
                 'verbose',
