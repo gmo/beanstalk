@@ -6,31 +6,22 @@ namespace Gmo\Beanstalk\Console;
 
 use Bolt\Common\Str;
 use Gmo\Beanstalk\Bridge;
-use GMO\Console\ConsoleApplication;
+use Gmo\Common\Console\Application;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 
-class QueueConsoleApplication extends ConsoleApplication
+class QueueConsoleApplication extends Application
 {
     /**
      * Constructor.
-     *
-     * @param \Pimple|\Pimple\Container|null $container
      */
-    public function __construct($container = null)
+    public function __construct()
     {
-        if ($container === null) {
-            if (class_exists('Pimple\Container')) {
-                $container = new \Pimple\Container();
-                $container->register(new Bridge\Pimple3\BeanstalkServiceProvider());
-            } else {
-                $container = new \Pimple();
-                $sp = new Bridge\Pimple1\BeanstalkServiceProvider();
-                $sp->register($container);
-            }
-        }
-        parent::__construct('Queue', null, $container);
+        parent::__construct('Queue');
+
+        $this->setProjectDirectory(__DIR__ . '/../..');
+        $this->setPackageName('gmo/beanstalk');
 
         foreach (static::getCommands() as $command) {
             $command->setName(Str::removeFirst($command->getName(), 'queue:'));
@@ -56,16 +47,6 @@ class QueueConsoleApplication extends ConsoleApplication
             ),
             new InputOption('version', '-V', InputOption::VALUE_NONE, 'Display this application version.'),
         ]);
-    }
-
-    protected function getPackageName()
-    {
-        return 'gmo/beanstalk';
-    }
-
-    public function getProjectDirectory()
-    {
-        return __DIR__ . '/../..';
     }
 
     /**

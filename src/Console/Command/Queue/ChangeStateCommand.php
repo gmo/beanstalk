@@ -19,8 +19,6 @@ abstract class ChangeStateCommand extends AbstractQueueCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        parent::execute($input, $output);
-
         if ($this->validateState) {
             if (!$input->getOption('ready') && !$input->getOption('buried') && !$input->getOption('delayed')) {
                 throw new \RuntimeException('One or more states must be specified. (ready, buried, and/or delayed)');
@@ -32,10 +30,9 @@ abstract class ChangeStateCommand extends AbstractQueueCommand
             }
         }
 
-        $queue = $this->getQueue();
         if ($input->getOption('all')) {
             $error = false;
-            $tubes = $queue->tubes();
+            $tubes = $this->queue->tubes();
             if ($tubes->isEmpty()) {
                 $output->writeln('There are no current tubes');
             }

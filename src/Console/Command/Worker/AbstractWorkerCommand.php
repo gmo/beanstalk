@@ -14,6 +14,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class AbstractWorkerCommand extends AbstractCommand
 {
+    /** @var WorkerManager */
+    protected $manager;
+
     protected function configure()
     {
         $this->addArgument(
@@ -32,55 +35,40 @@ abstract class AbstractWorkerCommand extends AbstractCommand
         return parent::completeArgumentValues($argumentName, $context);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        parent::execute($input, $output);
-        $manager = $this->getManager($input);
-        if (!$manager->getWorkerDir()) {
-            throw new \RuntimeException(
-                'Worker directory needs to be passed in via --dir or set in the dependency container'
+        parent::initialize($input, $output);
+
+        $this->manager = $this->getOrCreate('beanstalk.worker_manager', function () {
+            $dir = $this->input->hasOption('dir') ? $this->input->getOption('dir') : null;
+
+            if (!$dir) {
+                throw new \RuntimeException(
+                    'Worker directory needs to be passed in via --dir or set in the dependency container'
+                );
+            }
+
+            return new WorkerManager(
+                $dir,
+                $this->logger,
+                $this->host,
+                $this->port
             );
-        }
-        $this->executeManagerFunction($input, $output, $manager, $input->getArgument('worker'));
-    }
-
-    protected function executeManagerFunction(InputInterface $input, OutputInterface $output, WorkerManager $manager, $workers)
-    {
-    }
-
-    protected function getManager(InputInterface $input)
-    {
-        $container = $this->getContainer();
-        if ($input->hasOption('host') && $host = $input->getOption('host')) {
-            $container['beanstalk.host'] = $host;
-        }
-        if ($input->hasOption('port') && $port = $input->getOption('port')) {
-            $container['beanstalk.port'] = $port;
-        }
-        if ($input->hasOption('dir') && $dir = $input->getOption('dir')) {
-            $container['beanstalk.worker_manager.directory'] = $dir;
-        }
-
-        /** @var WorkerManager $manager */
-        $manager = $container['beanstalk.worker_manager'];
-        $manager->setLogger($this->logger);
-
-        return $manager;
+        });
     }
 
     private function completeWorkerNames(CompletionContext $context)
     {
         try {
-            $input = $this->createInputFromContext($context);
-            $manager = $this->getManager($input);
+            $this->initializeFromContext($context);
         } catch (\InvalidArgumentException $e) {
             return false;
         }
 
-        $currentWorkers = array_map('strtolower', $input->getArgument('worker'));
+        $currentWorkers = array_map('strtolower', $this->input->getArgument('worker'));
         $currentWord = $context->getCurrentWord();
 
-        return $manager
+        return $this->manager
             ->getWorkers($currentWord)
             ->filter(function ($i, WorkerInfo $info) use ($currentWorkers) {
                 // filter out workers already defined in input

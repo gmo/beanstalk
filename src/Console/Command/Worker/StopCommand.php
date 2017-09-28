@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Console\Command\Worker;
 
-use Gmo\Beanstalk\Manager\WorkerManager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -19,8 +18,9 @@ class StopCommand extends AbstractWorkerCommand
         ;
     }
 
-    protected function executeManagerFunction(InputInterface $input, OutputInterface $output, WorkerManager $manager, $workers)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $manager->stopWorkers($workers);
+        $workers = $input->getArgument('worker');
+        $this->manager->stopWorkers($workers);
     }
 }

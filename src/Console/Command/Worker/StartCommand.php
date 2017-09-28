@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Console\Command\Worker;
 
-use Gmo\Beanstalk\Manager\WorkerManager;
 use Gmo\Common\Str;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -27,9 +26,10 @@ class StartCommand extends AbstractWorkerCommand
         ;
     }
 
-    protected function executeManagerFunction(InputInterface $input, OutputInterface $output, WorkerManager $manager, $workers)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $number = (int) (Str::removeFirst($input->getOption('number'), '='));
-        $manager->startWorkers($workers, $number);
+        $workers = $input->getArgument('worker');
+        $number = (int) Str::removeFirst($input->getOption('number'), '=');
+        $this->manager->startWorkers($workers, $number);
     }
 }

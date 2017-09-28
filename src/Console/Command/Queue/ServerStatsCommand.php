@@ -31,9 +31,7 @@ class ServerStatsCommand extends AbstractQueueCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        parent::execute($input, $output);
-
-        $stats = $this->getQueue()->statsServer();
+        $stats = $this->queue->statsServer();
 
         if ($input->getOption('list')) {
             foreach ($stats->keys() as $key) {

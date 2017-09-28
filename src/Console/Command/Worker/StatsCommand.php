@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Gmo\Beanstalk\Console\Command\Worker;
 
 use Gmo\Beanstalk\Manager\WorkerInfo;
-use Gmo\Beanstalk\Manager\WorkerManager;
 use GMO\Console\Helper\AutoHidingTable;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,26 +23,26 @@ class StatsCommand extends AbstractWorkerCommand
         ;
     }
 
-    protected function executeManagerFunction(InputInterface $input, OutputInterface $output, WorkerManager $manager, $workers)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $workers = $manager->getWorkers($workers);
+        $workers = $this->manager->getWorkers($input->getArgument('worker'));
 
-        if ($input->getOption('pids')) {
+        if ($this->input->getOption('pids')) {
             foreach ($workers as $worker) {
                 $pids = $worker->getPids()->join("\n");
                 if ($pids) {
-                    $output->writeln($pids);
+                    $this->output->writeln($pids);
                 }
             }
 
             return;
         }
         if ($workers->isEmpty()) {
-            $output->writeln('There are no workers in: ' . $manager->getWorkerDir());
+            $this->output->writeln('There are no workers in: ' . $this->manager->getWorkerDir());
 
             return;
         }
-        $output->writeln($this->renderStats($workers));
+        $this->output->writeln($this->renderStats($workers));
     }
 
     /**

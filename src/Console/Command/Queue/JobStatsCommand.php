@@ -28,10 +28,9 @@ class JobStatsCommand extends AbstractQueueCommand
     {
         parent::execute($input, $output);
 
-        $queue = $this->getQueue();
         $stats = new Bag();
         foreach ($input->getArgument('id') as $id) {
-            $jobStats = $queue->statsJob($id);
+            $jobStats = $this->queue->statsJob($id);
             if ($jobStats->id() !== -1) {
                 $stats->add($jobStats);
             } else {

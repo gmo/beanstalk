@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Gmo\Beanstalk\Console\Command\Queue;
 
 use Gmo\Beanstalk\Console\Command\AbstractCommand;
+use Gmo\Beanstalk\Queue\Queue;
 use Gmo\Beanstalk\Queue\QueueInterface;
 use Gmo\Beanstalk\Tube\Tube;
 use Gmo\Beanstalk\Tube\TubeCollection;
@@ -16,13 +17,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class AbstractQueueCommand extends AbstractCommand
 {
-    /**
-     * @return QueueInterface
-     */
-    protected function getQueue()
-    {
-        return $this->getService('beanstalk.queue');
-    }
+    /** @var QueueInterface */
+    protected $queue;
 
     public function completeArgumentValues($argumentName, CompletionContext $context)
     {
@@ -36,10 +32,9 @@ class AbstractQueueCommand extends AbstractCommand
     protected function matchTubeNames($tubesSearch, OutputInterface $output)
     {
         $matchedTubes = new TubeCollection();
-        $queue = $this->getQueue();
         $error = false;
         foreach ((array) $tubesSearch as $tubeSearch) {
-            $matched = $queue
+            $matched = $this->queue
                 ->tubes()
                 ->filter(function ($i, Tube $tube) use ($tubeSearch) {
                     return Str::contains($tube->name(), $tubeSearch, false);
@@ -55,51 +50,32 @@ class AbstractQueueCommand extends AbstractCommand
         return [$matchedTubes, $error];
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        parent::execute($input, $output);
-        $this->setupQueue($input);
-    }
+        parent::initialize($input, $output);
 
-    private function setupQueue(InputInterface $input)
-    {
-        $container = $this->getContainer();
-        if ($input->hasOption('host') && $host = $input->getOption('host')) {
-            $container['beanstalk.host'] = $host;
-        }
-        if ($input->hasOption('port') && $port = $input->getOption('port')) {
-            $container['beanstalk.port'] = $port;
-        }
-
-        $logger = $this->logger;
-        if ($container instanceof \Pimple) {
-            $container['beanstalk.queue'] = $container->share($container->extend('beanstalk.queue', function (QueueInterface $queue) use ($logger) {
-                $queue->setLogger($logger);
-
-                return $queue;
-            }));
-        } elseif ($container instanceof \Pimple\Container) {
-            $container->extend('beanstalk.queue', function (QueueInterface $queue) use ($logger) {
-                $queue->setLogger($logger);
-
-                return $queue;
-            });
-        } else {
-            $queue = $container['beanstalk.queue'];
-            $queue->setLogger($logger);
-            $container['beanstalk.queue'] = $queue;
-        }
+        $this->queue = $this->getOrCreate('beanstalk.queue', function () {
+            return new Queue(
+                $this->host,
+                $this->port,
+                $this->logger
+            );
+        });
     }
 
     private function completeTubeNames(CompletionContext $context)
     {
-        $input = $this->createInputFromContext($context);
+        try {
+            $this->initializeFromContext($context);
+        } catch (\InvalidArgumentException $e) {
+            return false;
+        }
 
-        $currentTubes = array_map('strtolower', $input->getArgument('tube'));
+        $currentTubes = array_map('strtolower', $this->input->getArgument('tube'));
         $currentWord = $context->getCurrentWord();
 
         if (empty($currentWord)) {
-            $tubes = $this->getQueue()->tubes();
+            $tubes = $this->queue->tubes();
         } else {
             [$tubes, $error] = $this->matchTubeNames($currentWord, new NullOutput());
         }

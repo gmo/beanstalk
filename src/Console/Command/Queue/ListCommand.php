@@ -20,7 +20,7 @@ class ListCommand extends AbstractQueueCommand
     {
         parent::execute($input, $output);
 
-        $tubes = $this->getQueue()->tubes();
+        $tubes = $this->queue->tubes();
         if ($tubes->isEmpty()) {
             $output->writeln('There are no current tubes');
 

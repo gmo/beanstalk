@@ -38,7 +38,7 @@ class PeekCommand extends ChangeStateCommand
         parent::execute($input, $output);
 
         if ($id) {
-            $job = $this->getQueue()->peekJob((int) $id);
+            $job = $this->queue->peekJob((int) $id);
             $output->writeln("Peeking at job <info>#{$job->getId()}</info>");
             $output->writeln($this->renderJobData($job));
         }

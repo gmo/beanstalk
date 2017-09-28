@@ -34,8 +34,6 @@ class StatsCommand extends AbstractQueueCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        parent::execute($input, $output);
-
         $refresh = $input->getOption('refresh');
         do {
             [$stats, $error] = $this->getStats($input, $output);
@@ -56,9 +54,8 @@ class StatsCommand extends AbstractQueueCommand
 
     private function getStats(InputInterface $input, OutputInterface $output)
     {
-        $queue = $this->getQueue();
         if (!$tubes = $input->getArgument('tube')) {
-            return [$queue->statsAllTubes(), false];
+            return [$this->queue->statsAllTubes(), false];
         }
 
         /** @var $tubes TubeCollection */
