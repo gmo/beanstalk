@@ -17,8 +17,7 @@ class PeekCommand extends ChangeStateCommand
 
     protected function configure()
     {
-        parent::configure();
-        $this->setName('peek')
+        $this->setName('queue:peek')
             ->setDescription('Peek at the first job')
             ->addTubeArgument()
             ->addStateOptions()
@@ -89,6 +88,6 @@ class PeekCommand extends ChangeStateCommand
 
     protected function renderStats(OutputInterface $output, array $ids)
     {
-        $this->callCommand($output, JobStatsCommand::NAME, ['id' => $ids]);
+        $this->callCommand($output, 'queue:job-stats', ['id' => $ids]);
     }
 }

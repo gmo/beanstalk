@@ -12,16 +12,10 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class AbstractWorkerCommand extends AbstractCommand
+abstract class AbstractWorkerCommand extends AbstractCommand
 {
-    public function setName($name)
-    {
-        return parent::setName("workers:$name");
-    }
-
     protected function configure()
     {
-        parent::configure();
         $this->addArgument(
             'worker',
             InputArgument::IS_ARRAY,

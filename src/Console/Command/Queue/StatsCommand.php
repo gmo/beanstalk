@@ -19,8 +19,7 @@ class StatsCommand extends AbstractQueueCommand
 {
     protected function configure()
     {
-        parent::configure();
-        $this->setName('stats')
+        $this->setName('queue:stats')
             ->addArgument(
                 'tube',
                 InputArgument::IS_ARRAY,
@@ -51,7 +50,7 @@ class StatsCommand extends AbstractQueueCommand
 
         if ($error) {
             $output->writeln('');
-            $this->callCommand($output, ListCommand::NAME);
+            $this->callCommand($output, 'queue:tubes');
         }
     }
 

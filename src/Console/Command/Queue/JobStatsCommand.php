@@ -15,12 +15,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class JobStatsCommand extends AbstractQueueCommand
 {
-    public const NAME = 'job-stats';
-
     protected function configure()
     {
-        parent::configure();
-        $this->setName(static::NAME)
+        $this->setName('queue:job-stats')
             ->addArgument('id', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'The ID(s) of the job')
             ->setDescription('Displays information about a job')
             ->setHelp($this->getHelpText())

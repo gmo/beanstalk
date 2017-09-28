@@ -12,8 +12,7 @@ class DeleteCommand extends ChangeStateCommand
 {
     protected function configure()
     {
-        parent::configure();
-        $this->setName('delete')
+        $this->setName('queue:delete')
             ->setDescription('Delete jobs')
             ->addTubeArgument()
             ->addStateOptions()

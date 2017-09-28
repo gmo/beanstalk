@@ -15,7 +15,8 @@ class StartCommand extends AbstractWorkerCommand
     protected function configure()
     {
         parent::configure();
-        $this->setName('start')
+        $this
+            ->setName('workers:start')
             ->addOption(
                 'number',
                 'm',

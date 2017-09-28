@@ -13,7 +13,10 @@ class RestartCommand extends AbstractWorkerCommand
     protected function configure()
     {
         parent::configure();
-        $this->setName('restart')->setDescription('Restart workers');
+        $this
+            ->setName('workers:restart')
+            ->setDescription('Restart workers')
+        ;
     }
 
     protected function executeManagerFunction(InputInterface $input, OutputInterface $output, WorkerManager $manager, $workers)

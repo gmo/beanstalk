@@ -12,8 +12,7 @@ class KickCommand extends ChangeStateCommand
 {
     protected function configure()
     {
-        parent::configure();
-        $this->setName('kick')
+        $this->setName('queue:kick')
             ->setDescription('Kick buried and delayed jobs')
             ->addTubeArgument()
             ->addNumberOption()

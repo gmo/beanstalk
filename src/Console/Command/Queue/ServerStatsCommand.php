@@ -13,8 +13,7 @@ class ServerStatsCommand extends AbstractQueueCommand
 {
     protected function configure()
     {
-        parent::configure();
-        $this->setName('server-stats')
+        $this->setName('queue:server-stats')
             ->setDescription('Displays information about the beanstalkd server')
             ->addOption('list', 'l', InputOption::VALUE_NONE, 'List all the stat names')
             ->addOption(

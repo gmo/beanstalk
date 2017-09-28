@@ -13,8 +13,7 @@ class BuryCommand extends ChangeStateCommand
 {
     protected function configure()
     {
-        parent::configure();
-        $this->setName('bury')
+        $this->setName('queue:bury')
             ->setDescription('Bury jobs')
             ->addTubeArgument()
             ->addNumberOption()

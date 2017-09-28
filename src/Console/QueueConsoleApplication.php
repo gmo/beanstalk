@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Console;
 
+use Bolt\Common\Str;
 use Gmo\Beanstalk\Bridge;
 use GMO\Console\ConsoleApplication;
 use Symfony\Component\Console\Input\InputArgument;
@@ -29,9 +30,13 @@ class QueueConsoleApplication extends ConsoleApplication
                 $sp->register($container);
             }
         }
-        $container['beanstalk.console_commands.queue_prefix'] = '';
         parent::__construct('Queue', null, $container);
-        $this->addCommands($container['beanstalk.console_commands']);
+
+        foreach (static::getCommands() as $command) {
+            $command->setName(Str::removeFirst($command->getName(), 'queue:'));
+
+            $this->add($command);
+        }
     }
 
     protected function getDefaultInputDefinition()
@@ -61,5 +66,27 @@ class QueueConsoleApplication extends ConsoleApplication
     public function getProjectDirectory()
     {
         return __DIR__ . '/../..';
+    }
+
+    /**
+     * @return \Symfony\Component\Console\Command\Command[]
+     */
+    public static function getCommands()
+    {
+        return [
+            new Command\Queue\ListCommand(),
+            new Command\Queue\KickCommand(),
+            new Command\Queue\DeleteCommand(),
+            new Command\Queue\BuryCommand(),
+            new Command\Queue\PeekCommand(),
+            new Command\Queue\PauseCommand(),
+            new Command\Queue\StatsCommand(),
+            new Command\Queue\ServerStatsCommand(),
+            new Command\Queue\JobStatsCommand(),
+            new Command\Worker\StartCommand(),
+            new Command\Worker\StopCommand(),
+            new Command\Worker\RestartCommand(),
+            new Command\Worker\StatsCommand(),
+        ];
     }
 }

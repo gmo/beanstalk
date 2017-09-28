@@ -13,8 +13,7 @@ class PauseCommand extends ChangeStateCommand
 {
     protected function configure()
     {
-        parent::configure();
-        $this->setName('pause')
+        $this->setName('queue:pause')
             ->setDescription('Pause tubes')
             ->addArgument('delay', InputArgument::OPTIONAL, 'Pause the tube(s) for this many seconds', 0)
             ->addTubeArgument()

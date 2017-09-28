@@ -18,7 +18,7 @@ class StatsCommand extends AbstractWorkerCommand
     {
         parent::configure();
         $this
-            ->setName('stats')
+            ->setName('workers:stats')
             ->setDescription('Get stats about the workers')
             ->addOption('pids', 'p', null, 'Only return a list of PIDs')
         ;

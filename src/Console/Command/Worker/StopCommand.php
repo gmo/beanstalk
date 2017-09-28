@@ -13,7 +13,10 @@ class StopCommand extends AbstractWorkerCommand
     protected function configure()
     {
         parent::configure();
-        $this->setName('stop')->setDescription('Stop workers');
+        $this
+            ->setName('workers:stop')
+            ->setDescription('Stop workers')
+        ;
     }
 
     protected function executeManagerFunction(InputInterface $input, OutputInterface $output, WorkerManager $manager, $workers)

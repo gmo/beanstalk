@@ -9,12 +9,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ListCommand extends AbstractQueueCommand
 {
-    public const NAME = 'tubes';
-
     protected function configure()
     {
-        parent::configure();
-        $this->setName(static::NAME)
+        $this->setName('queue:tubes')
             ->setDescription('Get list of tubes')
         ;
     }

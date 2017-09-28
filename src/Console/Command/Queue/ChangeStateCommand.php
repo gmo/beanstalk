@@ -48,7 +48,7 @@ abstract class ChangeStateCommand extends AbstractQueueCommand
 
         if ($error) {
             $output->writeln('');
-            $this->callCommand($output, ListCommand::NAME);
+            $this->callCommand($output, 'queue:tubes');
         }
     }
 
