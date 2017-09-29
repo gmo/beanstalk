@@ -4,38 +4,21 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Worker;
 
-/**
- * @property \Pimple $container
- */
+use Psr\Container\ContainerInterface;
+
 abstract class ContainerAwareWorker extends AbstractWorker
 {
-    private $container;
+    /** @var ContainerInterface */
+    protected $container;
 
-    /**
-     * @return \Pimple
-     */
-    abstract protected function getDefaultContainer();
+    abstract protected function createContainer(): ContainerInterface;
 
-    public function getService($name)
-    {
-        return $this->getContainer()->offsetGet($name);
-    }
-
-    /** @return \Pimple */
-    public function getContainer()
+    public function getContainer(): ContainerInterface
     {
         if ($this->container === null) {
-            $this->container = $this->getDefaultContainer();
+            $this->container = $this->createContainer();
         }
 
         return $this->container;
-    }
-
-    public function __get($name)
-    {
-        if ($name === 'container') {
-            return $this->getContainer();
-        }
-        throw new \BadMethodCallException();
     }
 }

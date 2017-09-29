@@ -148,11 +148,13 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
 
     public function setupWorker(WorkerInterface $worker)
     {
+        if ($worker instanceof ContainerAwareWorker) {
+            $container = $worker->getContainer();
+            $this->queue = $container->get('beanstalk.queue');
+        }
+
         try {
             $worker->setup();
-            if ($worker instanceof ContainerAwareWorker) {
-                $this->queue = $worker->getService('beanstalk.queue');
-            }
         } catch (Exception $e) {
             $this->logger->critical('An error occurred when setting up the worker', ['exception' => $e]);
             throw $e;
