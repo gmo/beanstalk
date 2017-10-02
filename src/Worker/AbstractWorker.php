@@ -7,6 +7,7 @@ namespace Gmo\Beanstalk\Worker;
 use Bolt\Collection\Bag;
 use Gmo\Beanstalk\Job\JobProducerInterface;
 use Gmo\Beanstalk\Runner\BaseRunner;
+use Gmo\Common\Log\DelegateLogger;
 use Gmo\Common\Str;
 
 /**
@@ -57,6 +58,21 @@ abstract class AbstractWorker implements WorkerInterface
     public static function getRequiredParams()
     {
         return new Bag();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @return \Psr\Log\LoggerInterface|\Psr\Log\LoggerAwareInterface
+     */
+    public static function getLogger()
+    {
+        static $logger;
+        if (!$logger) {
+            $logger = new DelegateLogger();
+        }
+
+        return $logger;
     }
 
     public function setup()

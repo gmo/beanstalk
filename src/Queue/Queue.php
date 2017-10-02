@@ -49,6 +49,11 @@ class Queue implements QueueInterface
         $this->logProcessor = new JobProcessor();
     }
 
+    public function setJobProcessor(JobProcessor $processor): void
+    {
+        $this->logProcessor = $processor;
+    }
+
     //region Tube Control
 
     public function push($tube, $data, $priority = null, $delay = null, $ttr = null)
@@ -301,17 +306,6 @@ class Queue implements QueueInterface
         $stats = $this->pheanstalk->stats();
 
         return ServerStats::from($stats);
-    }
-
-    /**
-     * Gets a monolog processor that will add current job info.
-     * Useful for workers.
-     *
-     * @return JobProcessor
-     */
-    public function getJobProcessor()
-    {
-        return $this->logProcessor;
     }
 
     protected function createJob(Pheanstalk\Job $job)

@@ -9,22 +9,29 @@ namespace Gmo\Beanstalk\Log;
  */
 class WorkerProcessor
 {
-    /** @var string */
+    /** @var string|null */
     protected $workerName;
 
     /**
      * Constructor.
      *
-     * @param string $workerName
+     * @param string|null $workerName
      */
-    public function __construct($workerName)
+    public function __construct(string $workerName = null)
+    {
+        $this->workerName = $workerName;
+    }
+
+    public function setName(string $workerName = null): void
     {
         $this->workerName = $workerName;
     }
 
     public function __invoke(array $record)
     {
-        $record['extra']['worker'] = $this->workerName;
+        if ($this->workerName) {
+            $record['extra']['worker'] = $this->workerName;
+        }
 
         return $record;
     }

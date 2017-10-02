@@ -63,10 +63,9 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
             throw new \LogicException('Setup method needs to be called before run');
         }
 
-        $this->logger->info('Running worker');
-
         $this->setupWorker($this->worker);
-        $this->logger->debug('Finished setting up worker');
+
+        $this->logger->info('Running worker');
 
         $job = new NullJob();
         do {
@@ -148,11 +147,21 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
 
     public function setupWorker(WorkerInterface $worker)
     {
+        if ($worker instanceof ContainerAwareWorker) {
+            $container = $worker->getContainer();
+            $this->queue = $container->get('beanstalk.queue');
+
+            if ($container->has('beanstalk.logger.processor.worker')) {
+                $container->get('beanstalk.logger.processor.worker')->setName($this->tubeName);
+            }
+
+            if ($this->logger instanceof LoggerAwareInterface && $container->has('logger.new')) {
+                $this->logger->setLogger($container->get('logger.new')('Worker'));
+            }
+        }
+
         try {
             $worker->setup();
-            if ($worker instanceof ContainerAwareWorker) {
-                $this->queue = $worker->getService('beanstalk.queue');
-            }
         } catch (Exception $e) {
             $this->logger->critical('An error occurred when setting up the worker', ['exception' => $e]);
             throw $e;

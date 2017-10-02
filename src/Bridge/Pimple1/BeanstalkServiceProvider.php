@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Gmo\Beanstalk\Bridge\Pimple1;
 
 use Gmo\Beanstalk\Console\QueueConsoleApplication;
+use Gmo\Beanstalk\Log\JobProcessor;
+use Gmo\Beanstalk\Log\WorkerProcessor;
 use Gmo\Beanstalk\Manager\WorkerManager;
 use Gmo\Beanstalk\Queue\Queue;
 use Gmo\Beanstalk\Queue\WebJobProducer;
-use Pimple;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console;
 
@@ -17,7 +18,7 @@ use Symfony\Component\Console;
  */
 class BeanstalkServiceProvider
 {
-    public function register(Pimple $app)
+    public function register(\Pimple $app)
     {
         $app['beanstalk.host'] = 'localhost';
         $app['beanstalk.port'] = 11300;
@@ -39,11 +40,14 @@ class BeanstalkServiceProvider
 
         $app['beanstalk.queue'] = $app->share(
             function ($app) {
-                return new Queue(
+                $queue = new Queue(
                     $app['beanstalk.host'],
                     $app['beanstalk.port'],
                     $app['beanstalk.queue.logger']
                 );
+                $queue->setJobProcessor($app['beanstalk.logger.job_processor']);
+
+                return $queue;
             }
         );
 
@@ -79,6 +83,32 @@ class BeanstalkServiceProvider
                         $console->addCommands(QueueConsoleApplication::getCommands());
 
                         return $console;
+                    }
+                )
+            );
+        }
+
+        $app['beanstalk.logger.processor.job'] = $app->share(
+            function () {
+                return new JobProcessor();
+            }
+        );
+
+        $app['beanstalk.logger.processor.worker'] = $app->share(
+            function () {
+                return new WorkerProcessor();
+            }
+        );
+
+        if (isset($app['logger.processors'])) {
+            $app['logger.processors'] = $app->share(
+                $app->extend(
+                    'logger.processors',
+                    function (iterable $processors, $app) {
+                        $processors[] = $app['beanstalk.logger.processor.job'];
+                        $processors[] = $app['beanstalk.logger.processor.worker'];
+
+                        return $processors;
                     }
                 )
             );

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Gmo\Beanstalk\Bridge\Pimple3;
 
 use Gmo\Beanstalk\Console\QueueConsoleApplication;
+use Gmo\Beanstalk\Log\JobProcessor;
+use Gmo\Beanstalk\Log\WorkerProcessor;
 use Gmo\Beanstalk\Manager\WorkerManager;
 use Gmo\Beanstalk\Queue\Queue;
 use Gmo\Beanstalk\Queue\WebJobProducer;
@@ -40,11 +42,14 @@ class BeanstalkServiceProvider implements ServiceProviderInterface
         };
 
         $app['beanstalk.queue'] = function ($app) {
-            return new Queue(
+            $queue = new Queue(
                 $app['beanstalk.host'],
                 $app['beanstalk.port'],
                 $app['beanstalk.queue.logger']
             );
+            $queue->setJobProcessor($app['beanstalk.logger.job_processor']);
+
+            return $queue;
         };
 
         $app['beanstalk.queue.web_job_producer'] = function ($app) {
@@ -72,6 +77,23 @@ class BeanstalkServiceProvider implements ServiceProviderInterface
                 $console->addCommands(QueueConsoleApplication::getCommands());
 
                 return $console;
+            });
+        }
+
+        $app['beanstalk.logger.processor.job'] = function () {
+            return new JobProcessor();
+        };
+
+        $app['beanstalk.logger.processor.worker'] = function () {
+            return new WorkerProcessor();
+        };
+
+        if (isset($app['logger.processors'])) {
+            $app->extend('logger.processors', function (iterable $processors, $app) {
+                $processors[] = $app['beanstalk.logger.processor.job'];
+                $processors[] = $app['beanstalk.logger.processor.worker'];
+
+                return $processors;
             });
         }
     }
