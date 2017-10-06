@@ -8,6 +8,9 @@ https://bitbucket.org/gmodev/beanstalk-library/branches/compare/v2.0.0..v1.0.0
 
 * NEXT
 
+* 2.7.1 (2017-10-06)
+    * Fix autoloader with new namespace
+
 * 2.7.0 (2017-07-26)
     * Moved ServiceProviders to `Bridge` folder and deprecated old ones. Didn't keep Pimple 3 version since it wasn't in use yet.
     * Deprecated `BeanstalkKeys`.
