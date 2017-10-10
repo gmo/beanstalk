@@ -8,6 +8,7 @@ use Bolt\Collection\Bag;
 use Gmo\Beanstalk\Console\Helper\AutoHidingTable;
 use Gmo\Beanstalk\Queue\Response\TubeStats;
 use Gmo\Beanstalk\Tube\TubeCollection;
+use Psr\Log\NullLogger;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -135,7 +136,10 @@ class StatsCommand extends AbstractQueueCommand
      */
     private function logStats(iterable $tubes)
     {
-        $logger = $this->getService('beanstalk.queue.logger');
+        $logger = $this->getOrCreate('beanstalk.queue.logger', function () {
+            return new NullLogger();
+        });
+
         foreach ($tubes as $tube => $stats) {
             $logger->info('Tube stats', [
                 'tube'          => $tube,
