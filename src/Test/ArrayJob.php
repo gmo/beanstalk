@@ -48,7 +48,9 @@ class ArrayJob extends Job
 
     public function stats()
     {
-        $this->stats->set('age', $this->created->diffInSeconds());
+        $this->stats = $this->stats->replace([
+            'age' => $this->created->diffInSeconds(),
+        ]);
 
         return $this->stats;
     }
@@ -84,7 +86,10 @@ class ArrayJob extends Job
     public function setPriority($priority)
     {
         $this->priority = (int) $priority;
-        $this->stats->set('pri', $this->priority);
+
+        $this->stats = $this->stats->replace([
+            'pri' => $this->priority,
+        ]);
     }
 
     public function resetHandled()
@@ -94,7 +99,9 @@ class ArrayJob extends Job
 
     public function setState($state)
     {
-        $this->stats->set('state', $state);
+        $this->stats = $this->stats->replace([
+            'state' => $state,
+        ]);
     }
 
     public function incrementReserves()
@@ -119,6 +126,8 @@ class ArrayJob extends Job
 
     protected function incrementStat($name)
     {
-        $this->stats->set($name, $this->stats->get($name) + 1);
+        $this->stats = $this->stats->replace([
+            $name => $this->stats[$name] + 1,
+        ]);
     }
 }
