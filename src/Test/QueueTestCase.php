@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Test;
 
-use Bolt\Collection\Bag;
+use Bolt\Collection\Arr;
 use Gmo\Beanstalk\Job\Job;
 use PHPUnit\Framework\TestCase;
 
@@ -86,7 +86,7 @@ abstract class QueueTestCase extends TestCase
             })
             ->toArray()
         ;
-        $expected = Bag::from($expected)->toArray();
+        $expected = Arr::from($expected);
         static::assertEquals($expected, $jobs, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
     }
 

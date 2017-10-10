@@ -53,7 +53,7 @@ class ServerStatsCommand extends AbstractQueueCommand
             return;
         }
 
-        $optionNames = new Bag(['current', 'cmd', 'binlog', 'other']);
+        $optionNames = Bag::of('current', 'cmd', 'binlog', 'other');
 
         $hasNoSpecific = $optionNames
             ->filter(function ($key, $value) use ($input) {
@@ -76,7 +76,7 @@ class ServerStatsCommand extends AbstractQueueCommand
         }
     }
 
-    private function renderStats(OutputInterface $output, $name, Bag $stats)
+    private function renderStats(OutputInterface $output, $name, iterable $stats)
     {
         $output->writeln('<comment>' . ucfirst($name) . ' Stats:</comment>');
         foreach ($stats as $statName => $value) {

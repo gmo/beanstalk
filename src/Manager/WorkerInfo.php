@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Gmo\Beanstalk\Manager;
 
 use Bolt\Collection\Bag;
-use Bolt\Collection\ImmutableBag;
+use Bolt\Collection\MutableBag;
 use Gmo\Beanstalk\Worker\WorkerInterface;
 
 class WorkerInfo
@@ -14,13 +14,13 @@ class WorkerInfo
     private $refCls;
     /** @var WorkerInterface */
     private $instance;
-    /** @var Bag */
+    /** @var MutableBag */
     private $pids;
 
     public function __construct(\ReflectionClass $reflectionClass)
     {
         $this->refCls = $reflectionClass;
-        $this->pids = new Bag();
+        $this->pids = new MutableBag();
     }
 
     /** @return string Fully qualified class name */
@@ -62,7 +62,7 @@ class WorkerInfo
         return $this->instance;
     }
 
-    /** @return int[]|ImmutableBag */
+    /** @return int[]|Bag */
     public function getPids()
     {
         return $this->pids->immutable();

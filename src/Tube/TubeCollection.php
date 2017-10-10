@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Tube;
 
-use Bolt\Collection\Bag;
+use Bolt\Collection\MutableBag;
 use Gmo\Common\Str;
 
-class TubeCollection extends Bag
+class TubeCollection extends MutableBag
 {
     /**
      * Additional functionality:

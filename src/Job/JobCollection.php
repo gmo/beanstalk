@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Job;
 
-use Bolt\Collection\Bag;
+use Bolt\Collection\MutableBag;
 use Gmo\Beanstalk\Test\ArrayJob;
 
-class JobCollection extends Bag
+class JobCollection extends MutableBag
 {
     /**
      * @inheritdoc

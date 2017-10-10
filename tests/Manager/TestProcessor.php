@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Gmo\Beanstalk\Tests\Manager;
 
 use Bolt\Collection\Bag;
+use Bolt\Collection\MutableBag;
 use Gmo\Beanstalk\Helper\Processor;
 use Gmo\Common\Str;
 
@@ -19,10 +20,10 @@ class TestProcessor extends Processor
     public function __construct($workerDir)
     {
         $this->workerDir = realpath($workerDir) . '/';
-        $this->executeCalls = new Bag();
-        $this->terminatedProcesses = new Bag();
-        $this->terminatedForcefullyProcesses = new Bag();
-        $this->waitedForProcesses = new Bag();
+        $this->executeCalls = new MutableBag();
+        $this->terminatedProcesses = new MutableBag();
+        $this->terminatedForcefullyProcesses = new MutableBag();
+        $this->waitedForProcesses = new MutableBag();
     }
 
     public function waitForProcess($pid, $interval = 200, $timeout = 10)

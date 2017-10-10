@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Manager;
 
-use Bolt\Collection\ImmutableBag;
+use Bolt\Collection\Bag;
 use Gmo\Beanstalk\Helper\ClassFinder;
 use Gmo\Beanstalk\Helper\Processor;
 use Gmo\Common\Str;
@@ -22,7 +22,7 @@ class WorkerManager implements LoggerAwareInterface
 
     /** @var string Directory containing workers */
     protected $workerDir;
-    /** @var WorkerInfo[]|ImmutableBag */
+    /** @var WorkerInfo[]|Bag */
     protected $workerInfoList;
     /** @var Processor */
     protected $processor;
@@ -140,7 +140,7 @@ class WorkerManager implements LoggerAwareInterface
      *
      * @param null|string|array $filter [optional] worker(s) filter
      *
-     * @return WorkerInfo[]|ImmutableBag
+     * @return WorkerInfo[]|Bag
      */
     public function getWorkers($filter = null)
     {
@@ -187,10 +187,10 @@ class WorkerManager implements LoggerAwareInterface
                 return new WorkerInfo($class);
             })
         ;
-        $list = iterator_to_array($list);
-        ksort($list);
 
-        return $this->workerInfoList = new ImmutableBag($list);
+        $list = Bag::from($list)->sortKeys();
+
+        return $this->workerInfoList = $list;
     }
 
     protected function spawnWorker(WorkerInfo $worker)

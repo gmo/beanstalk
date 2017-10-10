@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Console\Command\Queue;
 
-use Bolt\Collection\ImmutableBag;
+use Bolt\Collection\Bag;
 use Gmo\Beanstalk\Console\Helper\AutoHidingTable;
 use Gmo\Beanstalk\Queue\Response\TubeStats;
 use Gmo\Beanstalk\Tube\TubeCollection;
@@ -65,16 +65,16 @@ class StatsCommand extends AbstractQueueCommand
             $stats[$name] = $tube->stats();
         }
 
-        return [new ImmutableBag($stats), $error];
+        return [new Bag($stats), $error];
     }
 
     /**
-     * @param TubeStats[]|ImmutableBag $stats
-     * @param int|null                 $width
+     * @param TubeStats[]|Bag $stats
+     * @param int|null        $width
      *
      * @return string
      */
-    private function renderStats(ImmutableBag $stats, $width = null)
+    private function renderStats(Bag $stats, $width = null)
     {
         if ($stats->isEmpty()) {
             return 'There are no current tubes';
@@ -131,9 +131,9 @@ class StatsCommand extends AbstractQueueCommand
     }
 
     /**
-     * @param TubeStats[]|ImmutableBag $tubes
+     * @param TubeStats[]|iterable $tubes
      */
-    private function logStats(ImmutableBag $tubes)
+    private function logStats(iterable $tubes)
     {
         $logger = $this->getService('beanstalk.queue.logger');
         foreach ($tubes as $tube => $stats) {
@@ -154,7 +154,7 @@ class StatsCommand extends AbstractQueueCommand
 
     private function getHelpText()
     {
-        $exampleStats = new ImmutableBag([
+        $exampleStats = new Bag([
             new TubeStats(['name' => 'TubeA']),
             new TubeStats(['name' => 'SendApi']),
             new TubeStats(['name' => 'ReceiveApi']),

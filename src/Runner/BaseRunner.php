@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Runner;
 
-use Bolt\Collection\Bag;
 use Exception;
 use Gmo\Beanstalk\Job\Job;
 use Gmo\Beanstalk\Job\JobError\Action\JobActionInterface;
@@ -38,7 +37,7 @@ class BaseRunner implements RunnerInterface, LoggerAwareInterface
     protected $queue;
     /** @var string Tube name cached for performance */
     protected $tubeName;
-    /** @var JobErrorHandlerInterface[]|Bag Error handlers cached for performance */
+    /** @var JobErrorHandlerInterface[] Error handlers cached for performance */
     protected $errorHandlers;
 
     public function setup(QueueInterface $queue, WorkerInterface $worker)

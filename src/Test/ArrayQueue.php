@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Test;
 
-use Bolt\Collection\ImmutableBag;
+use Bolt\Collection\Bag;
 use Bolt\Common\Serialization;
 use Gmo\Beanstalk\Exception\RangeException;
 use Gmo\Beanstalk\Job\Job;
@@ -140,7 +140,7 @@ class ArrayQueue implements QueueInterface
             $stats[$tube->name()] = $this->statsTube($tube);
         }
 
-        return new ImmutableBag($stats);
+        return new Bag($stats);
     }
 
     public function statsServer()

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Gmo\Beanstalk\Queue;
 
-use Bolt\Collection\ImmutableBag;
+use Bolt\Collection\Bag;
 use Gmo\Beanstalk\Job\JobControlInterface;
 use Gmo\Beanstalk\Queue\Response\ServerStats;
 use Gmo\Beanstalk\Queue\Response\TubeStats;
@@ -34,7 +34,7 @@ interface QueueInterface extends TubeControlInterface, JobControlInterface, Logg
     /**
      * Gets the stats for all tubes.
      *
-     * @return TubeStats[]|ImmutableBag
+     * @return TubeStats[]|Bag
      */
     public function statsAllTubes();
 
