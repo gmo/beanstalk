@@ -9,7 +9,7 @@
         "bolt/common": "^1.0@dev",
         "gmo/common": "^2.0@dev",
         "nesbot/carbon": "~1.19",
-        "nikic/php-parser": "~0.9|~1.0",
+        "nikic/php-parser": "^3.0",
         "pda/pheanstalk": "~3.0",
         "pimple/pimple": "^1.0 || ^3.0",
         "psr/container": "^1.0",
