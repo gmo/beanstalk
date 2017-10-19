@@ -45,7 +45,7 @@ class BeanstalkServiceProvider
                     $app['beanstalk.port'],
                     $app['beanstalk.queue.logger']
                 );
-                $queue->setJobProcessor($app['beanstalk.logger.job_processor']);
+                $queue->setJobProcessor($app['beanstalk.logger.processor.job']);
 
                 return $queue;
             }
